@@ -1,0 +1,200 @@
+{
+  "id": "note-01",
+  "slug": "beyond-the-bottom-line",
+  "title": "Beyond the bottom line",
+  "summary": "A reading framework for understanding the business behind a financial statement.",
+  "category": "Business analysis",
+  "tags": [
+    "Financial statements",
+    "Fundamentals"
+  ],
+  "publishedAt": "2026-09-25",
+  "status": "sample",
+  "featuredOrder": 0,
+  "theme": "forest",
+  "cover": {
+    "word": "Foundations",
+    "color": "#dbe3d5",
+    "variation": 0,
+    "type": "theme",
+    "preset": "forest"
+  },
+  "question": "What would you need to understand before the numbers made sense?",
+  "sections": [
+    {
+      "heading": "Start with the business",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "orderedList",
+              "attrs": {
+                "start": 1,
+                "type": "1"
+              },
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "This example note is a reading exercise, not an analysis of a particular company. Its purpose is to organise questions before drawing a conclusion."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Begin by describing what a business sells, who pays for it, and what has to happen for that relationship to continue. A simple explanation exposes the gaps that a spreadsheet can sometimes conceal."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "dlkjfg;lkasdjg"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "a;lskdgjsld;kjf"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "sl;kjfsdl;jgflskdjflksadfsd"
+                        },
+                        {
+                          "type": "hardBreak"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph"
+            }
+          ]
+        }
+      },
+      "prompts": [
+        "What is the customer actually paying for?",
+        "Which part of the business would be hardest to replace?",
+        "What evidence would challenge the first impression?"
+      ]
+    },
+    {
+      "heading": "Read the statements together",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The income statement, balance sheet, and cash-flow statement offer different views of a business. Read them as a connected account rather than treating one headline number as the whole story."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "A useful notebook separates the reported figure, the explanation offered for it, and the questions that remain. Differences between earnings and cash deserve investigation, not an automatic verdict."
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Write down what is still unknown",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "End with an evidence list, not a confident target price. Record which claims are supported by filings, which rely on interpretation, and which require further work."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The finished research should make its limits as readable as its conclusions. That is the standard this sample format is designed to encourage."
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "title": "SEC — Beginners’ Guide to Financial Statements",
+      "url": "https://www.sec.gov/about/reports-publications/investorpubsbegfinstmtguide"
+    }
+  ],
+  "attachments": [
+    {
+      "kind": "excel",
+      "id": "361fecf0-6461-4799-893b-01b1a51a9047",
+      "label": "Example financial statements"
+    }
+  ]
+}

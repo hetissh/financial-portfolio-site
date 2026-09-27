@@ -1,0 +1,72 @@
+[
+  {
+    "id": "layers",
+    "label": "Layers",
+    "word": "Layers",
+    "color": "#dbe3d5",
+    "seed": "e3e6000c-5486-4bde-b16d-c3514b23e1c7"
+  },
+  {
+    "id": "orbits",
+    "label": "Orbits",
+    "word": "Orbits",
+    "color": "#dce3e6",
+    "seed": "ae1122d6-79cb-4a85-81b4-31ef8fac3cea"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "word": "Columns",
+    "color": "#eee0ce",
+    "seed": "ed993fcb-a0f4-400e-b3a3-861537068300"
+  },
+  {
+    "id": "arches",
+    "label": "Arches",
+    "word": "Arches",
+    "color": "#e4dfec",
+    "seed": "bacf541f-42f9-4429-a125-757c81f1825c"
+  },
+  {
+    "id": "waves",
+    "label": "Waves",
+    "word": "Waves",
+    "color": "#f0e8d8",
+    "seed": "830487a9-0b5a-4d55-914f-1435c5d69587"
+  },
+  {
+    "id": "lattice",
+    "label": "Lattice",
+    "word": "Lattice",
+    "color": "#dbe3d5",
+    "seed": "62717e0b-7466-4bae-a7a3-7dc1e83512ee"
+  },
+  {
+    "id": "spiral",
+    "label": "Spiral",
+    "word": "Spiral",
+    "color": "#dce3e6",
+    "seed": "de521cf6-b94f-4fb0-92cd-21e684728938"
+  },
+  {
+    "id": "fan",
+    "label": "Fan",
+    "word": "Fan",
+    "color": "#eee0ce",
+    "seed": "a710006d-dc2c-493a-ab16-e610dd577cc4"
+  },
+  {
+    "id": "branches",
+    "label": "Branches",
+    "word": "Branches",
+    "color": "#e4dfec",
+    "seed": "06ad8044-71f8-488d-8f72-acf03a0fdfc7"
+  },
+  {
+    "id": "contours",
+    "label": "Contours",
+    "word": "Contours",
+    "color": "#f0e8d8",
+    "seed": "8c92abb0-85a1-43d9-b028-e59b9bf59cdf"
+  }
+]

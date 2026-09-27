@@ -1,0 +1,50 @@
+{
+  "id": "note-02",
+  "slug": "the-assumptions-underneath",
+  "title": "The assumptions underneath",
+  "summary": "Working backwards from a conclusion to the ideas that hold it together.",
+  "category": "Valuation thinking",
+  "tags": [
+    "Scenarios",
+    "Uncertainty"
+  ],
+  "publishedAt": "2026-09-25",
+  "status": "sample",
+  "featuredOrder": 1,
+  "theme": "clay",
+  "question": "Which assumption is doing the most work?",
+  "sections": [
+    {
+      "heading": "Make the starting point visible",
+      "paragraphs": [
+        "This example is a framework for reviewing a model, not a valuation or an investment recommendation. It begins with the inputs rather than a desired output.",
+        "List the assumptions in plain language. Separate an observed fact from an estimate, and an estimate from a convenient simplification. Someone reading the work should be able to find those distinctions without reverse-engineering a spreadsheet."
+      ],
+      "prompts": [
+        "What is measured, and what is assumed?",
+        "Which estimate has the weakest evidence?",
+        "What changes if that estimate is wrong?"
+      ]
+    },
+    {
+      "heading": "Explore a range of stories",
+      "paragraphs": [
+        "Build a small number of internally consistent scenarios. Give each one a narrative that explains how its inputs belong together. A scenario is a way to ask a question; it is not a claim about what will happen.",
+        "Use sensitivity checks to identify the inputs that deserve more research. Avoid choosing a precise number simply because the model produces one."
+      ]
+    },
+    {
+      "heading": "Keep an audit trail",
+      "paragraphs": [
+        "Record the date of the exercise, the sources of the inputs, and the reason for revisions. When new information arrives, that history makes it easier to distinguish a changed fact from a changed interpretation.",
+        "A clear model helps a reader inspect the reasoning. Its usefulness comes from transparency, not from the apparent certainty of its output."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "SEC — Reading financial statements",
+      "url": "https://www.sec.gov/about/reports-publications/investorpubsbegfinstmtguide"
+    }
+  ]
+}

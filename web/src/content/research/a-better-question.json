@@ -1,0 +1,45 @@
+{
+  "id": "note-03",
+  "slug": "a-better-question",
+  "title": "A better question, first",
+  "summary": "A practical notebook for separating evidence, interpretation, and uncertainty.",
+  "category": "Research process",
+  "tags": [
+    "Decision journal",
+    "Method"
+  ],
+  "publishedAt": "2026-09-25",
+  "status": "sample",
+  "featuredOrder": 2,
+  "theme": "blue",
+  "question": "What would change your mind?",
+  "sections": [
+    {
+      "heading": "Frame a question you can investigate",
+      "paragraphs": [
+        "This sample note describes an editorial process rather than a trading strategy. A useful research question is narrow enough to investigate and open enough to admit an unwelcome answer.",
+        "Write the question before collecting material. Then keep a record of why it matters, what evidence would be relevant, and what you cannot yet know."
+      ],
+      "prompts": [
+        "What is the question, in one sentence?",
+        "What evidence would support a different explanation?",
+        "When should this question be revisited?"
+      ]
+    },
+    {
+      "heading": "Separate three layers",
+      "paragraphs": [
+        "Use distinct notes for observations, interpretations, and unresolved questions. An observation records what a source says. An interpretation explains what you think it means. An open question marks the limits of that interpretation.",
+        "This separation gives future readers a way to inspect the reasoning, and gives you a way to revise it without rewriting the history of the decision."
+      ]
+    },
+    {
+      "heading": "Leave a useful trail",
+      "paragraphs": [
+        "Keep source links, dates, and short explanations of material changes. A concise research log can be more useful than a polished conclusion that hides how it was reached.",
+        "Close the note with the next piece of evidence to look for. The aim is not to make every uncertainty disappear, but to make the remaining work clear."
+      ]
+    }
+  ],
+  "sources": []
+}

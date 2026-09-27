@@ -1,0 +1,32 @@
+[
+  {
+    "name": "admin-desktop",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "admin-mobile",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "editor-desktop",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "editor-mobile",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "name": "workbook-desktop",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "name": "workbook-small-mobile",
+    "width": 320,
+    "overflow": false
+  }
+]

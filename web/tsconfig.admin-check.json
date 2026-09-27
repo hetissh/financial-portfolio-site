@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "next", "next/image-types/global"],
+    "tsBuildInfoFile": "tsconfig.admin-check.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx", "next.config.ts"],
+  "exclude": ["node_modules", "node_modules.incomplete", "out", ".next", ".next-admin", "next-env.d.ts"]
+}

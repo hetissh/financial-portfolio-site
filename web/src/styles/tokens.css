@@ -1,0 +1,11 @@
+:root {
+  --paper: #f8f7f2;
+  --ink: #232e29;
+  --muted: #636b64;
+  --green: #2c5141;
+  --green-light: #e8ede3;
+  --line: #dcdfd5;
+  --serif: var(--font-editorial), Georgia, serif;
+  --sans: var(--font-body), system-ui, sans-serif;
+  --mono: 'SFMono-Regular', Consolas, monospace;
+}

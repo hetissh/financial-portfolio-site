@@ -1,0 +1,85 @@
+// These reserved sample notes are maintained after each change request.
+// The generator never touches the profile or any other research note.
+import fs from 'node:fs';
+import path from 'node:path';
+import sharp from 'sharp';
+import { parseResearch, researchSchema, type Research } from './content-schema';
+import { heroPatterns } from './artwork';
+import type { RichNode, RichMark } from './rich-content';
+
+export const showcaseSlugs = ['showcase-formatting', 'showcase-images', 'showcase-workflow'] as const;
+export const showcaseImageIds = ['90f3fe01-a1b2-4c33-8d44-e55500000001', '90f3fe01-a1b2-4c33-8d44-e55500000002'] as const;
+const currentChange = 'Local release readiness checks and verified content backup/restore. Deployment remains pending; all existing notes remain samples.';
+const text = (value: string, marks?: RichMark[]): RichNode => ({ type: 'text', text: value, ...(marks ? { marks } : {}) });
+const paragraph = (...content: RichNode[]): RichNode => ({ type: 'paragraph', content });
+const p = (value: string) => paragraph(text(value));
+const item = (value: string, ...children: RichNode[]): RichNode => ({ type: 'listItem', content: [p(value), ...children] });
+const bullets = (...content: RichNode[]): RichNode => ({ type: 'bulletList', content });
+const numbers = (type: '1' | 'a' | 'A', ...content: RichNode[]): RichNode => ({ type: 'orderedList', attrs: { start: 1, type }, content });
+const heading = (value: string, level = 3): RichNode => ({ type: 'heading', attrs: { level }, content: [text(value)] });
+const section = (title: string, ...content: RichNode[]) => ({ heading: title, paragraphs: [], body: { version: 1 as const, doc: { type: 'doc', content } } });
+function image(index: 0 | 1, displayWidth: number, caption: string): RichNode {
+  return { type: 'image', attrs: { src: `/images/articles/${showcaseImageIds[index]}.webp`, width: index ? 480 : 960, height: index ? 640 : 540, alt: index ? 'A portrait illustration with three stacked shapes' : 'An illustrative chart with four rising bars', caption, displayWidth } };
+}
+export function makeShowcaseNotes(date: string, change = currentChange): Research[] {
+  const base = { category: 'Showcase', tags: ['showcase', 'testing'], publishedAt: '2026-09-28', updatedAt: date, status: 'sample' as const, sources: [], attachments: [] };
+  const latest = section('Latest change', p(change), p('These three sample notes are refreshed after each change request. Use the checks below to try the current features.'));
+  return [
+    researchSchema.parse({ ...base, id: 'qa-formatting', slug: showcaseSlugs[0], title: 'Writing with clarity', summary: 'A living example of bold and italic text, subheadings, visible bullets and nested numbered or lettered points.', theme: 'forest', cover: { type: 'theme', preset: 'forest', word: 'Clarity', color: '#dbe3d5', variation: 0 }, question: 'How can a note make its structure easy to follow?', sections: [
+      section('Words and emphasis', paragraph(text('A clear opening. ', [{ type: 'bold' }]), text('A useful qualification. ', [{ type: 'italic' }]), text('Both together.', [{ type: 'bold' }, { type: 'italic' }])), heading('A useful subheading'), p('Use short paragraphs to separate the observation from the question.'), heading('A smaller heading', 4), paragraph(text('A soft line break stays in the same paragraph.'), { type: 'hardBreak' }, text('Outside a list, press Shift+Enter to add one.')), paragraph(text('A worded point: ', [{ type: 'bold' }]), text('Lead with a short label, then explain the idea.')), paragraph(text('Read the example source', [{ type: 'link', attrs: { href: 'https://example.com/' } }]))),
+      section('Visible bullets and nested points', bullets(item('Start with the main observation.', bullets(item('Press Shift+Enter at the end to create a nested point.', bullets(item('A third level has a square marker.'))), item('Press Enter to add a point at the same level.'))), item('Tab nests an existing point; Shift+Tab moves it out.'), item('Nest point and Unnest point buttons work with a mouse or touch.'))),
+      section('Numbers and letters', heading('Numbered steps'), numbers('1', item('State the question.', numbers('1', item('Identify the evidence.'), item('Separate assumptions from observations.'))), item('Review the conclusion.')), heading('Lowercase letters'), numbers('a', item('First interpretation.'), item('Alternative interpretation.')), heading('Uppercase letters'), numbers('A', item('Supporting evidence.'), item('Open questions.'))),
+      section('Try the writing checks', bullets(item('Edit this note in admin and check that bullet markers remain visible.'), item('Use Shift+Enter, Tab, Shift+Tab and the nesting buttons inside both list types.'), item('Try up to five list levels, then save, reload and preview.'), item('Try bold, italic, headings, links, undo and redo; reset an unsaved edit.'))), latest,
+    ] }),
+    researchSchema.parse({ ...base, id: 'qa-images', slug: showcaseSlugs[1], title: 'Evidence in pictures', summary: 'Centered landscape and portrait images at every available width, with descriptions, captions and text on either side.', theme: 'blue', cover: { type: 'hero', hero: heroPatterns[0].id, word: 'Evidence', color: '#dce3e6', foregroundColor: '#365553', foregroundOpacity: .35, variation: 0 }, question: 'Can images support the story without interrupting the reading order?', sections: [
+      section('Text before and after an image', paragraph(text('This text precedes an image stored inside the same paragraph. The image is still centered.'), image(0, 75, 'Landscape illustration at 75% width. Values are fictional.'), text('This text follows the image, keeping the original reading order.'))),
+      section('Every image width', { type: 'heading', attrs: { level: 4 }, content: [text('An image pasted into a heading'), image(1, 25, 'Centered image from a heading; the rendered HTML stays valid.')] }, paragraph(image(0, 100, 'A full-width illustration.')), paragraph(image(0, 50, 'The same illustration at 50%, centered.')), paragraph(image(1, 25, 'A portrait illustration at 25%, centered.')), bullets(item('Images within a list remain centered within that point.', paragraph(image(1, 50, 'Portrait image inside a bullet point.'))))),
+      section('Try the image checks', numbers('1', item('Copy a PNG, JPEG or WebP image, place the cursor in the editor, then paste.'), item('Add alternative text and an optional caption in the paste dialog, then insert.'), item('Cancel a paste and confirm your text and cursor position are kept.'), item('Click an image to change its caption or choose 25%, 50%, 75% or 100% width.'), item('Try original, square, landscape and portrait cropping; cancel or reset the crop.'), item('Save and reload. Check centering on desktop, mobile, in preview and without JavaScript.'))),
+      section('Import and artwork checks', bullets(item('Import a file as well as pasting it. Unsupported or oversized images should show a useful error.'), item('Theme artwork keeps its default word and colour, both editable after selection.'), item('Browse all Hero Patterns and change the foreground colour, background colour and opacity.'), item('Import a cover image and adjust its crop. Article image originals stay private.'))), latest,
+    ] }),
+    researchSchema.parse({ ...base, id: 'qa-workflow', slug: showcaseSlugs[2], title: 'From draft to conversation', summary: 'A repeatable checklist for profile editing, contact links, research saves, sheets and responsive navigation.', theme: 'clay', cover: { type: 'theme', preset: 'clay', word: 'Review', color: '#eee0ce', variation: 0 }, question: 'Does the whole journey work from editing a note to contacting its author?', sections: [
+      section('Profile and contact', bullets(item('Edit the name and monogram; one, two and three characters fit without clipping.'), item('Edit “The person behind the notes”: heading, accent, biography and principles.'), item('Edit Contact: heading, introduction, email, link label and subject.'), item('Reorder, add or remove contact links, then save and reload.'), item('The email link opens a draft in your email app addressed to the saved profile email. Sending happens in that app.'), item('An invalid email should prevent saving and explain the issue.'))),
+      section('Research editing', numbers('1', item('On a fresh admin load, wait for the fields to become available; the very first title edit must remain saved.'), item('Create a draft with a title, summary, category, tags, question and sections.'), item('Change the slug, dates, section order and cover; save, reload and preview.'), item('Reset unsaved changes and confirm the saved content returns.'), item('Edit the same note in two tabs; a stale save should ask you to reload.'), item('Check required fields and duplicate slugs before publishing. Citations are optional for published notes and production releases; any supplied links must be valid HTTPS addresses.'), item('Remove a temporary test note; its saved file should move to trash. Keep these three showcase notes.'))),
+      section('Sheets and sources', bullets(item('Upload an example Excel workbook, open each sheet and inspect formulas and values.'), item('Download the workbook and confirm the filename and contents.'), item('Add a shared Google Sheets link, edit its label, open it and remove it.'), item('Publish a note without citations; Further reading stays hidden. Add an HTTPS source and check that the section and link appear.'), item('Missing or invalid attachments should show errors without losing the note.'))),
+      section('Release and recovery', numbers('1', item('Review the Release checklist in Admin: profile approval, published research and the production HTTPS address are separate blockers.'), item('Run npm run release:check from web/. It reports every blocker without approving or publishing content.'), item('Citations remain optional. Samples, including these three notes, stay out of production.'), item('Stop the local admin, then run npm run content:backup. Private images, workbooks, content, public files and local trash are included with checksums.'), item('Run npm run content:restore -- BACKUP NEW-FOLDER. Restoration requires a new destination and checks every file before writing.'), item('Compare restored profile, research, original images and workbooks; do not overwrite live content until you have reviewed the recovery.'), item('Corrupted backups, unsafe paths and existing restore folders must be refused. Keep an off-device backup and review a release before deploying.'))),
+      { heading: 'Legacy paragraphs and reflection points', paragraphs: ['This section intentionally uses the original plain-paragraph format. Older research still reads correctly alongside rich sections.'], prompts: ['Do reflection bullets display their markers?', 'Does the section remain reachable from the contents links?'] },
+      section('Reading and navigation', bullets(item('Check the home carousel arrows, swiping and every direct research link.'), item('Check widths of 320, 390, 768, 1024 and 1440 pixels for overflow.'), item('Use the contents links, next-note link and Back to top repeatedly.'), item('Read with the keyboard, reduced motion and JavaScript disabled.'), item('Check unknown URLs return a 404 and the static export has no admin pages.'), item('Sample and draft notes stay out of production builds. These notes remain samples.'))), latest,
+    ] }),
+  ];
+}
+export async function updateShowcaseNotes({ root = path.join(process.cwd(), 'src/content'), date = [new Date().toISOString().slice(0, 10), '2026-09-28'].sort().at(-1)!, change }: { root?: string; date?: string; change?: string } = {}) {
+  const notes = makeShowcaseNotes(date, change);
+  const researchDir = path.join(root, 'research');
+  const entries = fs.existsSync(researchDir) ? fs.readdirSync(researchDir).filter(name => name.endsWith('.json')).map(name => ({ name, note: JSON.parse(fs.readFileSync(path.join(researchDir, name), 'utf8')) })) : [];
+  // Refuse collisions or renamed reserved records before writing anything.
+  for (const entry of entries) {
+    const reserved = notes.find(note => note.slug + '.json' === entry.name || note.id === entry.note.id || note.slug === entry.note.slug);
+    if (reserved && (entry.name !== reserved.slug + '.json' || entry.note.id !== reserved.id || entry.note.slug !== reserved.slug || entry.note.category !== 'Showcase' || entry.note.status !== 'sample')) throw new Error(`Showcase collision: ${entry.name}. Resolve it before updating.`);
+  }
+  parseResearch([...entries.filter(entry => !notes.some(note => note.id === entry.note.id)).map(entry => entry.note), ...notes]);
+  const imageDir = path.join(root, 'images');
+  for (const id of showcaseImageIds) for (const suffix of ['.json', '.webp', '.original.webp']) {
+    const file = path.join(imageDir, id + suffix);
+    if (fs.existsSync(file)) {
+      const meta = path.join(imageDir, id + '.json');
+      if (!fs.existsSync(meta) || JSON.parse(fs.readFileSync(meta, 'utf8')).managedBy !== 'showcase-notes-v1') throw new Error(`Showcase image collision: ${id}`);
+    }
+  }
+  const illustrations = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540"><rect width="960" height="540" fill="#e7ede6"/><path d="M120 420H840" stroke="#426153" stroke-width="3"/><g fill="#426153"><rect x="180" y="290" width="100" height="130" rx="8"/><rect x="340" y="230" width="100" height="190" rx="8"/><rect x="500" y="180" width="100" height="240" rx="8"/><rect x="660" y="100" width="100" height="320" rx="8"/></g></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="640"><rect width="480" height="640" fill="#eee0ce"/><circle cx="240" cy="160" r="72" fill="#ad7258"/><rect x="168" y="272" width="144" height="144" rx="12" fill="#446254"/><path d="M240 455L320 575H160Z" fill="#66818f"/></svg>',
+  ];
+  const assets = await Promise.all(illustrations.map(svg => sharp(Buffer.from(svg)).webp({ quality: 92 }).toBuffer({ resolveWithObject: true })));
+  fs.mkdirSync(imageDir, { recursive: true }); fs.mkdirSync(researchDir, { recursive: true });
+  for (const [index, asset] of assets.entries()) {
+    const id = showcaseImageIds[index];
+    fs.writeFileSync(path.join(imageDir, id + '.webp'), asset.data);
+    fs.writeFileSync(path.join(imageDir, id + '.original.webp'), asset.data);
+    fs.writeFileSync(path.join(imageDir, id + '.json'), JSON.stringify({ kind: 'article', managedBy: 'showcase-notes-v1', width: asset.info.width, height: asset.info.height }));
+  }
+  for (const note of notes) {
+    const target = path.join(researchDir, note.slug + '.json');
+    const temporary = target + '.showcase-tmp';
+    fs.writeFileSync(temporary, JSON.stringify(note, null, 2) + '\n'); fs.renameSync(temporary, target);
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "id": "qa-images",
+  "slug": "showcase-images",
+  "title": "Evidence in pictures",
+  "summary": "Centered landscape and portrait images at every available width, with descriptions, captions and text on either side.",
+  "category": "Showcase",
+  "tags": [
+    "showcase",
+    "testing"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-28",
+  "status": "sample",
+  "theme": "blue",
+  "cover": {
+    "word": "Evidence",
+    "color": "#dce3e6",
+    "foregroundColor": "#365553",
+    "foregroundOpacity": 0.35,
+    "variation": 0,
+    "type": "hero",
+    "hero": "jigsaw"
+  },
+  "question": "Can images support the story without interrupting the reading order?",
+  "sections": [
+    {
+      "heading": "Text before and after an image",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This text precedes an image stored inside the same paragraph. The image is still centered."
+                },
+                {
+                  "type": "image",
+                  "attrs": {
+                    "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000001.webp",
+                    "width": 960,
+                    "height": 540,
+                    "alt": "An illustrative chart with four rising bars",
+                    "caption": "Landscape illustration at 75% width. Values are fictional.",
+                    "displayWidth": 75
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": "This text follows the image, keeping the original reading order."
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Every image width",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "heading",
+              "attrs": {
+                "level": 4
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "An image pasted into a heading"
+                },
+                {
+                  "type": "image",
+                  "attrs": {
+                    "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000002.webp",
+                    "width": 480,
+                    "height": 640,
+                    "alt": "A portrait illustration with three stacked shapes",
+                    "caption": "Centered image from a heading; the rendered HTML stays valid.",
+                    "displayWidth": 25
+                  }
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "image",
+                  "attrs": {
+                    "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000001.webp",
+                    "width": 960,
+                    "height": 540,
+                    "alt": "An illustrative chart with four rising bars",
+                    "caption": "A full-width illustration.",
+                    "displayWidth": 100
+                  }
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "image",
+                  "attrs": {
+                    "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000001.webp",
+                    "width": 960,
+                    "height": 540,
+                    "alt": "An illustrative chart with four rising bars",
+                    "caption": "The same illustration at 50%, centered.",
+                    "displayWidth": 50
+                  }
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "image",
+                  "attrs": {
+                    "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000002.webp",
+                    "width": 480,
+                    "height": 640,
+                    "alt": "A portrait illustration with three stacked shapes",
+                    "caption": "A portrait illustration at 25%, centered.",
+                    "displayWidth": 25
+                  }
+                }
+              ]
+            },
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Images within a list remain centered within that point."
+                        }
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "image",
+                          "attrs": {
+                            "src": "/images/articles/90f3fe01-a1b2-4c33-8d44-e55500000002.webp",
+                            "width": 480,
+                            "height": 640,
+                            "alt": "A portrait illustration with three stacked shapes",
+                            "caption": "Portrait image inside a bullet point.",
+                            "displayWidth": 50
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Try the image checks",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "orderedList",
+              "attrs": {
+                "start": 1,
+                "type": "1"
+              },
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Copy a PNG, JPEG or WebP image, place the cursor in the editor, then paste."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Add alternative text and an optional caption in the paste dialog, then insert."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Cancel a paste and confirm your text and cursor position are kept."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Click an image to change its caption or choose 25%, 50%, 75% or 100% width."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Try original, square, landscape and portrait cropping; cancel or reset the crop."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Save and reload. Check centering on desktop, mobile, in preview and without JavaScript."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Import and artwork checks",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Import a file as well as pasting it. Unsupported or oversized images should show a useful error."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Theme artwork keeps its default word and colour, both editable after selection."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Browse all Hero Patterns and change the foreground colour, background colour and opacity."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Import a cover image and adjust its crop. Article image originals stay private."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Latest change",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Local release readiness checks and verified content backup/restore. Deployment remains pending; all existing notes remain samples."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "These three sample notes are refreshed after each change request. Use the checks below to try the current features."
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sources": [],
+  "attachments": []
+}

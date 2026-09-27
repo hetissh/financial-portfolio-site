@@ -1,0 +1,4 @@
+.DS_Store
+
+# Machine-specific editor permissions and launch settings.
+.claude/

@@ -1,0 +1,61 @@
+{
+  "conditions": "Local Chromium, unthrottled. Rendering observations only; not real-user Web Vitals.",
+  "results": [
+    {
+      "page": "home-desktop",
+      "width": 1440,
+      "lcp": 56,
+      "cls": 0,
+      "overflow": false,
+      "resources": 30
+    },
+    {
+      "page": "home-mobile",
+      "width": 390,
+      "lcp": 48,
+      "cls": 0,
+      "overflow": false,
+      "resources": 21
+    },
+    {
+      "page": "home-small-mobile",
+      "width": 320,
+      "lcp": 36,
+      "cls": 0,
+      "overflow": false,
+      "resources": 21
+    },
+    {
+      "page": "research-desktop",
+      "width": 1440,
+      "lcp": 44,
+      "cls": 0,
+      "overflow": false,
+      "resources": 30
+    },
+    {
+      "page": "research-mobile",
+      "width": 390,
+      "lcp": 48,
+      "cls": 0,
+      "overflow": false,
+      "resources": 27
+    },
+    {
+      "page": "article-desktop",
+      "width": 1440,
+      "lcp": 40,
+      "cls": 0,
+      "overflow": false,
+      "resources": 21
+    },
+    {
+      "page": "article-mobile",
+      "width": 390,
+      "lcp": 32,
+      "cls": 0,
+      "overflow": false,
+      "resources": 21
+    }
+  ]
+}

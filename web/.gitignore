@@ -1,0 +1,33 @@
+node_modules/
+node_modules.incomplete/
+.next/
+.next-admin/
+out/
+test-results/
+.admin-trash/
+.admin-e2e/
+playwright-report/
+*.tsbuildinfo
+.env*
+!.env.example
+.DS_Store
+
+# Generated exports of visible research workbooks
+public/downloads/workbooks/
+
+playwright-report-admin/
+
+# Cropped images are regenerated from private content on build.
+/public/images/covers/
+
+/public/images/articles/
+/test-results-public/
+
+# Local content snapshots and recovery folders must never be served or committed.
+.content-backups/
+.content-restores/
+
+/test-results-admin/
+
+# Next.js generates route references for the active public/admin server.
+/next-env.d.ts

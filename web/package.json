@@ -1,0 +1,57 @@
+{
+  "name": "financial-portfolio-site",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "admin": "PORTFOLIO_ADMIN=1 next dev --hostname 127.0.0.1 --port 3000",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "validate:content": "tsx scripts/validate-content.ts",
+    "test:unit": "vitest run",
+    "build": "npm run validate:content && tsx scripts/generate-discovery-files.ts && tsx scripts/generate-workbook-downloads.ts && tsx scripts/generate-cover-images.ts && node scripts/generate-social.mjs && next build",
+    "build:release": "SITE_MODE=production npm run build",
+    "preview": "node scripts/preview.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:admin": "playwright test --config playwright.admin.config.ts",
+    "test:admin": "playwright test --config playwright.admin.config.ts",
+    "demo:workbook": "tsx scripts/add-example-workbook.ts",
+    "showcase:update": "tsx scripts/update-showcase-notes.ts",
+    "release:check": "tsx scripts/check-release.ts",
+    "content:backup": "tsx scripts/content-backup.ts",
+    "content:restore": "tsx scripts/content-backup.ts restore",
+    "typecheck:admin": "tsc --noEmit --project tsconfig.admin-check.json"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "5.3.0",
+    "@fontsource/instrument-serif": "5.3.0",
+    "@tiptap/extension-image": "3.31.3",
+    "@tiptap/extension-list": "3.31.3",
+    "@tiptap/pm": "3.31.3",
+    "@tiptap/react": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
+    "lucide-react": "1.48.0",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.6",
+    "sharp": "0.35.4",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.0.2"
+  },
+  "type": "module"
+}

@@ -1,0 +1,17 @@
+{
+  "conditions": "Chromium Pixel 7 emulation; cold cache; 4x CPU slowdown; 150ms latency; 1.6 Mbps downstream; local server. One run per route, no field/INP claim.",
+  "results": [
+    {
+      "route": "/",
+      "lcp": 956,
+      "cls": 0,
+      "transferredBytes": 612942
+    },
+    {
+      "route": "/research/beyond-the-bottom-line/",
+      "lcp": 888,
+      "cls": 0,
+      "transferredBytes": 612942
+    }
+  ]
+}
