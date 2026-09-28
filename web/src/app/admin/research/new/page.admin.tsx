@@ -1,3 +1,4 @@
+import { readAdminContent } from "@/lib/admin/store";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -11,6 +12,6 @@ export default function NewResearch() {
       <div><Link className={`text-link ${styles.backLink}`} href="/admin/"><ArrowLeft size={16} aria-hidden="true" /> Overview</Link><span className="eyebrow">NEW NOTE</span><h1 id="top" tabIndex={-1}>Start a <em>note.</em></h1></div>
       <div><p>New notes start as drafts, which never appear on the site. Switch to Published when the note is ready. Sources are optional.</p></div>
     </header>
-    <ResearchEditor />
+    <ResearchEditor number={readAdminContent().research.filter(item => item.status !== "draft").length + 1} />
   </main>;
 }

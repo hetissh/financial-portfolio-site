@@ -1,6 +1,7 @@
 import { richImageIds, richText, type RichDocument } from "./rich-content";
 import { imageExists } from "./admin/images";
 import { workbookExists } from "./admin/workbooks";
+import { researchOrderSchema } from "./research-order";
 import fs from "node:fs";
 import path from "node:path";
 import { parseResearch, profileSchema, visibleResearch, validateRelease, type SiteMode } from "./content-schema";
@@ -23,6 +24,10 @@ export function readResearchFiles(root = contentRoot()): { file: string; data: u
   return fs.readdirSync(directory).filter((file) => file.endsWith(".json")).sort()
     .map((file) => ({ file, data: JSON.parse(fs.readFileSync(path.join(directory, file), "utf8")) }));
 }
+export function readResearchOrder(root = contentRoot()): string[] {
+  const file = path.join(root, 'research-order.json');
+  return fs.existsSync(file) ? researchOrderSchema.parse(JSON.parse(fs.readFileSync(file, 'utf8'))).ids : [];
+}
 export function assetExists(asset: string) {
   try {
     const root = fs.realpathSync(path.join(process.cwd(), 'public'));
@@ -42,7 +47,7 @@ export function loadContent() {
   for (const record of records) for (const section of record.sections) if (section.body) for (const id of richImageIds(section.body.doc)) if (!imageExists(id, root)) throw new Error(`Missing article image for ${record.slug}: ${id}`);
   const mode = getSiteMode();
   if (mode === "production") validateRelease(profile, records, process.env.SITE_URL);
-  return { profile, research: visibleResearch(records, mode), mode };
+  return { profile, research: visibleResearch(records, mode, readResearchOrder(root)), mode };
 }
 export function formatDate(value: string) {
   return new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));

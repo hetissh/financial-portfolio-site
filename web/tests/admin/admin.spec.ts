@@ -98,7 +98,11 @@ test('local origin checks, upload errors, and admin navigation', async ({ page, 
   const response = await request.put('/admin/api/profile/', { headers: { Origin: 'https://attacker.test' }, data: {} }); expect(response.status()).toBe(403);
   const malformed = await request.put('/admin/api/profile/', { headers: { Origin: 'http://127.0.0.1:4186', 'Content-Type': 'application/json' }, data: Buffer.from('{') }); expect(malformed.status()).toBe(400);
   await page.goto('/admin/'); await expect(page.getByRole('link', { name: 'Edit profile', exact: true }).first()).toBeVisible();
-  await page.getByRole('link', { name: 'New note', exact: true }).click();
+  await expect(page.getByRole('navigation', { name: 'Admin', exact: true }).getByRole('link', { name: 'New note', exact: true })).toHaveCount(0);
+  await page.getByRole('link', { name: 'New research note', exact: true }).click();
+  await expect(page.getByRole('navigation', { name: 'Admin', exact: true }).getByRole('link', { name: 'Overview', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByLabel('Tags', { exact: false })).toHaveAttribute('placeholder', 'Separate with commas.');
+  await expect(page.getByText('Separate with commas.', { exact: true })).toHaveCount(0);
   await page.getByLabel('Upload Excel workbook', { exact: true }).setInputFiles({ name: 'fake.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from('not a workbook') });
   await expect(page.locator('main [role=alert]')).toContainText('valid .xlsx'); await expect(page.getByRole('button', { name: 'Create note', exact: true })).toBeEnabled();
   await page.getByLabel('Google Sheet name', { exact: true }).fill('Unsafe link'); await page.getByLabel('Google Sheets sharing link').fill('https://attacker.test'); await page.getByRole('button', { name: 'Attach Google Sheet', exact: true }).click(); await expect(page.locator('main [role=alert]')).toContainText('valid Google Sheets');

@@ -32,5 +32,7 @@ export function generateMetadata(): Metadata {
 }
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const { profile, mode } = loadContent();
-  return <html lang="en" className={`${bodyFont.variable} ${editorialFont.variable}`}><body><a href="#main" className="skip-link">Skip to content</a><SiteHeader profile={profile} preview={mode === "preview"} />{children}<SiteFooter name={profile.displayName} /></body></html>;
+  // Browser extensions can add body attributes before React starts (e.g. cz-shortcut-listen).
+  // Tolerate attributes on this element only; descendant mismatches remain visible.
+  return <html lang="en" className={`${bodyFont.variable} ${editorialFont.variable}`}><body suppressHydrationWarning><a href="#main" className="skip-link">Skip to content</a><SiteHeader profile={profile} preview={mode === "preview"} />{children}<SiteFooter name={profile.displayName} /></body></html>;
 }

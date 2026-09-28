@@ -8,8 +8,9 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { z } from "zod";
-import { parseResearch, profileSchema, researchSchema, type Profile, type Research } from "@/lib/content-schema";
-import { assetExists, contentRoot, readProfileFile, readResearchFiles } from "@/lib/content";
+import { parseResearch, profileSchema, researchSchema, sortResearch, type Profile, type Research } from "@/lib/content-schema";
+import { assetExists, contentRoot, readProfileFile, readResearchFiles, readResearchOrder } from "@/lib/content";
+import { researchOrderSchema } from "../research-order";
 import type { ContentIssue } from "./form";
 
 export class ContentValidationError extends Error {
@@ -27,7 +28,7 @@ function friendlyMessage(issue: z.core.$ZodIssue) {
   const key = String(issue.path.at(-1) ?? "");
   if (issue.code === "too_small" && issue.origin === "string") return "Required";
   if (issue.code === "too_small" && issue.origin === "array") return issue.minimum === 1 ? "Add at least one" : `Add at least ${issue.minimum}`;
-  if (issue.code === "too_small" && issue.origin === "number") return "Use 0 or higher";
+  if (issue.code === "too_small" && issue.origin === "number") return `Use ${issue.minimum} or higher`;
   if (issue.code === "too_big" && issue.origin === "string") return `Use at most ${issue.maximum} characters`;
   if (issue.code === "invalid_type" && issue.message.endsWith("received undefined")) return "Required";
   if (issue.code === "invalid_type" && issue.expected === "number") return "Use a whole number";
@@ -50,8 +51,12 @@ function toIssues(error: z.ZodError, input?: unknown): ContentIssue[] {
 }
 function writeJson(file: string, value: unknown) {
   const temporary = `${file}.tmp-${randomUUID()}`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`);
-  fs.renameSync(temporary, file);
+  try {
+    fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`);
+    fs.renameSync(temporary, file);
+  } finally {
+    if (fs.existsSync(temporary)) fs.rmSync(temporary);
+  }
 }
 function readStoredResearch(root: string): StoredResearch[] {
   const entries = readResearchFiles(root).map(({ file, data }) => {
@@ -66,7 +71,8 @@ function readStoredResearch(root: string): StoredResearch[] {
 export function readAdminContent({ root = contentRoot() }: StoreOptions = {}) {
   const profile = profileSchema.parse(readProfileFile(root));
   const research = readStoredResearch(root);
-  return { profile, profileVersion: recordVersion(profile), research: research.map((entry) => ({ ...entry.record, file: entry.file, version: recordVersion(entry.record) })) };
+  const ids = readResearchOrder(root);
+  return { profile, profileVersion: recordVersion(profile), orderVersion: collectionVersion(research, ids), research: sortResearch(research.map((entry) => ({ ...entry.record, file: entry.file, version: recordVersion(entry.record) })), ids) };
 }
 export type AdminResearch = Research & { file: string; version: string };
 
@@ -141,4 +147,23 @@ export function trashResearch(id: string, { root = contentRoot(), trashDir = def
     fs.rmSync(source);
   }
   return { file: current.file, trashedTo: destination };
+}
+
+// A reorder is one atomic file replacement, never a series of individual note saves.
+function collectionVersion(entries: StoredResearch[], ids: string[]) {
+  return recordVersion({ ids, records: entries.map(entry => ({ id: entry.record.id, version: recordVersion(entry.record) })).sort((a, b) => a.id.localeCompare(b.id)) });
+}
+export function reorderResearch(input: unknown, { root = contentRoot(), expectedVersion }: StoreOptions = {}) {
+  const existing = readStoredResearch(root);
+  const previous = readResearchOrder(root);
+  if (!expectedVersion || collectionVersion(existing, previous) !== expectedVersion) throw new VersionConflictError();
+  const parsed = researchOrderSchema.safeParse(input);
+  if (!parsed.success) throw new ContentValidationError(toIssues(parsed.error, input));
+  const ids = parsed.data.ids;
+  const expectedIds = new Set(existing.map(entry => entry.record.id));
+  if (ids.length !== expectedIds.size || ids.some(id => !expectedIds.has(id))) {
+    throw new ContentValidationError([{ path: 'ids', message: 'Include every current note exactly once. Reload the saved order before trying again.' }]);
+  }
+  writeJson(path.join(root, 'research-order.json'), { ids });
+  return { ids, version: collectionVersion(existing, ids) };
 }

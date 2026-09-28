@@ -525,6 +525,34 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Selected formatting buttons and keyboard focus use copper; list markers and text stay readable on the cream editor surface."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The cover corner shows this note’s notebook number, independent of its artwork or variation."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -545,7 +573,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Local release readiness checks and verified content backup/restore. Deployment remains pending; all existing notes remain samples."
+                  "text": "Prevent extension-added body attributes from triggering hydration warnings while keeping admin editing responsive."
                 }
               ]
             },

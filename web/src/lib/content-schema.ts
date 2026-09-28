@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { googleSheetUrl, googleEmbedUrl, microsoftEmbedUrl, microsoftWorkbookUrl } from "./sheet-embed";
+export { googleSheetUrl } from "./sheet-embed";
 import { releaseReadiness } from "./release-readiness";
 import { richDocumentSchema } from "./rich-content";
 import { themeArtwork, heroPatterns } from "./artwork";
@@ -48,12 +50,10 @@ export const profileSchema = z.object({
   about: z.object({ label: text, heading: text, accent: z.string().trim(), principles: z.array(text.max(160)).max(8) }).optional(),
   contact: z.object({ label: text, heading: text, accent: z.string().trim(), intro: text, email: z.string().trim().email().optional(), emailLabel: text, emailSubject: text.max(200) }).optional(),
 });
-export const googleSheetUrl = z.string().url().refine((value) => {
-  try { const u = new URL(value); return u.protocol === 'https:' && u.hostname === 'docs.google.com' && !u.port && !u.username && !u.password && /^\/spreadsheets\/d\/(?:e\/)?[A-Za-z0-9_-]+(?:\/|$)/.test(u.pathname); } catch { return false; }
-}, 'Use a Google Sheets sharing link from docs.google.com/spreadsheets/d/...');
 export const attachmentSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('excel'), id: z.string().uuid(), label: text.max(120) }),
-  z.object({ kind: z.literal('google'), id: z.string().uuid(), label: text.max(120), url: googleSheetUrl }),
+  z.object({ kind: z.literal('excel'), id: z.string().uuid(), label: text.max(120), embedUrl: microsoftEmbedUrl.optional(), originalUrl: microsoftWorkbookUrl.optional() }),
+  z.object({ kind: z.literal('google'), id: z.string().uuid(), label: text.max(120), url: googleSheetUrl, embedUrl: googleEmbedUrl.optional() }),
+  z.object({ kind: z.literal('microsoft'), id: z.string().uuid(), label: text.max(120), embedUrl: microsoftEmbedUrl, originalUrl: microsoftWorkbookUrl.optional() }),
 ]);
 export type Attachment = z.infer<typeof attachmentSchema>;
 export const researchSchema = z.object({
@@ -61,6 +61,7 @@ export const researchSchema = z.object({
   title: text, summary: text, category: text,
   tags: z.array(text), publishedAt: isoDate, updatedAt: isoDate.optional(),
   status: z.enum(researchStatuses), featuredOrder: z.number().int().nonnegative().optional(),
+  noteNumber: z.number().int().min(1).max(9999).optional(),
   theme: z.enum(researchThemes),
   cover: wordCoverSchema.optional(),
   question: text,
@@ -80,11 +81,14 @@ export function parseResearch(value: unknown): Research[] {
   }
   return records;
 }
-export function sortResearch<T extends Research>(records: T[]): T[] {
-  return [...records].sort((a, b) => (a.featuredOrder ?? Number.MAX_SAFE_INTEGER) - (b.featuredOrder ?? Number.MAX_SAFE_INTEGER) || b.publishedAt.localeCompare(a.publishedAt));
+export function sortResearch<T extends Research>(records: T[], order: readonly string[] = []): T[] {
+  const positions = new Map(order.map((id, index) => [id, index]));
+  return [...records].sort((a, b) => (positions.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (positions.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+    || (a.featuredOrder ?? Number.MAX_SAFE_INTEGER) - (b.featuredOrder ?? Number.MAX_SAFE_INTEGER)
+    || b.publishedAt.localeCompare(a.publishedAt) || a.id.localeCompare(b.id));
 }
-export function visibleResearch(records: Research[], mode: SiteMode): Research[] {
-  return sortResearch(records.filter((item) => item.status === "published" || (mode === "preview" && item.status === "sample")));
+export function visibleResearch(records: Research[], mode: SiteMode, order: readonly string[] = []): Research[] {
+  return sortResearch(records.filter((item) => item.status === "published" || (mode === "preview" && item.status === "sample")), order);
 }
 export function validateRelease(profile: Profile, records: Research[], siteUrl: string | undefined) {
   const blocker = releaseReadiness(profile, records, siteUrl).checks.find(check => !check.ok);

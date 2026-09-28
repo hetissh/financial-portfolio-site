@@ -2,11 +2,11 @@ import { ProceduralCoverDrawing } from './ProceduralCoverDrawing';
 import type { WordCover } from '@/lib/content-schema';
 import { coverDesign, coverInk } from '@/lib/word-cover';
 
-export function WordResearchArt({ cover, large = false }: { cover: WordCover; large?: boolean }) {
+export function WordResearchArt({ cover, large = false, number = "01" }: { number?: string; cover: WordCover; large?: boolean }) {
   const { motif, rotation, spacing, count } = coverDesign(cover);
   const steps = Array.from({ length: count }, (_, index) => index);
-  return <div className={`research-art art-word ${large ? 'art-large' : ''}`} style={{ backgroundColor: cover.color, color: coverInk(cover.color) }} aria-hidden="true" data-cover-word={cover.word} data-cover-color={cover.color} data-cover-variation={cover.variation} data-cover-seed={cover.seed}>
-    <span className="art-corner">FIELD NOTES / {String(cover.variation + 1).padStart(2, '0')}</span>
+  return <div className={`research-art art-word ${large ? 'art-large' : ''}`} style={{ backgroundColor: cover.color, color: coverInk(cover.color) }} aria-hidden="true" data-note-number={number} data-cover-word={cover.word} data-cover-color={cover.color} data-cover-variation={cover.variation} data-cover-seed={cover.seed}>
+    <span className="art-corner">FIELD NOTES / {number}</span>
     <svg viewBox="0 0 400 230" fill="none" focusable="false">{cover.seed ? <ProceduralCoverDrawing word={cover.word} seed={cover.seed} /> : <g stroke="currentColor" strokeWidth="1.2" transform={`rotate(${rotation} 200 115)`}>
       {motif === 0 && steps.map(i => <g key={i} transform={`translate(0 ${(i - (count - 1) / 2) * spacing * .55})`}><path d="M95 115 200 160 305 115 200 70Z" /><path d="M95 115v10l105 45 105-45v-10" opacity=".3" /></g>)}
       {motif === 1 && <>{steps.map(i => <ellipse key={i} cx="200" cy="115" rx={34 + i * spacing} ry={80 - i * 5} transform={`rotate(${i * 24} 200 115)`} />)}<circle cx="200" cy="115" r="5" fill="currentColor" /><path d="M70 115h260M200 35v160" strokeDasharray="3 6" opacity=".5" /></>}

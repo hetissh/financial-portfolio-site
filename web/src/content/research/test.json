@@ -22,14 +22,37 @@
   "sections": [
     {
       "heading": "test",
-      "paragraphs": [
-        "setest"
-      ],
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "setest"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "prompts": [
         "test"
       ]
     }
   ],
   "sources": [],
-  "attachments": []
+  "attachments": [
+    {
+      "kind": "google",
+      "id": "63d05684-37da-4079-91ba-b35dd7192f41",
+      "label": "Darwinbox Field Mapping Sheet",
+      "url": "https://docs.google.com/spreadsheets/d/1mAtBTxDKJM4atsCDeVlgNC0NMsoCogE9N_z0E_05sCw/edit?usp=sharing",
+      "embedUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoM2qcoz0z1b9P-U6fQvFF3LyNkdlARlIAmRq6tE8g1aWq_vPt-DHfKb5gxsxNzrIyrrgYht9qzcbs/pubhtml?widget=true&headers=false"
+    }
+  ]
 }

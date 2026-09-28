@@ -5,9 +5,8 @@ import { ArrowUpRight } from "lucide-react";
 import styles from "./admin.module.css";
 
 const links = [
-  { href: "/admin/", label: "Overview", match: (path: string) => path === "/admin/" || /^\/admin\/research\/(?!new)/.test(path) },
+  { href: "/admin/", label: "Overview", match: (path: string) => path === "/admin/" || path.startsWith("/admin/research/") },
   { href: "/admin/profile/", label: "Profile", match: (path: string) => path.startsWith("/admin/profile") },
-  { href: "/admin/research/new/", label: "New note", match: (path: string) => path.startsWith("/admin/research/new") },
 ];
 export function AdminNav() {
   const pathname = usePathname();

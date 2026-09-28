@@ -34,7 +34,7 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173). The preview server binds only to t
 - Self-hosted fonts, local illustrations, generated social image, and page metadata.
 - Validated content, draft exclusion, preview/production modes, and automated checks.
 - Local admin for profile/research editing, reset, validation, conflict-safe saves, and trash recovery.
-- Research spreadsheet attachments with Excel previews/downloads and Google Sheets links.
+- Research spreadsheet attachments with inline Google Sheets/Excel embeds, an expanded reader, and local Excel previews/downloads.
 
 The current preview contains three clearly labeled **example notes** and editable profile defaults. No résumé or contact details were supplied, so those links are omitted. The original ChatGPT page was not available: this is a new design based on the confirmed responsive and interaction requirements.
 
@@ -51,6 +51,14 @@ Open [127.0.0.1:3000/admin](http://127.0.0.1:3000/admin/). The local site's foot
 The admin runs on your own machine. It edits the same JSON content used by the static build; it is deliberately excluded from the exported site. The static preview on port 4173 has no admin routes. Stop the admin before running a release build.
 
 You can edit profile/contact details, create research, reorder sections, preview drafts, publish notes, and move notes to `.admin-trash/`. Reset edits restores the last saved version. Unsaved edits prompt before navigating through links or closing the tab. Saves from an older tab are rejected so they cannot overwrite newer edits; reload to review the saved version.
+
+### Arrange cards and number notes
+
+On the admin Overview, drag a card's handle to arrange the notebook, then click **Save order**. On mobile, drag the same handle. Arrow buttons and keyboard arrow keys are available too; Home/End move a focused handle to the first/last position. Escape cancels a drag and **Reset order** discards an unsaved arrangement. Older tabs cannot overwrite a newer saved order.
+
+Every cover shows **FIELD NOTES / 01**, **02**, etc., following the visible notebook order. The same note keeps its number on the home rail, archive and article. Artwork type labels are omitted. In a note's Cover section, leave **Note number** empty for automatic numbering, or enter a whole number from 1 to 9999 to override it. The main cover word and colour remain editable. In Publishing, **Show on home page** selects notes for the home rail; the saved notebook order also arranges those selected cards. If no visible notes are selected, the home rail shows all visible notes.
+
+The arrangement is stored in `web/src/content/research-order.json` when you save it. Keep this file with content backups. Rebuild the static preview after saving an arrangement or changing a note number.
 
 ### Choose and customise card artwork
 
@@ -71,8 +79,19 @@ Imported originals and crop metadata are stored privately in `web/src/content/im
 Open a research editor and use the **Sheets & models** shortcut:
 
 - Upload an `.xlsx` workbook up to 5 MB. The viewer offers sheet selection, cached values, formulas, and a download of the original workbook. It does not recalculate Excel formulas. Save your workbook in Excel before uploading.
-- Attach a Google Sheets sharing link. Visitors open it in Google Sheets, subject to its existing sharing permissions.
+- Attach a Google Sheets sharing link, and optionally its published embed link. Published sheets appear inline with Expand and Open original; ordinary sharing links stay available as external links. Access follows the provider’s settings.
+- Attach an Excel embed from OneDrive or SharePoint, or add a hosted embed link to an uploaded workbook. The hosted viewer appears inline, while the uploaded original remains downloadable.
 - Save the note after adding, renaming, or removing an attachment. Drafts can be previewed from the admin.
+
+To embed Google Sheets, use **File → Share → Publish to web → Embed**. Paste its `/pubhtml` URL or iframe code into **Google Sheets embed URL or code**, click **Preview Google embed**, then **Attach Google Sheet** and save the note. A sharing link is optional when the published embed is supplied. Choose only the tabs/range intended for visitors. Published sheets preserve provider formatting but are read-only and omit formulas and the editing toolbar. A published `/pubhtml` link entered directly as the sharing link is also embedded automatically.
+
+For Excel, host the workbook on **OneDrive or SharePoint** and generate its embed code. Use **Embed an Excel workbook** to attach it, or fill an existing uploaded attachment’s **embed URL or code**. Paste the generated OneDrive `/embed` URL, or a SharePoint Excel URL with `action=embedview`; preview and save. An optional **original workbook link** is used by Open original. The app does not upload files to Microsoft. If an upload has no hosted embed, its existing local preview remains; clear an optional embed URL to restore it.
+
+The **Expand** button promotes the same iframe to a large reader, preserving its selected sheet and scroll position. **Close** returns to the note and restores focus. On mobile, the reader fills the screen. **Reload** retries the provider frame, and **Open original** is always available for sign-in/access issues. Escape closes the reader while a parent-page control has focus; when the provider iframe has keyboard focus, use its surrounding Close button. Inline frames and original links are also present in HTML without JavaScript.
+
+Only Google Sheets and generated OneDrive/SharePoint embed URLs are accepted. Pasted iframe code is reduced to its validated source URL; no pasted scripts, styles or HTML are inserted. Provider viewer appearance and controls cannot be restyled by this site. Test the hosted workbook in a private browser as a visitor before release; tenant restrictions, sharing settings and third-party browser policies can affect access. No existing note or sheet is made public automatically.
+
+Provider references: [Google publishing and embedding](https://support.google.com/docs/answer/183965?hl=en), [OneDrive embedding](https://support.microsoft.com/en-us/excel/share-it-embed-an-excel-workbook-on-your-web-page-or-blog-from-onedrive), [SharePoint embedding](https://support.microsoft.com/en-us/excel/embed-your-excel-workbook-on-your-web-page-or-blog-from-sharepoint-or-onedrive-for-business).
 
 Workbooks are stored in `web/src/content/workbooks/`. A build copies only workbooks attached to visible notes into `public/downloads/workbooks/`, a directory reserved for the generator. Production excludes draft and sample notes and their workbook downloads. Removed/unattached source workbooks are kept locally for recovery and never exported.
 
@@ -92,7 +111,7 @@ Research lives in `web/src/content/research/*.json`. Use one record per note, wi
 | `sample` | Visible with example labels | Excluded |
 | `published` | Visible | Visible |
 
-A note's `theme` is `forest`, `clay`, or `blue`. `featuredOrder` determines whether and where it appears in the home rail. If no records have that field, the home shows all visible notes. Dates use `YYYY-MM-DD`.
+A note's `theme` is `forest`, `clay`, or `blue`. `featuredOrder` marks selection for the home rail and supplies the original sorting fallback until an arrangement is saved. The saved `research-order.json` arrangement takes precedence. If no visible records have `featuredOrder`, the home shows all visible notes. Optional `noteNumber` overrides the automatic cover number. Dates use `YYYY-MM-DD`.
 
 After editing, run `npm run validate:content` and build again. Save the `src/content` folder, including workbook files, in your backups. Invalid dates, duplicate slugs, unsafe URLs, and missing local downloads stop the build. Research rendering escapes text rather than injecting HTML.
 

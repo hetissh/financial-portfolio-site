@@ -145,6 +145,34 @@
                       "content": [
                         {
                           "type": "text",
+                          "text": "The top admin navigation contains Overview, Profile and View site. Create a note using New research note in Overview."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Clear Tags to see Separate with commas. inside the input; there is no duplicate hint underneath. Tags remain editable and save as separate values."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
                           "text": "On a fresh admin load, wait for the fields to become available; the very first title edit must remain saved."
                         }
                       ]
@@ -242,6 +270,153 @@
       }
     },
     {
+      "heading": "Hosted workbook viewers",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "orderedList",
+              "attrs": {
+                "start": 1,
+                "type": "1"
+              },
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In Sheets & models, paste a published Google Sheets embed URL or its iframe code. Preview before attaching and saving."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "For Excel, paste the generated OneDrive or SharePoint embed link. You can attach it directly or add it to an uploaded workbook."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The note displays the provider’s spreadsheet inline with Open original, Reload and Expand controls. Pasted HTML must never execute in the site."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Select another sheet inside the viewer, expand it, close it and confirm the selected view remains. The close button is always available; Escape closes when focus is on a viewer control outside the iframe."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On mobile, the page should fit the screen while the spreadsheet scrolls within its own frame. Large views must close and return focus to Expand."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Save, reload, preview, rename, reset and remove attachments. Reject invalid provider hosts, unrelated links and unsafe URLs without losing the note."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "An uploaded Excel file without a hosted embed retains its local sheet preview, formula display and original download. Clearing its embed link restores that preview."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Published Google Sheets are read-only and do not show formulas. Access is controlled by the provider; if a viewer is blank or requests sign-in, Open original remains available."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Test visitor access to the real hosted link in a private browser before release. Keep these notes as samples; no fake embed links are attached to them."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
       "heading": "Sheets and sources",
       "paragraphs": [],
       "body": {
@@ -317,6 +492,226 @@
                         {
                           "type": "text",
                           "text": "Missing or invalid attachments should show errors without losing the note."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Arrange the notebook",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "orderedList",
+              "attrs": {
+                "start": 1,
+                "type": "1"
+              },
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Use Show on home page in Publishing to select cards for the home rail; Overview arranges the selected cards too."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In Admin Overview, drag a handle to move a research card. Dragging also works with touch; the page can scroll normally away from the handles."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Use Move up or Move down, or focus a handle and press an arrow key. Home and End move to the first and last positions."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Press Escape or cancel a touch gesture during dragging; the previous arrangement should return."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Save order, reload and check the notebook, home cards and saved article previews. Automatic numbers follow the visible notebook order."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Reset order discards an unsaved arrangement. Leaving with unsaved changes should ask before discarding it."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Try two admin tabs. A stale order save should ask you to reload; research text, status and selected-home membership should stay intact."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "A failed save keeps your arrangement so you can retry. Deleting a note and adding another must not hide remaining cards."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "heading": "Sand & Copper admin",
+      "paragraphs": [],
+      "body": {
+        "version": 1,
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Overview, Profile and New note share sand backgrounds, cream panels, copper actions and a dark brown admin navigation bar."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Active navigation, keyboard focus, checked controls and crop dialogs remain clear on desktop and mobile."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Successful saves and published badges remain green; invalid fields and failed saves remain red."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Profile headline, card and saved article previews retain the public portfolio colours."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Choose View site, then return to admin: the public page keeps its original green palette."
                         }
                       ]
                     }
@@ -476,6 +871,20 @@
                       "content": [
                         {
                           "type": "text",
+                          "text": "Reload an existing research editor, New note and Profile with an extension that adds body attributes. Fields should remain editable without a hydration warning; genuine mismatches inside the page should remain visible."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
                           "text": "Check the home carousel arrows, swiping and every direct research link."
                         }
                       ]
@@ -571,7 +980,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Local release readiness checks and verified content backup/restore. Deployment remains pending; all existing notes remain samples."
+                  "text": "Prevent extension-added body attributes from triggering hydration warnings while keeping admin editing responsive."
                 }
               ]
             },

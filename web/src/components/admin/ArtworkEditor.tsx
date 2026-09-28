@@ -1,4 +1,5 @@
 "use client";
+import { noteNumber } from '@/lib/research-order';
 import { useState } from 'react';
 import { themeArtwork, heroPatterns, heroAppearanceDefaults, legacyHeroOpacity, imageDefault } from '@/lib/artwork';
 import { coverInk } from '@/lib/word-cover';
@@ -9,7 +10,7 @@ import { ResearchArt } from '@/components/ResearchArt';
 import { Field } from './fields';
 import { ImageCropDialog } from './ImageCropDialog';
 import styles from './admin.module.css';
-export function ArtworkEditor({ draft, setDraft, issues, onBusy, generate, error, onEdited }: { draft: ResearchDraft; setDraft: React.Dispatch<React.SetStateAction<ResearchDraft>>; issues: Map<string, string[]>; onBusy: (busy: boolean) => void; generate: () => void; error?: string; onEdited: () => void }) {
+export function ArtworkEditor({ draft, setDraft, issues, onBusy, generate, error, onEdited, number }: { number: number; draft: ResearchDraft; setDraft: React.Dispatch<React.SetStateAction<ResearchDraft>>; issues: Map<string, string[]>; onBusy: (busy: boolean) => void; generate: () => void; error?: string; onEdited: () => void }) {
   const [picker, setPicker] = useState<'theme' | 'hero' | 'image'>(draft.cover?.type === 'hero' ? 'hero' : draft.cover?.type === 'image' ? 'image' : 'theme');
   const [query, setQuery] = useState('');
   const [imageError, setImageError] = useState<string>();
@@ -54,8 +55,9 @@ export function ArtworkEditor({ draft, setDraft, issues, onBusy, generate, error
     <p className={styles.intro}>Choose a design, then make its word and colour your own. Your selection appears immediately in the card preview.</p>
     <div className={styles.artworkTabs} aria-label="Artwork sources">{(['theme', 'hero', 'image'] as const).map(p => <button type="button" key={p} aria-pressed={picker === p} onClick={() => setPicker(p)}>{p === 'theme' ? 'Theme artwork' : p === 'hero' ? 'Hero Patterns' : 'Import image'}</button>)}</div>
     <div className={styles.artworkCustomize} id="artwork-customize">
-      <div className={styles.artworkPreview}><span className={styles.label}>Selected artwork</span><ResearchArt theme={draft.theme} cover={selected} /></div>
+      <div className={styles.artworkPreview}><span className={styles.label}>Selected artwork</span><ResearchArt theme={draft.theme} cover={selected} number={noteNumber({ noteNumber: draft.noteNumber.trim() ? Number(draft.noteNumber) : undefined }, number)} /></div>
       <div>
+      <Field field="noteNumber" label="Note number" optional hint="Leave blank to number this note automatically from its position in the notebook." issues={issues}>{props => <input {...props} className={styles.input} type="number" min={1} max={9999} step={1} inputMode="numeric" placeholder={`Automatic (${String(number).padStart(2, '0')})`} value={draft.noteNumber} onChange={e => { onEdited(); setDraft(current => ({ ...current, noteNumber: e.target.value })); }} />}</Field>
       <Field field="cover.word" label="Cover word" hint="One word, up to 32 characters." issues={issues}>{props => <input {...props} className={styles.input} maxLength={32} value={draft.coverWord} onChange={e => customize('word', e.target.value)} />}</Field>
       {picker !== 'hero' && <Field field="cover.color" label="Cover colour" issues={issues}>{props => <div className={styles.coverColour}><input aria-label="Pick cover colour" type="color" value={/^#[0-9a-fA-F]{6}$/.test(draft.coverColor) ? draft.coverColor : '#dbe3d5'} onChange={e => customize('color', e.target.value)} /><input {...props} className={styles.input} autoComplete="off" value={draft.coverColor} maxLength={7} spellCheck={false} onChange={e => customize('color', e.target.value)} /></div>}</Field>}
       </div>
@@ -68,13 +70,13 @@ export function ArtworkEditor({ draft, setDraft, issues, onBusy, generate, error
     {picker === 'hero' && !isHero && <p className={styles.hint}>Choose a pattern below to edit its appearance.</p>}
     {picker === 'theme' && <div className={styles.artworkGrid} aria-label="Theme artwork choices">{themeArtwork.map(p => {
       const cover: WordCover = { type: 'theme', preset: p.id, word: p.word, color: p.color, variation: 0 };
-      return <button type="button" className={styles.artworkChoice} key={p.id} aria-label={`Choose ${p.label} artwork`} aria-pressed={selected?.type === 'theme' ? selected.preset === p.id : !selected && draft.theme === p.id} onClick={() => choose(cover)}><ResearchArt theme="forest" cover={cover} /><span>{p.label}</span></button>;
+      return <button type="button" className={styles.artworkChoice} key={p.id} aria-label={`Choose ${p.label} artwork`} aria-pressed={selected?.type === 'theme' ? selected.preset === p.id : !selected && draft.theme === p.id} onClick={() => choose(cover)}><ResearchArt theme="forest" cover={cover} number={noteNumber({ noteNumber: draft.noteNumber.trim() ? Number(draft.noteNumber) : undefined }, number)} /><span>{p.label}</span></button>;
     })}</div>}
     {picker === 'hero' && <><label className={styles.group}><span className={styles.label}>Find a pattern</span><input className={styles.input} type="search" value={query} placeholder="Try circles, waves or hexagons" onChange={e => setQuery(e.target.value)} /></label>
       <p className={styles.hint}>{filtered.length} of {heroPatterns.length} patterns</p>
       <div className={styles.artworkGrid} aria-label="Hero Pattern choices">{filtered.map(p => {
         const cover: WordCover = { type: 'hero', hero: p.id, word: p.word, color: p.color, variation: 0, ...heroAppearanceDefaults };
-        return <button type="button" className={styles.artworkChoice} key={p.id} aria-label={`Choose ${p.label} pattern`} aria-pressed={selected?.type === 'hero' && selected.hero === p.id} onClick={() => { choose(cover); document.getElementById('artwork-customize')?.scrollIntoView({ block: 'start' }); }}><ResearchArt theme="forest" cover={cover} /><span>{p.label}</span></button>;
+        return <button type="button" className={styles.artworkChoice} key={p.id} aria-label={`Choose ${p.label} pattern`} aria-pressed={selected?.type === 'hero' && selected.hero === p.id} onClick={() => { choose(cover); document.getElementById('artwork-customize')?.scrollIntoView({ block: 'start' }); }}><ResearchArt theme="forest" cover={cover} number={noteNumber({ noteNumber: draft.noteNumber.trim() ? Number(draft.noteNumber) : undefined }, number)} /><span>{p.label}</span></button>;
       })}</div>
       {!filtered.length && <p className={styles.hint}>No matching patterns. Try another name.</p>}
       <p className={styles.hint}>Patterns by <a href="https://heropatterns.com/" target="_blank" rel="noreferrer">Steve Schoger / Hero Patterns</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Colours adapted to your selection.</p></>}

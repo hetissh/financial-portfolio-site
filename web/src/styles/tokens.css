@@ -1,10 +1,19 @@
 :root {
-  --paper: #f8f7f2;
-  --ink: #232e29;
-  --muted: #636b64;
-  --green: #2c5141;
-  --green-light: #e8ede3;
-  --line: #dcdfd5;
+  --portfolio-paper: #f8f7f2;
+  --paper: var(--portfolio-paper);
+  --portfolio-ink: #232e29;
+  --ink: var(--portfolio-ink);
+  --portfolio-muted: #636b64;
+  --muted: var(--portfolio-muted);
+  --portfolio-green: #2c5141;
+  --green: var(--portfolio-green);
+  --portfolio-green-light: #e8ede3;
+  --green-light: var(--portfolio-green-light);
+  --portfolio-line: #dcdfd5;
+  --line: var(--portfolio-line);
+  --button-on-accent: var(--paper);
+  --button-hover: #193b2d;
+  --selection: #dce6cd;
   --serif: var(--font-editorial), Georgia, serif;
   --sans: var(--font-body), system-ui, sans-serif;
   --mono: 'SFMono-Regular', Consolas, monospace;

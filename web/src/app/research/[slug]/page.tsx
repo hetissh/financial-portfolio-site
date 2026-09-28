@@ -15,5 +15,5 @@ export default async function ResearchDetail({ params }: { params: Promise<{ slu
   const note = research.find((item) => item.slug === slug);
   if (!note) notFound();
   const next = research[(research.findIndex((item) => item.id === note.id) + 1) % research.length];
-  return <ResearchArticle note={note} next={research.length > 1 ? next : undefined} back={{ href: "/research/", label: "All research" }} />;
+  return <ResearchArticle note={note} number={research.findIndex(item => item.id === note.id) + 1} next={research.length > 1 ? next : undefined} back={{ href: "/research/", label: "All research" }} />;
 }

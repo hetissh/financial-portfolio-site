@@ -12,7 +12,7 @@ export type LinkDraft = { key: number; label: string; href: string };
 export type ResearchDraft = {
   id: string; slug: string; title: string; summary: string; category: string; tags: string;
   publishedAt: string; updatedAt: string; status: Research["status"]; featuredOrder: string; theme: Research["theme"];
-  cover: Research["cover"]; coverWord: string; coverColor: string;
+  cover: Research["cover"]; coverWord: string; coverColor: string; noteNumber: string;
   question: string; sections: SectionDraft[]; sources: SourceDraft[]; download: string; attachments: Attachment[];
 };
 export type ProfileDraft = {
@@ -47,7 +47,7 @@ export function researchToDraft(record?: Research): ResearchDraft {
     category: record?.category ?? "", tags: record?.tags.join(", ") ?? "",
     publishedAt: record?.publishedAt ?? today(), updatedAt: record?.updatedAt ?? "",
     status: record?.status ?? "draft", featuredOrder: record?.featuredOrder?.toString() ?? "", theme: record?.theme ?? "forest",
-    cover: record?.cover, coverWord: record?.cover?.word ?? themeArtwork.find(p => p.id === (record?.theme ?? "forest"))!.word, coverColor: record?.cover?.color ?? themeArtwork.find(p => p.id === (record?.theme ?? "forest"))!.color,
+    noteNumber: record?.noteNumber?.toString() ?? "", cover: record?.cover, coverWord: record?.cover?.word ?? themeArtwork.find(p => p.id === (record?.theme ?? "forest"))!.word, coverColor: record?.cover?.color ?? themeArtwork.find(p => p.id === (record?.theme ?? "forest"))!.color,
     question: record?.question ?? "",
     sections: record?.sections.map((section) => ({ key: nextKey(), heading: section.heading, paragraphs: joinParagraphs(section.paragraphs), body: section.body, prompts: (section.prompts ?? []).join("\n") })) ?? [emptySection()],
     sources: record?.sources.map((source) => ({ key: nextKey(), ...source })) ?? [],
@@ -60,7 +60,7 @@ export function draftToResearch(draft: ResearchDraft) {
   return {
     id: draft.id, slug: draft.slug.trim(), title: draft.title, summary: draft.summary, category: draft.category,
     tags: splitTags(draft.tags), publishedAt: draft.publishedAt.trim(), updatedAt: optional(draft.updatedAt),
-    status: draft.status, featuredOrder: order === "" ? undefined : Number(order), theme: draft.theme, cover: draft.cover, question: draft.question,
+    status: draft.status, featuredOrder: order === "" ? undefined : Number(order), theme: draft.theme, cover: draft.cover, noteNumber: draft.noteNumber.trim() ? Number(draft.noteNumber) : undefined, question: draft.question,
     sections: draft.sections.map((section) => {
       const prompts = splitLines(section.prompts);
       return { heading: section.heading, paragraphs: section.body ? [] : splitParagraphs(section.paragraphs), body: section.body, prompts: prompts.length ? prompts : undefined };
@@ -101,8 +101,8 @@ export const fieldId = (field: string) => `field-${field.replaceAll(".", "-")}`;
 
 const labels: Record<string, string> = {
   id: "ID", slug: "URL slug", title: "Title", summary: "Summary", category: "Category", tags: "Tags", publishedAt: "Published date",
-  updatedAt: "Updated date", status: "Status", featuredOrder: "Home order", theme: "Illustration", question: "Guiding question",
-  sections: "Sections", heading: "Heading", paragraphs: "Paragraphs", prompts: "Prompts", sources: "Sources", url: "URL", download: "Download", attachments: "Sheets & models",
+  updatedAt: "Updated date", status: "Status", noteNumber: "Note number", featuredOrder: "Home page selection", theme: "Illustration", question: "Guiding question",
+  sections: "Sections", heading: "Heading", paragraphs: "Paragraphs", prompts: "Prompts", sources: "Sources", url: "URL", download: "Download", attachments: "Sheets & models", embedUrl: "Embed link", originalUrl: "Original workbook link",
   displayName: "Name", monogram: "Monogram", role: "Role", headline: "Headline", headlineAccent: "Headline accent", intro: "Introduction",
   bio: "Biography", isPlaceholder: "Approval", contactLinks: "Contact links", label: "Label", href: "Link", resume: "Résumé",
 };

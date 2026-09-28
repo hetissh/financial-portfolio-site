@@ -20,7 +20,7 @@ const statusCopy: Record<Research["status"], { label: string; detail: string }> 
   published: { label: "Published", detail: "Shown in preview and production. Sources are optional." },
 };
 
-export function ResearchEditor({ record, file, version }: { record?: Research; file?: string; version?: string }) {
+export function ResearchEditor({ record, file, version, number = 1 }: { number?: number; record?: Research; file?: string; version?: string }) {
   const router = useRouter();
   const [refreshing, startRefresh] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -100,12 +100,12 @@ export function ResearchEditor({ record, file, version }: { record?: Research; f
           <Field field="summary" label="Summary" hint="One or two sentences for cards and search results." issues={grouped}>{(props) => <textarea {...props} className={styles.input} rows={3} value={draft.summary} onChange={(event) => update("summary", event.target.value)} />}</Field>
           <div className={styles.row2}>
             <Field field="category" label="Category" issues={grouped}>{(props) => <input {...props} className={styles.input} value={draft.category} onChange={(event) => update("category", event.target.value)} />}</Field>
-            <Field field="tags" label="Tags" optional hint="Separate with commas." issues={grouped}>{(props) => <input {...props} className={styles.input} value={draft.tags} onChange={(event) => update("tags", event.target.value)} />}</Field>
+            <Field field="tags" label="Tags" optional issues={grouped}>{(props) => <input {...props} className={styles.input} placeholder="Separate with commas." value={draft.tags} onChange={(event) => update("tags", event.target.value)} />}</Field>
           </div>
           <Field field="question" label="Guiding question" hint="Displayed as the opening pull quote." issues={grouped}>{(props) => <input {...props} className={styles.input} value={draft.question} onChange={(event) => update("question", event.target.value)} />}</Field>
         </fieldset>
 
-        <ArtworkEditor draft={draft} setDraft={setDraft} issues={grouped} onBusy={setUploading} generate={generateCover} error={coverError} onEdited={() => setCoverError(undefined)} />
+        <ArtworkEditor number={number} draft={draft} setDraft={setDraft} issues={grouped} onBusy={setUploading} generate={generateCover} error={coverError} onEdited={() => setCoverError(undefined)} />
 
         <fieldset className={styles.fieldset} id="editor-sections">
           <legend className={styles.legend}>Sections</legend>
@@ -127,7 +127,7 @@ export function ResearchEditor({ record, file, version }: { record?: Research; f
           <button type="button" className={styles.addButton} onClick={() => update("sections", [...draft.sections, emptySection()])}><Plus size={15} aria-hidden="true" /> Add section</button>
         </fieldset>
 
-        <SheetEditor attachments={draft.attachments} onChange={value => update("attachments", value)} onBusy={setUploading} />
+        <SheetEditor issues={grouped} attachments={draft.attachments} onChange={value => update("attachments", value)} onBusy={setUploading} />
         <fieldset className={styles.fieldset} id="editor-sources">
           <legend className={styles.legend}>Sources</legend>
           <p className={styles.intro}>Optional, including for published notes. Listed under “Further reading” when added. Use full https:// addresses.</p>
@@ -155,12 +155,18 @@ export function ResearchEditor({ record, file, version }: { record?: Research; f
             <Field field="publishedAt" label="Published" issues={grouped}>{(props) => <input {...props} className={styles.input} type="date" value={draft.publishedAt} onChange={(event) => update("publishedAt", event.target.value)} />}</Field>
             <Field field="updatedAt" label="Updated" optional issues={grouped}>{(props) => <input {...props} className={styles.input} type="date" value={draft.updatedAt} onChange={(event) => update("updatedAt", event.target.value)} />}</Field>
           </div>
-          <Field field="featuredOrder" label="Home order" optional hint="0 appears first in the home page rail. Leave blank to list it by date after featured notes." issues={grouped}>{(props) => <input {...props} className={styles.input} type="number" min={0} step={1} inputMode="numeric" value={draft.featuredOrder} onChange={(event) => update("featuredOrder", event.target.value)} />}</Field>
+          <div className={styles.field}>
+            <label className={styles.choice}>
+              <input id="field-featuredOrder" type="checkbox" checked={draft.featuredOrder !== ""} onChange={(event) => update("featuredOrder", event.target.checked ? String(record?.featuredOrder ?? Math.max(0, number - 1)) : "")} aria-describedby="field-featuredOrder-hint" />
+              <span><strong>Show on home page</strong><small id="field-featuredOrder-hint">Include in Selected research. Arrange cards in Overview. If no notes are selected, the home page shows all visible notes.</small></span>
+            </label>
+            {grouped.get("featuredOrder") && <p className={styles.error}>{grouped.get("featuredOrder")!.join(" ")}</p>}
+          </div>
           <Field field="download" label="Download" optional hint={<>A file in <code className={styles.code}>web/public</code>, e.g. <code className={styles.code}>/downloads/note.pdf</code>.</>} issues={grouped}>{(props) => <input {...props} className={styles.input} spellCheck={false} value={draft.download} onChange={(event) => update("download", event.target.value)} />}</Field>
         </fieldset></div>
         <div className={styles.panel}>
           <p className={`small-label ${styles.previewLabel}`}>Card preview</p>
-          <div className={styles.previewCard} inert><ResearchCard item={preview} number={(preview.featuredOrder ?? 0) + 1} /></div>
+          <div className={styles.previewCard} inert><ResearchCard item={preview} number={number} /></div>
         </div>
       </aside>
     </div>

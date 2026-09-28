@@ -348,6 +348,48 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The copper admin controls must not recolour theme artwork, Hero Patterns, imported images or the saved article preview."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Every cover type shows FIELD NOTES followed by the automatic note number. Cover types are not printed as labels."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Enter a Note number override, save and reload; clear it to return to automatic numbering. Changing designs, crops and variations must keep that choice."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -368,7 +410,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Local release readiness checks and verified content backup/restore. Deployment remains pending; all existing notes remain samples."
+                  "text": "Prevent extension-added body attributes from triggering hydration warnings while keeping admin editing responsive."
                 }
               ]
             },

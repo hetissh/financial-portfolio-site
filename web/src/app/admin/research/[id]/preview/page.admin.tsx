@@ -1,3 +1,4 @@
+import { automaticNoteNumber } from "@/lib/research-order";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,5 +20,5 @@ export default async function PreviewResearch(props: Props) {
   const note = await findNote(props);
   if (!note) notFound();
   const editHref = `/admin/research/${encodeURIComponent(note.id)}/`;
-  return <ResearchArticle note={note} back={{ href: editHref, label: "Back to editor" }} notice={<p className={styles.notice} role="note"><span><strong>Preview of the saved version.</strong> {visibility[note.status]}</span>{note.status !== "draft" && <Link href={`/research/${note.slug}/`}>Open public page</Link>}</p>} />;
+  return <div className={styles.publicPreview}><ResearchArticle note={note} number={automaticNoteNumber(readAdminContent().research, note.id)} back={{ href: editHref, label: "Back to editor" }} notice={<p className={styles.notice} role="note"><span><strong>Preview of the saved version.</strong> {visibility[note.status]}</span>{note.status !== "draft" && <Link href={`/research/${note.slug}/`}>Open public page</Link>}</p>} /></div>;
 }

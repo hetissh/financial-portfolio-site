@@ -2,8 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 import { cpSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-const directory = mkdtempSync(path.join(tmpdir(), 'portfolio-admin-browser-'));
-cpSync('src/content', directory, { recursive: true });
+// Workers re-load this config; reuse the parent-created disposable content copy.
+const workerDirectory = process.env.TEST_WORKER_INDEX !== undefined ? process.env.PORTFOLIO_ADMIN_TEST_CONTENT : undefined;
+const directory = workerDirectory || mkdtempSync(path.join(tmpdir(), 'portfolio-admin-browser-'));
+if (!workerDirectory) cpSync('src/content', directory, { recursive: true });
 process.env.PORTFOLIO_ADMIN_TEST_CONTENT = directory;
 export default defineConfig({
   outputDir: './test-results-admin',

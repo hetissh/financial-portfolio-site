@@ -24,7 +24,7 @@ describe('publication boundaries', () => {
   });
   it('blocks placeholder profiles and unapproved research from release', () => {
     expect(() => validateRelease(profile, parseResearch([base]), 'https://portfolio.test')).toThrow('placeholder');
-    expect(() => validateRelease({ ...profile, isPlaceholder: false }, parseResearch([base]), 'https://portfolio.test')).toThrow('published');
+    expect(() => validateRelease({ ...profile, isPlaceholder: false }, parseResearch([{ ...base, status: 'sample' }]), 'https://portfolio.test')).toThrow('published');
   });
   it('allows approved content only with a valid production origin', () => {
     const approved = { ...profile, isPlaceholder: false };
