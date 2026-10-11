@@ -1,6 +1,6 @@
 # Three maintained showcase notes
 
-Latest update: 28 September 2026 — simplified admin navigation and tags placeholder. Earlier change evidence is retained below.
+Latest update: 9 October 2026 — substantive standards review and admin response validation. Earlier change evidence is retained below.
 
 | Sample note | Public preview route | Admin record | Examples and checks |
 | --- | --- | --- | --- |
@@ -22,16 +22,143 @@ The command updates the same three reserved records and two managed private illu
 
 ## Current validation
 
-- Content validation, lint and TypeScript build passed. Unit tests: 58 passed, including safe repeated showcase updates and collision refusal.
-- Public browser suite: 76 passed, 4 engine-specific touch checks skipped. Chromium, Firefox, Safari, mobile Chromium and mobile Safari covered routes, navigation, sheets, export privacy, accessibility and the three showcases at 320/390/1440 pixels.
-- Admin browser coverage: all 31 applicable checks passed across the final regression run and focused rerun (13 writing/profile/clipboard checks passed in the focused rerun after the link-dialog focus fix; 18 other cases passed in the regression run). Two native-clipboard engine checks are intentionally skipped. Includes research create/publish/rename/reset/trash, stale tabs, workbooks, cover artwork, profile/About/Contact and all new writing behaviors.
-- Additional reading check: all three notes work without JavaScript; article originals and private image endpoints return 404 in the static preview.
-- Cross-browser file paste events cover PNG, JPEG and WebP, descriptions/captions, cancellation, unsupported/oversized files, server errors and retry. A separate Chromium test exercises native clipboard write and keyboard paste. Native clipboard permissions are not automated in Firefox/Safari; their application paste handlers are covered with file-bearing events.
-- Hardware keyboard Shift+Enter is handled before the iOS Enter fallback, which otherwise drops Shift. Ordinary Enter is unchanged; outside a list, Shift+Enter adds a soft break. Tab/Shift+Tab and toolbar nesting work; five levels are allowed to keep documents within the saved-content depth limit.
-- Rapid typing does not replay earlier React editor updates. Reset remains explicit. Server-rendered admin controls wait for hydration so the first field edit is not lost.
-- Images are centered in the editor, admin preview and static article, including older inline paragraphs and images pasted into headings. Text order is preserved and figures are rendered outside paragraphs/headings.
+For the latest standards review, the Prettier and purpose-comment checks, lint,
+both TypeScript checks, content validation, the Next.js `16.3.8` static preview
+build, and all 87 unit tests passed. Public browser tests on desktop and
+mobile Chrome passed 39 checks with one desktop touch check skipped. Both
+showcase cases opened all three rebuilt sample notes. The full admin Chrome
+suite passed 27 checks using isolated content. Firefox and WebKit binaries
+were unavailable for this run; earlier cross-browser results below are
+historical.
+
+The latest showcase update kept all three notes at `sample`. A SHA-256
+comparison showed only those three note JSON files changed among 19
+source-content files; the other 16 files, including profile, personal notes,
+and uploaded assets, remained byte-identical. The two managed illustration
+files also remained byte-identical. No note was published.
 
 Visual evidence: [nested points on desktop](writing-workflow/nested-points-desktop.png), [centered image on mobile](writing-workflow/centered-image-mobile.png).
+
+## CR: Substantive standards review — 9 October 2026
+
+The 8 October pass established formatting and comment gates. This review
+inspected the public and admin boundaries, content schemas, save and upload
+flows, workbook persistence, scripts, tests, styling conventions, dependency
+setup, and generated-output exclusions against the shared rules. Its detailed
+scope and findings are in `ENGINEERING_STANDARDS_AUDIT.md`.
+
+Admin save handlers now validate the returned record and version before
+marking profile, research, or notebook-order drafts as saved. Malformed HTTP
+success payloads leave the draft editable and show a reload/retry message.
+Image and workbook editors validate upload and preview payloads before use.
+The workbook preview contract is shared by the worker result, persisted
+metadata, and browser response; corrupt saved metadata is treated as an
+unavailable attachment. Regression tests cover these cases.
+
+The same three sample notes gained checks for malformed save/upload responses
+and corrupt workbook previews. `npm run showcase:update -- "Audit codebase
+standards and validate admin responses and saved workbook previews"` succeeded.
+All three remain `sample`. A SHA-256 comparison of 19 source-content files
+found only their three JSON records changed. Profile, personal notes, workbook
+sources, uploaded images, and both managed sample illustrations remained
+byte-identical. No note was published.
+
+The final Prettier and purpose-comment checks, ESLint, public/admin type
+checks, 87 unit tests, content validation, and static preview build passed.
+The 9 October dependency audit reported zero production advisories and five
+high entries in the development-only Next ESLint chain.
+The full public desktop/mobile Chrome suite passed 39 checks and skipped one
+desktop touch-only case; both showcase tests opened all three notes on the
+rebuilt preview. The full admin Chrome suite passed 27 checks against isolated
+content, including the malformed-save response regression. Firefox and WebKit
+were not run because their executables are unavailable locally. The generated
+social image was restored to its tracked version after the build. No deployment
+occurred.
+
+## CR: Codebase-wide source standards — 8 October 2026
+
+`docs/coding-standards.md` now requires short purpose comments in maintained
+source, scripts, tests, and styles, plus explanations for non-obvious behavior.
+All 108 maintained source/script/test/stylesheet files have purpose
+comments and were formatted with pinned Prettier `3.9.9`; the check covers
+113 code files when web configuration is included. Focused comments
+explain validation, upload rollback, editor behavior, and stylesheet sections.
+The format and opening-comment checks are part of CI. Generated Next.js manifests and private content
+remain outside the formatter's scope. The same three reserved sample notes
+were updated with a latest-change checklist, using `npm run showcase:update --
+"Standardize maintained source formatting and comments and patch Next.js"`.
+Their status remains `sample`.
+
+The dependency audit also found a newly reported advisory on Next.js `16.3.6`.
+The compatible `16.3.8` patch and matching ESLint config were installed.
+Afterward, `npm audit --omit=dev` reported zero advisories. The full audit
+reported five high entries in one development-only Next ESLint dependency
+chain; it is not a clean full-tree audit.
+
+The Prettier and purpose-comment checks, lint, public/admin type checks, all 84 unit tests, content
+validation, and the `npm run build` preview export passed after the patch.
+The public desktop/mobile Chrome run passed 39 checks with one desktop touch
+case skipped, including both all-three-showcase cases. The complete admin
+Chrome run passed 26 checks against an isolated content copy. The default
+all-browser admin command could not start its 52 Firefox/WebKit cases because
+those browser executables are not installed; its 26 Chrome cases passed, then
+the explicit Chrome-only run passed cleanly. No Firefox or WebKit result is
+claimed for this CR.
+
+A SHA-256 comparison against the pre-update content found changes only in the
+three reserved showcase JSON files among 19 source-content files. The other
+16 files, including profile, personal notes, the personal `test` note, workbook,
+and uploaded image files, remained byte-identical. Both managed showcase
+illustrations remained byte-identical. No note was published or deployed.
+
+## CR: Admin navigation source readability — 8 October 2026
+
+`AdminNav.tsx` is maintained source. Its route predicates and JSX were expanded
+for reviewability while preserving the same Overview, Profile, and View site
+links and `aria-current` behavior. The shared Latest change checklist in all
+three reserved showcase notes now asks readers to check active navigation on
+Overview, research editors, and Profile, then use View site by keyboard and at
+mobile width. `npm run showcase:update -- "Clarify admin navigation source
+without changing behavior"` completed successfully.
+
+Content validation, lint, public and admin TypeScript checks, all 84 unit
+tests, and the preview build passed. Focused admin Chrome browser checks:
+2 passed using the suite's isolated content copy. Focused public showcase
+checks: 2 passed on desktop and mobile Chrome in the rebuilt preview. A
+SHA-256 check found only the three reserved sample JSON records changed;
+profile, personal notes, uploaded files, and managed illustration bytes did
+not change. The generated social preview image was restored to its tracked
+version after the build. No publication or deployment occurred.
+
+## CR: Public links and local upload hardening — 7–8 October 2026
+
+The same three reserved sample notes were updated with checks for HTTPS links
+containing credentials, useful invalid-upload messages, and generic unexpected
+upload errors. `npm run showcase:update -- "Audit public links and local upload
+errors"` completed successfully. Public content validation now rejects
+embedded credentials in source, contact, and rich-writing HTTPS links. Image
+and workbook upload handlers distinguish known input errors from unexpected
+server failures. This includes one-pixel images, which now receive a useful
+input error. Partial upload files are removed after a metadata write
+failure, without touching files that already existed.
+
+Content validation, lint, public and admin TypeScript checks, all 84 unit tests,
+and `npm run build` passed. Public browser tests on desktop and mobile Chrome:
+39 passed, 1 skipped in the full run; both focused showcase checks passed after
+the final note refresh. This includes loading all three refreshed samples in the
+rebuilt preview and checking responsive layout, accessibility, static-export
+privacy, and no-JavaScript reading. The admin suite used an isolated project
+copy because the owner's local admin development server was already running:
+25 checks passed in the full run; the one failed assertion assumed three fixed
+release blockers and passed after correction in a focused rerun. Unit tests
+cover rejected credential-bearing links, known versus unexpected upload
+responses, and upload rollback. A clean full admin rerun was not completed.
+
+The current published personal note was preserved. Two old browser assertions
+that assumed every note was a sample and the release checklist always had three
+blockers were corrected to use the actual content state. The public build
+regenerated `public/social.png`; its unrelated generated diff was restored so
+it is not part of this change. No production build or deployment was performed.
 
 
 ## CR: Optional citations — 28 September 2026

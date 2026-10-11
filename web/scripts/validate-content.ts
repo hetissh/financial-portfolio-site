@@ -1,3 +1,6 @@
-import { loadContent } from "../src/lib/content";
+// Validates saved content and asset references before a build.
+import { loadContent } from '../src/lib/content';
 const { profile, research, mode } = loadContent();
-console.log(`Validated ${profile.displayName}: ${research.length} visible research notes (${mode}).`);
+console.log(
+  `Validated ${profile.displayName}: ${research.length} visible research notes (${mode}).`,
+);

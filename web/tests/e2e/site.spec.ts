@@ -1,3 +1,4 @@
+// Checks public routes, navigation, accessibility, and static-export boundaries.
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -5,13 +6,17 @@ import { readFileSync } from 'node:fs';
 test('pages render without runtime or asset errors and fit narrow screens', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  page.on('response', (response) => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
+  page.on('response', (response) => {
+    if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
+  });
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Making sense of what matters.');
   await expect(page.getByRole('button', { name: 'Next research' })).toBeEnabled();
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+    ).toBeTruthy();
     if (width === 390) {
       const card = await page.locator('#research-rail > li').first().boundingBox();
       expect(card!.width).toBeGreaterThan(width * 0.7);
@@ -40,7 +45,9 @@ test('Back to top works repeatedly and preserves keyboard focus', async ({ page 
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
 });
 
-test('normal-motion Back to top and viewport changes do not leave a trapped scroller', async ({ page }) => {
+test('normal-motion Back to top and viewport changes do not leave a trapped scroller', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Back to top' }).click();
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
@@ -59,41 +66,73 @@ test('research arrows reach both rail boundaries without moving the document', a
   await next.scrollIntoViewIfNeeded();
   const y = await page.evaluate(() => scrollY);
   const expectSynchronizedControls = async () => {
-    await expect.poll(() => page.evaluate(() => {
-      const rail = document.querySelector('#research-rail')!;
-      const previous = document.querySelector<HTMLButtonElement>('[aria-label="Previous research"]')!;
-      const next = document.querySelector<HTMLButtonElement>('[aria-label="Next research"]')!;
-      return previous.disabled === (rail.scrollLeft <= 2) && next.disabled === (rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2);
-    })).toBe(true);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const rail = document.querySelector('#research-rail')!;
+          const previous = document.querySelector<HTMLButtonElement>(
+            '[aria-label="Previous research"]',
+          )!;
+          const next = document.querySelector<HTMLButtonElement>('[aria-label="Next research"]')!;
+          return (
+            previous.disabled === rail.scrollLeft <= 2 &&
+            next.disabled === rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2
+          );
+        }),
+      )
+      .toBe(true);
   };
-  for (let attempt = 0; attempt < await page.locator('#research-rail > li').count() * 2 && await next.isEnabled(); attempt++) {
+  for (
+    let attempt = 0;
+    attempt < (await page.locator('#research-rail > li').count()) * 2 && (await next.isEnabled());
+    attempt++
+  ) {
     await next.click();
     await expectSynchronizedControls();
   }
   await expect(next).toBeDisabled();
-  expect(Math.abs(await page.evaluate(() => scrollY) - y)).toBeLessThan(3);
+  expect(Math.abs((await page.evaluate(() => scrollY)) - y)).toBeLessThan(3);
   await expect(previous).toBeEnabled();
-  for (let attempt = 0; attempt < await page.locator('#research-rail > li').count() * 2 && await previous.isEnabled(); attempt++) {
+  for (
+    let attempt = 0;
+    attempt < (await page.locator('#research-rail > li').count()) * 2 &&
+    (await previous.isEnabled());
+    attempt++
+  ) {
     await previous.click();
     await expectSynchronizedControls();
   }
   await expect(previous).toBeDisabled();
-  await expect.poll(() => page.locator('#research-rail').evaluate((element) => element.scrollLeft)).toBeLessThanOrEqual(2);
+  await expect
+    .poll(() => page.locator('#research-rail').evaluate((element) => element.scrollLeft))
+    .toBeLessThanOrEqual(2);
 });
 
-test('every research detail route loads directly, refreshes, and links to the next note', async ({ page }) => {
+test('every research detail route loads directly, refreshes, and links to the next note', async ({
+  page,
+}) => {
   await page.goto('/research/');
-  const links = await page.locator('.research-grid .card-link').evaluateAll((elements) => elements.map((element) => element.getAttribute('href')!));
-  expect(links.length).toBeGreaterThanOrEqual(3);
-  for (const href of links) {
-    const response = await page.goto(href);
+  const notes = await page.locator('.research-grid .card-link').evaluateAll((elements) =>
+    elements.map((element) => ({
+      href: element.getAttribute('href')!,
+      sample: element.querySelector('.card-foot')?.textContent?.includes('Example note') ?? false,
+    })),
+  );
+  expect(notes.length).toBeGreaterThanOrEqual(3);
+  for (const [index, note] of notes.entries()) {
+    const response = await page.goto(note.href);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.locator('.sample-note')).toBeVisible();
+    if (note.sample) await expect(page.locator('.sample-note')).toBeVisible();
+    else await expect(page.locator('.sample-note')).toHaveCount(0);
+    await expect(page.locator('.next-note')).toHaveAttribute(
+      'href',
+      notes[(index + 1) % notes.length].href,
+    );
     expect((await page.reload())?.status()).toBe(200);
   }
   await page.locator('.next-note').click();
-  await expect(page).toHaveURL(/beyond-the-bottom-line/);
+  await expect(page).toHaveURL(new URL(notes[0].href, page.url()).href);
 });
 
 test('unknown routes return real 404s with working navigation', async ({ page }) => {
@@ -105,11 +144,15 @@ test('unknown routes return real 404s with working navigation', async ({ page })
 });
 
 test('the local admin is not part of the static export', async ({ page }) => {
-  for (const route of ['/admin/', '/admin/research/new/', '/admin/api/profile/']) expect((await page.goto(route))?.status()).toBe(404);
+  for (const route of ['/admin/', '/admin/research/new/', '/admin/api/profile/'])
+    expect((await page.goto(route))?.status()).toBe(404);
 });
 
 test('core reading and anchors work without JavaScript', async ({ browser, baseURL }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 },
+  });
   const page = await context.newPage();
   await page.goto(`${baseURL}/`);
   await page.getByRole('link', { name: 'Explore my research' }).click();
@@ -130,7 +173,7 @@ test('keyboard focus can reach an off-screen research card', async ({ page, brow
   await cards.first().focus();
   // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
   const key = browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab';
-  for (let index = 1; index < await cards.count(); index++) await page.keyboard.press(key);
+  for (let index = 1; index < (await cards.count()); index++) await page.keyboard.press(key);
   await expect(cards.last()).toBeFocused();
   const visible = await cards.last().evaluate((element) => {
     const box = element.getBoundingClientRect();
@@ -143,13 +186,23 @@ test('keyboard focus can reach an off-screen research card', async ({ page, brow
 test('automated accessibility checks pass on home, index, and detail', async ({ page }) => {
   for (const route of ['/', '/research/', '/research/beyond-the-bottom-line/']) {
     await page.goto(route);
-    const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+    const result = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
     expect(result.violations).toEqual([]);
   }
 });
 
-test('native touch scrolling works over the research rail', async ({ page, context, browserName, isMobile }) => {
-  test.skip(browserName !== 'chromium' || !isMobile, 'Uses Chromium mobile touch dispatch; real device testing remains separate.');
+test('native touch scrolling works over the research rail', async ({
+  page,
+  context,
+  browserName,
+  isMobile,
+}) => {
+  test.skip(
+    browserName !== 'chromium' || !isMobile,
+    'Uses Chromium mobile touch dispatch; real device testing remains separate.',
+  );
   await page.goto('/#research');
   await expect(page.getByRole('button', { name: 'Next research' })).toBeEnabled();
   const session = await context.newCDPSession(page);
@@ -160,7 +213,10 @@ test('native touch scrolling works over the research rail', async ({ page, conte
   const startY = await page.evaluate(() => scrollY);
   await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
   for (let step = 1; step <= 6; step++) {
-    await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - step * 25 }] });
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x, y: y - step * 25 }],
+    });
     await page.waitForTimeout(30);
   }
   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
@@ -171,15 +227,22 @@ test('native touch scrolling works over the research rail', async ({ page, conte
   if (!rail) throw new Error('Missing rail');
   const touchY = Math.max(60, rail.y + 80);
   expect(touchY).toBeLessThan(rail.y + rail.height);
-  await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 360, y: touchY }] });
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: 360, y: touchY }],
+  });
   for (let step = 1; step <= 6; step++) {
-    await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 360 - step * 45, y: touchY }] });
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: 360 - step * 45, y: touchY }],
+    });
     await page.waitForTimeout(30);
   }
   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await expect.poll(() => page.locator('#research-rail').evaluate((element) => element.scrollLeft)).toBeGreaterThan(30);
+  await expect
+    .poll(() => page.locator('#research-rail').evaluate((element) => element.scrollLeft))
+    .toBeGreaterThan(30);
 });
-
 
 test('section navigation and browser history preserve usable page scrolling', async ({ page }) => {
   await page.goto('/');
@@ -198,15 +261,22 @@ test('section navigation and browser history preserve usable page scrolling', as
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
 });
 
-test('example Excel sheets work in the static export and private admin endpoints stay absent', async ({ page, request }) => {
+test('example Excel sheets work in the static export and private admin endpoints stay absent', async ({
+  page,
+  request,
+}) => {
   await page.goto('/research/beyond-the-bottom-line/');
   await page.locator('summary').filter({ hasText: 'Example financial statements' }).click();
   await expect(page.getByRole('cell', { name: '100', exact: true })).toBeVisible();
   await page.getByLabel('Show formulas').check();
   await expect(page.getByRole('cell', { name: '=B5-B6', exact: true })).toBeVisible();
   await page.getByLabel('Sheet', { exact: true }).selectOption({ label: 'Research questions' });
-  await expect(page.getByRole('cell', { name: 'What does the business sell?', exact: true })).toBeVisible();
-  const href = await page.getByRole('link', { name: 'Download Excel', exact: true }).getAttribute('href');
+  await expect(
+    page.getByRole('cell', { name: 'What does the business sell?', exact: true }),
+  ).toBeVisible();
+  const href = await page
+    .getByRole('link', { name: 'Download Excel', exact: true })
+    .getAttribute('href');
   const response = await request.get(href!);
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('spreadsheetml.sheet');
@@ -214,26 +284,56 @@ test('example Excel sheets work in the static export and private admin endpoints
   const id = href!.split('/').at(-1)!.replace('.xlsx', '');
   expect((await request.get(`/admin/api/workbooks/${id}/`)).status()).toBe(404);
   expect((await request.get(`/src/content/workbooks/${id}.json`)).status()).toBe(404);
-  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
 });
 
-
-test('saved card artwork matches the home, index, article and no-JavaScript export', async ({ page, browser }) => {
+test('saved card artwork matches the home, index, article and no-JavaScript export', async ({
+  page,
+  browser,
+}) => {
   const note = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
   for (const route of ['/', '/research/', `/research/${note.slug}/`]) {
     await page.goto(route);
-    const art = route.includes(note.slug) ? page.locator('main .research-art') : page.locator(`.card-link[href="/research/${note.slug}/"] .research-art`);
+    const art = route.includes(note.slug)
+      ? page.locator('main .research-art')
+      : page.locator(`.card-link[href="/research/${note.slug}/"] .research-art`);
     if (note.cover) {
       await expect(art).toHaveAttribute('data-cover-word', note.cover.word);
       await expect(art).toHaveAttribute('data-cover-color', note.cover.color.toLowerCase());
       await expect(art).toHaveAttribute('data-cover-variation', String(note.cover.variation ?? 0));
       if (note.cover.seed) await expect(art).toHaveAttribute('data-cover-seed', note.cover.seed);
-    } else { await expect(art).toHaveClass(new RegExp(`art-${note.theme}`)); }
-    await expect(art.locator(note.cover?.type === 'image' ? 'img' : note.cover?.type === 'hero' ? '.hero-pattern-layer' : 'svg')).toBeVisible();
+    } else {
+      await expect(art).toHaveClass(new RegExp(`art-${note.theme}`));
+    }
+    await expect(
+      art.locator(
+        note.cover?.type === 'image'
+          ? 'img'
+          : note.cover?.type === 'hero'
+            ? '.hero-pattern-layer'
+            : 'svg',
+      ),
+    ).toBeVisible();
   }
   const context = await browser.newContext({ javaScriptEnabled: false });
-  const reading = await context.newPage(); await reading.goto(new URL(`/research/${note.slug}/`, page.url()).href);
+  const reading = await context.newPage();
+  await reading.goto(new URL(`/research/${note.slug}/`, page.url()).href);
   const art = reading.locator('main .research-art');
   if (note.cover) await expect(art).toHaveAttribute('data-cover-word', note.cover.word);
-  await expect(art.locator(note.cover?.type === 'image' ? 'img' : note.cover?.type === 'hero' ? '.hero-pattern-layer' : 'svg')).toBeVisible(); await context.close();
+  await expect(
+    art.locator(
+      note.cover?.type === 'image'
+        ? 'img'
+        : note.cover?.type === 'hero'
+          ? '.hero-pattern-layer'
+          : 'svg',
+    ),
+  ).toBeVisible();
+  await context.close();
 });

@@ -1,3 +1,4 @@
+/* Defines shared public color, spacing, and typography tokens. */
 :root {
   --portfolio-paper: #f8f7f2;
   --paper: var(--portfolio-paper);

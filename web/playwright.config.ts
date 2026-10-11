@@ -1,3 +1,4 @@
+// Runs public browser tests against the rebuilt static preview.
 import { defineConfig, devices } from '@playwright/test';
 const port = process.env.PORTFOLIO_PREVIEW_PORT || '4187';
 const baseURL = `http://127.0.0.1:${port}`;
@@ -12,11 +13,24 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: { baseURL, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 }, launchOptions: { executablePath } } },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1440, height: 1000 },
+        launchOptions: { executablePath },
+      },
+    },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'], launchOptions: { executablePath } } },
     { name: 'mobile-webkit', use: { ...devices['iPhone 13'] } },
   ],
-  webServer: { command: 'npm run preview', url: baseURL, reuseExistingServer: false, timeout: 15000, env: { PORT: port } },
+  webServer: {
+    command: 'npm run preview',
+    url: baseURL,
+    reuseExistingServer: false,
+    timeout: 15000,
+    env: { PORT: port },
+  },
 });

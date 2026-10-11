@@ -9,7 +9,7 @@
     "testing"
   ],
   "publishedAt": "2026-09-28",
-  "updatedAt": "2026-09-28",
+  "updatedAt": "2026-10-09",
   "status": "sample",
   "theme": "blue",
   "cover": {
@@ -410,7 +410,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Prevent extension-added body attributes from triggering hydration warnings while keeping admin editing responsive."
+                  "text": "Audit codebase standards and validate admin responses and saved workbook previews"
                 }
               ]
             },
@@ -420,6 +420,109 @@
                 {
                   "type": "text",
                   "text": "These three sample notes are refreshed after each change request. Use the checks below to try the current features."
+                }
+              ]
+            },
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Check formatting, images, notebook navigation and sheet links in these three notes after the repository-wide standards review. Source comments, formatting and dependency advisories are verified by code review and automated checks, not by saved note content."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In local admin, a malformed or interrupted save response should leave the current profile, note, or notebook-order draft available for retry; reload before retrying when the server may have saved the change."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In local admin, Overview should be active on Overview and research editors, Profile should be active on Profile, and View site should open the public page. Check navigation by keyboard and at mobile width."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Try an HTTPS source, contact or writing link containing user:password@ before the host. Saving should reject it; an ordinary HTTPS or mailto link should still work."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Try an invalid image or workbook upload. The editor should explain the input problem and keep the note editable."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "If an upload fails or returns malformed data, the editor should show a retry message without exposing a filesystem path or parser detail. Keep the draft editable and retry after resolving the local problem."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "If a saved workbook preview is corrupt, content validation should report the missing usable attachment rather than rendering malformed rows. This failure is covered by automated tests, not by a sample note."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }

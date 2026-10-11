@@ -2,6 +2,12 @@
 
 A responsive finance/research portfolio built with Next.js, React, TypeScript, and static export.
 
+Repository development instructions are in [AGENTS.md](AGENTS.md) (also used by
+[CLAUDE.md](CLAUDE.md)). Read the maintained [architecture](docs/architecture.md)
+and [coding standards](docs/coding-standards.md) before substantial changes.
+Shared engineering defaults are in [docs/ai-rules/](docs/ai-rules/); the
+repository-specific instructions and documented decisions take precedence.
+
 Project: `/Users/hetissh/Workspace/personal_projects/financial-portfolio-site/`
 
 ## Run locally
@@ -120,6 +126,8 @@ After editing, run `npm run validate:content` and build again. Save the `src/con
 Run from `web/`:
 
 ```sh
+npm run format:check
+npm run comments:check
 npm run lint
 npm run typecheck
 npm run test:unit
@@ -129,11 +137,17 @@ npm run test:e2e
 npm run test:e2e:admin
 ```
 
+Use `npm run format` after editing maintained code. The formatter is scoped to
+source, scripts, tests, and web configuration; private content and generated
+build output stay outside that pass. Add a short purpose comment to each
+maintained code file and explain non-obvious decisions near the relevant code,
+as described in [coding standards](docs/coding-standards.md).
+
 Public browser checks run against the static export on an isolated port (4187 by default). Admin checks start a separate server on port 4186 and edit temporary copies of the content. They cover Chromium, Firefox, WebKit, and mobile profiles. The test dataset currently uses the included example notes; update content-specific expectations alongside any changes to those fixtures. See [admin and sheets QA](docs/qa-evidence/ADMIN_REVIEW.md) for admin/sheets results and remaining manual checks. [Word-cover QA](docs/qa-evidence/WORD_COVERS.md) records the initial cover checks. [Artwork picker QA](docs/qa-evidence/ARTWORK_PICKER.md) records theme, pattern and crop checks. [Continuous-cover QA](docs/qa-evidence/PROCEDURAL_COVERS.md) records the expanded generator checks. [Original site QA](docs/qa-evidence/RESULTS.md) records the earlier public-site checks.
 
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` optionally selects an existing Chromium binary. `PLAYWRIGHT_BROWSERS_PATH` optionally selects a browser cache. Neither is required for normal use after `npx playwright install`.
 
-A GitHub Actions workflow is provided in `.github/workflows/ci.yml`. It runs checks and saves the browser report when this project is pushed to a GitHub repository; no remote was created or connected by this implementation.
+A GitHub Actions workflow is provided in `.github/workflows/ci.yml`. It runs checks and saves the browser report on pushes and pull requests. An `origin` remote is configured; the repository does not establish a hosting deployment.
 
 ## Release
 

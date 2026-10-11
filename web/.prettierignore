@@ -1,0 +1,16 @@
+# Generated output, private content, and lockfiles are not formatter inputs.
+node_modules/
+node_modules.incomplete/
+.next/
+.next-admin/
+out/
+public/
+src/content/
+test-results/
+test-results-admin/
+test-results-public/
+playwright-report/
+playwright-report-admin/
+next-env.d.ts
+package-lock.json
+*.tsbuildinfo

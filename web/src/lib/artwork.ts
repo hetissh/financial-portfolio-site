@@ -1,3 +1,4 @@
+// Defines the selectable artwork catalog and its stable preset identifiers.
 import presets from './artwork-presets.json';
 import patterns from './hero-patterns.json';
 export const themeArtwork = [
@@ -7,11 +8,13 @@ export const themeArtwork = [
   ...presets,
 ];
 export const heroPatterns = patterns;
-export const heroAppearanceDefaults = { foregroundColor: '#000000', foregroundOpacity: .4 };
+export const heroAppearanceDefaults = { foregroundColor: '#000000', foregroundOpacity: 0.4 };
 // Existing covers without appearance settings retain their original auto ink and opacity.
-export const legacyHeroOpacity = .18;
+export const legacyHeroOpacity = 0.18;
 export function heroBackground(id: string, ink: string) {
-  const pattern = patterns.find(p => p.id === id);
-  return pattern ? `url("data:image/svg+xml,${encodeURIComponent(pattern.svg.replaceAll('#000', ink))}")` : undefined;
+  const pattern = patterns.find((p) => p.id === id);
+  return pattern
+    ? `url("data:image/svg+xml,${encodeURIComponent(pattern.svg.replaceAll('#000', ink))}")`
+    : undefined;
 }
 export const imageDefault = { word: 'Image', color: '#f2eee3' };

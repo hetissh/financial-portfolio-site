@@ -1,6 +1,8 @@
 # Release and rollback
 
-Current status: implemented local preview. No remote repository, hosting project, domain, or public deployment has been created.
+Current status: implemented local preview with a configured `origin` Git remote.
+This repository does not establish a hosting project, production domain, or public
+deployment; confirm their external status before release.
 
 ## Finish the content
 
