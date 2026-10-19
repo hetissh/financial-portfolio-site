@@ -64,11 +64,6 @@ export function releaseReadiness(
     samples,
     drafts,
     notices: [
-      ...(!profile.contact?.email && !profile.contactLinks.length
-        ? [
-            'No contact email or links are configured. Add them in Admin → Profile if visitors should be able to contact you.',
-          ]
-        : []),
       ...(samples || drafts
         ? [`${samples} sample and ${drafts} draft notes are excluded from production.`]
         : []),

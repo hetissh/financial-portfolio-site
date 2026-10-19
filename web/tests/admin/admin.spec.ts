@@ -173,15 +173,16 @@ test('profile validation, connection failure recovery, stale-tab conflict and ke
     expect(Math.abs(nameBox!.y - monogramBox!.y)).toBeLessThan(1);
   else expect(Math.abs(nameBox!.x - monogramBox!.x)).toBeLessThan(1);
   expect(Math.abs(nameBox!.height - monogramBox!.height)).toBeLessThan(1);
+  await page.goto('/admin/home/');
   const original = await page.getByLabel('Introduction', { exact: true }).inputValue();
   await page.getByLabel('Introduction', { exact: true }).fill('');
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
   await expect(page.locator('main [role=alert]')).toContainText('Introduction');
   await page.getByLabel('Introduction', { exact: true }).fill('An unsaved introduction');
   await page.route('**/admin/api/profile/', (route) => route.abort());
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
   await expect(page.locator('main [role=alert]')).toContainText('Could not connect');
-  await expect(page.getByRole('button', { name: 'Save profile', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Save homepage', exact: true })).toBeEnabled();
   await expect(page.getByLabel('Introduction', { exact: true })).toHaveValue(
     'An unsaved introduction',
   );
@@ -190,18 +191,18 @@ test('profile validation, connection failure recovery, stale-tab conflict and ke
   await page.getByRole('button', { name: 'Reset edits', exact: true }).click();
   await expect(page.getByLabel('Introduction', { exact: true })).toHaveValue(original);
   const other = await context.newPage();
-  await other.goto('/admin/profile/');
+  await other.goto('/admin/home/');
   await other.getByLabel('Introduction', { exact: true }).fill('A newer introduction');
-  await other.getByRole('button', { name: 'Save profile', exact: true }).click();
-  await expect(other.getByRole('status')).toContainText('Saved to');
+  await other.getByRole('button', { name: 'Save homepage', exact: true }).click();
+  await expect(other.getByRole('status')).toContainText('Profile saved');
   await page.getByLabel('Introduction', { exact: true }).fill('A stale introduction');
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
   await expect(page.locator('main [role=alert]')).toContainText('another tab or editor');
   await other.getByLabel('Introduction', { exact: true }).fill(original);
   await other
     .getByLabel('Introduction', { exact: true })
     .press(process.platform === 'darwin' ? 'Meta+s' : 'Control+s');
-  await expect(other.getByRole('status')).toContainText('Saved to');
+  await expect(other.getByRole('status')).toContainText('Profile saved');
   await other.reload();
   await expect(other.getByLabel('Introduction', { exact: true })).toHaveValue(original);
   expect(
@@ -215,22 +216,22 @@ test('profile validation, connection failure recovery, stale-tab conflict and ke
 });
 
 test('malformed save responses leave profile edits available for retry', async ({ page }) => {
-  await page.goto('/admin/profile/');
+  await page.goto('/admin/home/');
   const introduction = page.getByLabel('Introduction', { exact: true });
   const original = await introduction.inputValue();
   await introduction.fill('An introduction awaiting a valid save response');
   await page.route('**/admin/api/profile/', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '{"record":null}' }),
   );
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
   await expect(page.locator('main [role=alert]')).toContainText('incomplete save response');
   await expect(introduction).toHaveValue('An introduction awaiting a valid save response');
   await page.unroute('**/admin/api/profile/');
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Saved to');
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Profile saved');
   await introduction.fill(original);
-  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Saved to');
+  await page.getByRole('button', { name: 'Save homepage', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Profile saved');
 });
 
 test('local origin checks, upload errors, and admin navigation', async ({ page, request }) => {
@@ -245,7 +246,11 @@ test('local origin checks, upload errors, and admin navigation', async ({ page, 
   });
   expect(malformed.status()).toBe(400);
   await page.goto('/admin/');
-  await expect(page.getByRole('link', { name: 'Edit profile', exact: true }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Admin', exact: true })
+      .getByRole('link', { name: 'Profile' }),
+  ).toBeVisible();
   await expect(
     page
       .getByRole('navigation', { name: 'Admin', exact: true })
@@ -255,7 +260,7 @@ test('local origin checks, upload errors, and admin navigation', async ({ page, 
   await expect(
     page
       .getByRole('navigation', { name: 'Admin', exact: true })
-      .getByRole('link', { name: 'Overview', exact: true }),
+      .getByRole('link', { name: 'Research', exact: true }),
   ).toHaveAttribute('aria-current', 'page');
   await expect(page.getByLabel('Tags', { exact: false })).toHaveAttribute(
     'placeholder',

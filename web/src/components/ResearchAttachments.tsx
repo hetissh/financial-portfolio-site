@@ -5,9 +5,21 @@ import { getWorkbook } from '@/lib/admin/workbooks';
 import { WorkbookViewer } from './WorkbookViewer';
 import { SheetEmbed } from './SheetEmbed';
 import { sheetEmbed } from '@/lib/sheet-embed';
-export function ResearchAttachments({ attachments }: { attachments: Attachment[] }) {
+import { visitorAssetUrl } from '@/lib/supabase/assets';
+import { getCloudWorkbook } from '@/lib/supabase/workbooks';
+export async function ResearchAttachments({ attachments }: { attachments: Attachment[] }) {
   if (!attachments.length) return null;
   const localAdmin = process.env.PORTFOLIO_ADMIN === '1';
+  const cloud = process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+  const previews = new Map(
+    cloud
+      ? await Promise.all(
+          attachments
+            .filter((item) => item.kind === 'excel')
+            .map(async (item) => [item.id, await getCloudWorkbook(item.id)] as const),
+        )
+      : [],
+  );
   return (
     <section className="research-attachments" aria-labelledby="sheets-heading" id="sheets">
       <div className="section-heading">
@@ -30,9 +42,11 @@ export function ResearchAttachments({ attachments }: { attachments: Attachment[]
                   <a
                     className="text-link"
                     href={
-                      localAdmin
-                        ? `/admin/api/workbooks/${attachment.id}/`
-                        : `/downloads/workbooks/${attachment.id}.xlsx`
+                      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+                        ? visitorAssetUrl(`/downloads/workbooks/${attachment.id}.xlsx`)
+                        : localAdmin
+                          ? `/media/workbooks/${attachment.id}/`
+                          : `/downloads/workbooks/${attachment.id}.xlsx`
                     }
                     download
                   >
@@ -61,7 +75,7 @@ export function ResearchAttachments({ attachments }: { attachments: Attachment[]
             </div>
           );
         if (attachment.kind === 'microsoft') return null;
-        const workbook = getWorkbook(attachment.id);
+        const workbook = cloud ? previews.get(attachment.id) : getWorkbook(attachment.id);
         return (
           <details className="workbook-card" key={attachment.id}>
             <summary>
@@ -79,9 +93,11 @@ export function ResearchAttachments({ attachments }: { attachments: Attachment[]
                     <a
                       className="text-link"
                       href={
-                        localAdmin
-                          ? `/admin/api/workbooks/${attachment.id}/`
-                          : `/downloads/workbooks/${attachment.id}.xlsx`
+                        process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+                          ? visitorAssetUrl(`/downloads/workbooks/${attachment.id}.xlsx`)
+                          : localAdmin
+                            ? `/media/workbooks/${attachment.id}/`
+                            : `/downloads/workbooks/${attachment.id}.xlsx`
                       }
                       download
                     >

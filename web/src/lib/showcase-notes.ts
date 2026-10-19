@@ -17,7 +17,7 @@ export const showcaseImageIds = [
   '90f3fe01-a1b2-4c33-8d44-e55500000002',
 ] as const;
 const currentChange =
-  'Audit maintained modules against the project standards and validate admin responses and saved workbook previews before use.';
+  'Add certification PDF uploads and prepare one cloud-backed server for the public site and admin.';
 const text = (value: string, marks?: RichMark[]): RichNode => ({
   type: 'text',
   text: value,
@@ -84,7 +84,76 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
         'In local admin, a malformed or interrupted save response should leave the current profile, note, or notebook-order draft available for retry; reload before retrying when the server may have saved the change.',
       ),
       item(
-        'In local admin, Overview should be active on Overview and research editors, Profile should be active on Profile, and View site should open the public page. Check navigation by keyboard and at mobile width.',
+        'In the content desk, Overview, Homepage, Research, Profile and Admin management each open the expected destination. Research stays active in a research editor. Check keyboard focus and mobile navigation.',
+      ),
+      item(
+        'Overview keeps the blue grid visible, shows real published, draft and release counts, and lists compact research rows with usable order, edit and preview controls. Sample notes stay labelled as examples.',
+      ),
+      item(
+        'In Overview, the Evidence in pictures pattern thumbnail shows repeated puzzle pieces at compact size rather than a cropped fragment. Its full research cover keeps the saved pattern appearance.',
+      ),
+      item(
+        'Check the classic ivory and brass palette across home, research, article, and admin views: keep the navy grid visible, use warm reading and editing surfaces, and reserve brass for accents with readable contrast.',
+      ),
+      item(
+        'Scroll to the bottom of the home, research, article and admin pages, including with a fast trackpad gesture. The footer should stay at the viewport edge without a large empty grid below it.',
+      ),
+      item(
+        'With UNSPLASH_ACCESS_KEY configured in the private server environment, search Unsplash in the cover artwork picker, select a result, save the note and verify it hotlinks the Unsplash image and credits the photographer. Without a key, the picker should explain how to configure it.',
+      ),
+      item(
+        'On the new-note page, open Unsplash in the cover picker and confirm its search stays inside the editor without nested forms or hydration errors.',
+      ),
+      item(
+        'Open Homepage from the navigation or yellow overview action. Edit the portfolio title, introduction and two research transition lines; the preview should respond, and saving should update the public page. Profile still edits identity and saved About and Contact content.',
+      ),
+      item(
+        'On the home page, the selected research rail has no “notes to explore” count label; its arrow controls appear only when the cards overflow. Visible résumé and certifications appear together in their own section after selected research. Hide them in Profile and confirm they disappear from the public home page.',
+      ),
+      item(
+        'In Profile, attach a PDF up to 5 MB to a certification. Preview it before saving, then save and confirm its PDF action appears in the dedicated home credentials section. Hide the certification and confirm the public PDF link disappears. Invalid files should leave the draft editable.',
+      ),
+      item(
+        'When the profile has visible credentials, the Credentials navigation link should take you to their home-page section from home or a research page. Contact should appear only when a contact method exists and should lead to the compact contact area.',
+      ),
+      item(
+        'In the combined cloud server after the migration, sign in to Admin on the same origin as the public site; save a profile edit, image, workbook and certification PDF, then reload the public page. The saved files and content should persist after a server restart. Keep draft media inaccessible without an admin session.',
+      ),
+      item(
+        'The overview Release panel shows blockers first and expands to all checks. Its profile action opens Profile; the production address remains an operator setting.',
+      ),
+      item(
+        'On the combined site, use Admin in the main navigation or footer while signed out: the login form should appear. Sign in, return to the public page, and use Admin again to reach the content desk. The static export should have no Admin link. Admin management should show two account slots and no Remove access action for the current account. Password recovery and session revocation are verified by automated tests.',
+      ),
+      item(
+        'In the content desk, choose Sign out. The main public page should open, and choosing Admin again should lead to login because the prior session ended.',
+      ),
+      item(
+        'On login, reset, and Admin management password fields, use Show and Hide to inspect only the value you typed. The control should keep the value and never submit the form. Test fixture credentials do not change a live admin login.',
+      ),
+      item(
+        'Keep local admin and Resend settings in the private web/.env.local file. Initial passwords are needed only for bootstrap; password changes use Admin management or reset. The live auth JSON contains hashes, and test fixture values never sign in to the live site.',
+      ),
+      item(
+        'After an operator updates both private admin accounts, sign in with each updated email and password. Earlier sessions and pending recovery links should no longer grant access. Keep real credentials out of sample notes and test fixtures.',
+      ),
+      item(
+        'Change the profile monogram, save, then reload a public page: the browser tab icon should show the same initials as the header. Rebuild the static preview to check its icon too.',
+      ),
+      item(
+        'Edit Portfolio title, Introduction and both Research introduction lines in Profile. The admin journey preview updates before saving; after saving, reload home to see the title in the header, hero and card, the description beneath it, and the two research lines at the end of the scroll sequence.',
+      ),
+      item(
+        'On home, move over a sheet cell: its faint formula should stay inside that cell. Scroll to turn the reflective card, raise the dashboard bars and reveal the allocation, cash-flow and trend widgets. At the end, the dashboard blurs and the research introduction appears before the selected notes.',
+      ),
+      item(
+        'Open the notebook index and an article after the home sequence. Check the navy grid, ivory reading surfaces, brass accents, readable article text, and working navigation. Try a small screen and reduced motion.',
+      ),
+      item(
+        'Follow the blue grid from the hero through selected research, the research index, an article, and the footer. Confirm the grid has no abrupt colour break and that note cards and article text remain readable on light panels.',
+      ),
+      item(
+        'The home page ends after selected research. About and Contact no longer appear there or in the main navigation; their saved content remains editable in Profile. The admin keeps a subtle blue grid around solid form panels.',
       ),
       item(
         'Try an HTTPS source, contact or writing link containing user:password@ before the host. Saving should reject it; an ordinary HTTPS or mailto link should still work.',
@@ -180,9 +249,12 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
             item('Edit this note in admin and check that bullet markers remain visible.'),
             item('Use Shift+Enter, Tab, Shift+Tab and the nesting buttons inside both list types.'),
             item('Try up to five list levels, then save, reload and preview.'),
+            item(
+              'When hosted editing is enabled, refresh the visitor article after a save and check that rich formatting updates without a rebuild.',
+            ),
             item('Try bold, italic, headings, links, undo and redo; reset an unsaved edit.'),
             item(
-              'Selected formatting buttons and keyboard focus use copper; list markers and text stay readable on the cream editor surface.',
+              'Selected formatting buttons and keyboard focus use navy or yellow accents; list markers and text stay readable on the editor surface.',
             ),
             item(
               'The cover corner shows this note’s notebook number, independent of its artwork or variation.',
@@ -269,7 +341,10 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
             ),
             item('Import a cover image and adjust its crop. Article image originals stay private.'),
             item(
-              'The copper admin controls must not recolour theme artwork, Hero Patterns, imported images or the saved article preview.',
+              'When hosted media is enabled, only published image crops and downloads should be public; originals and draft media stay private.',
+            ),
+            item(
+              'The navy admin controls must not recolour theme artwork, Hero Patterns, imported images or the saved article preview.',
             ),
             item(
               'Every cover type shows FIELD NOTES followed by the automatic note number. Cover types are not printed as labels.',
@@ -296,10 +371,27 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
         section(
           'Profile and contact',
           bullets(
-            item('Edit the name and monogram; one, two and three characters fit without clipping.'),
+            item(
+              'Edit the name and monogram; one, two and three characters fit without clipping, and the browser tab icon matches after saving and reloading.',
+            ),
             item('Edit “The person behind the notes”: heading, accent, biography and principles.'),
             item('Edit Contact: heading, introduction, email, link label and subject.'),
             item('Reorder, add or remove contact links, then save and reload.'),
+            item(
+              'Add an HTTPS or mailto contact link, save, and check the compact public contact area after the research. Invalid and credential-bearing URLs should be rejected.',
+            ),
+            item(
+              'Upload a PDF résumé, set its link label and visibility, save, then open it from the home-page credentials section above Certifications. Reject a non-PDF or file over 5 MB; hiding or removing the link should remove it from the public home page.',
+            ),
+            item(
+              'Add, reorder and hide certifications. Visible entries show the name, issuer, issue date and optional verification link; invalid dates and URLs should block saving.',
+            ),
+            item(
+              'When hosted editing is enabled, refresh the visitor site after a profile save and check that the new details and monogram appear without a rebuild.',
+            ),
+            item(
+              'When hosted Supabase admin access is enabled, sign in as each of the two invited Auth users. The bound account slots should keep their fixed IDs; disabling the other slot should end its access, while the current account cannot disable itself.',
+            ),
             item(
               'The email link opens a draft in your email app addressed to the saved profile email. Sending happens in that app.',
             ),
@@ -311,7 +403,7 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
           numbers(
             '1',
             item(
-              'The top admin navigation contains Overview, Profile and View site. Create a note using New research note in Overview.',
+              'The top admin navigation contains Overview, Homepage, Research, Profile and View site. Create a note using New note in Overview.',
             ),
             item(
               'Clear Tags to see Separate with commas. inside the input; there is no duplicate hint underneath. Tags remain editable and save as separate values.',
@@ -320,6 +412,12 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
               'On a fresh admin load, wait for the fields to become available; the very first title edit must remain saved.',
             ),
             item('Create a draft with a title, summary, category, tags, question and sections.'),
+            item(
+              'On a new note, open Unsplash in Cover artwork. Its search region must not create a nested form, and the editor should hydrate without console errors.',
+            ),
+            item(
+              'When hosted editing is enabled, publishing should make a note visible on the next visitor request while drafts stay hidden.',
+            ),
             item('Change the slug, dates, section order and cover; save, reload and preview.'),
             item('Reset unsaved changes and confirm the saved content returns.'),
             item('Edit the same note in two tabs; a stale save should ask you to reload.'),
@@ -409,22 +507,28 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
           ),
         ),
         section(
-          'Sand & Copper admin',
+          'Portfolio admin palette',
           bullets(
             item(
-              'Overview, Profile and New note share sand backgrounds, cream panels, copper actions and a dark brown admin navigation bar.',
+              'Overview, Homepage, Profile and New note show the blue grid around warm ivory editing panels, navy actions and brass focus and active accents.',
             ),
             item(
               'Active navigation, keyboard focus, checked controls and crop dialogs remain clear on desktop and mobile.',
             ),
             item(
+              'Selected green controls and Save buttons keep light, readable labels against their accent backgrounds.',
+            ),
+            item(
               'Successful saves and published badges remain green; invalid fields and failed saves remain red.',
             ),
             item(
-              'Profile headline, card and saved article previews retain the public portfolio colours.',
+              'The Homepage journey preview shows the card title, description and research lines in the public palette. Saved article previews keep the same reading colours.',
             ),
             item(
-              'Choose View site, then return to admin: the public page keeps its original green palette.',
+              'Choose View site, then return to admin: the public card journey, notebook and article keep their navy, ivory, brass and green palette.',
+            ),
+            item(
+              'At the end of an admin or public page, scroll past the footer and confirm the page stops at the footer edge on desktop and mobile.',
             ),
           ),
         ),

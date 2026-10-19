@@ -9,12 +9,27 @@ const links = [
   {
     href: '/admin/',
     label: 'Overview',
-    match: (path: string) => path === '/admin/' || path.startsWith('/admin/research/'),
+    match: (path: string) => path === '/admin/',
+  },
+  {
+    href: '/admin/home/',
+    label: 'Homepage',
+    match: (path: string) => path.startsWith('/admin/home/'),
+  },
+  {
+    href: '/admin/#notes-heading',
+    label: 'Research',
+    match: (path: string) => path.startsWith('/admin/research/'),
   },
   {
     href: '/admin/profile/',
     label: 'Profile',
     match: (path: string) => path.startsWith('/admin/profile'),
+  },
+  {
+    href: '/admin/admins/',
+    label: 'Admin management',
+    match: (path: string) => path.startsWith('/admin/admins'),
   },
 ];
 
@@ -32,6 +47,9 @@ export function AdminNav() {
       <Link href="/">
         View site <ArrowUpRight size={14} aria-hidden="true" />
       </Link>
+      <form action="/api/admin-auth/logout/" method="post">
+        <button type="submit">Sign out</button>
+      </form>
     </nav>
   );
 }

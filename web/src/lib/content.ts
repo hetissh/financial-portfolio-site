@@ -2,9 +2,12 @@
 import { richImageIds, richText, type RichDocument } from './rich-content';
 import { imageExists } from './admin/images';
 import { workbookExists } from './admin/workbooks';
+import { isManagedResume, resumeExists } from './admin/resumes';
+import { certificationExists } from './admin/certifications';
 import { researchOrderSchema } from './research-order';
 import fs from 'node:fs';
 import path from 'node:path';
+import { connection } from 'next/server';
 import {
   parseResearch,
   profileSchema,
@@ -12,6 +15,7 @@ import {
   validateRelease,
   type SiteMode,
 } from './content-schema';
+import { readPublicPortfolio } from './supabase/reader';
 
 export function getSiteMode(): SiteMode {
   const value = process.env.SITE_MODE || 'preview';
@@ -58,9 +62,19 @@ export function loadContent() {
   const root = contentRoot();
   const profile = profileSchema.parse(readProfileFile(root));
   const records = parseResearch(readResearchFiles(root).map((entry) => entry.data));
-  for (const asset of [profile.resume, ...records.map((item) => item.download)].filter(
-    (value): value is string => Boolean(value),
-  )) {
+  if (
+    profile.resume &&
+    !(isManagedResume(profile.resume)
+      ? resumeExists(profile.resume, root)
+      : assetExists(profile.resume))
+  )
+    throw new Error(`Missing local asset: ${profile.resume}`);
+  for (const item of profile.certifications)
+    if (item.pdf && !certificationExists(item.pdf, root))
+      throw new Error(`Missing certification PDF: ${item.pdf}`);
+  for (const asset of records
+    .map((item) => item.download)
+    .filter((value): value is string => Boolean(value))) {
     if (!assetExists(asset)) throw new Error(`Missing local asset: ${asset}`);
   }
   for (const record of records)
@@ -68,7 +82,11 @@ export function loadContent() {
       if (attachment.kind === 'excel' && !workbookExists(attachment.id, root))
         throw new Error(`Missing workbook for ${record.slug}: ${attachment.id}`);
   for (const record of records)
-    if (record.cover?.type === 'image' && !imageExists(record.cover.imageId!, root))
+    if (
+      record.cover?.type === 'image' &&
+      !record.cover.unsplash &&
+      !imageExists(record.cover.imageId!, root)
+    )
       throw new Error(`Missing cover image for ${record.slug}`);
   for (const record of records)
     for (const section of record.sections)
@@ -79,6 +97,16 @@ export function loadContent() {
   const mode = getSiteMode();
   if (mode === 'production') validateRelease(profile, records, process.env.SITE_URL);
   return { profile, research: visibleResearch(records, mode, readResearchOrder(root)), mode };
+}
+
+// Cloud requests read current published rows; local static builds keep their
+// validated file source and existing export behavior.
+export async function loadPublicContent() {
+  if (process.env.PORTFOLIO_DATA_SOURCE === 'supabase') {
+    await connection();
+    return readPublicPortfolio();
+  }
+  return loadContent();
 }
 export function formatDate(value: string) {
   return new Intl.DateTimeFormat('en', {

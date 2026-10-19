@@ -653,7 +653,7 @@ export function ResearchEditor({
             <div className={styles.panel}>
               <p className={`small-label ${styles.previewLabel}`}>Card preview</p>
               <div className={styles.previewCard} inert>
-                <ResearchCard item={preview} number={number} />
+                <ResearchCard item={preview} number={number} privatePreview />
               </div>
             </div>
           </aside>

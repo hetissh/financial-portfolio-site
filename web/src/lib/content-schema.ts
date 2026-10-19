@@ -77,6 +77,17 @@ export const wordCoverSchema = z
       .refine((id) => heroPatterns.some((p) => p.id === id), 'Choose a Hero Pattern')
       .optional(),
     imageId: z.string().uuid().optional(),
+    unsplash: z
+      .object({
+        imageUrl: z
+          .string()
+          .url()
+          .refine((value) => new URL(value).hostname === 'images.unsplash.com'),
+        photoUrl: publicUrl.refine((value) => new URL(value).hostname === 'unsplash.com'),
+        photographer: text.max(120),
+        photographerUrl: publicUrl.refine((value) => new URL(value).hostname === 'unsplash.com'),
+      })
+      .optional(),
     crop: cropSchema.optional(),
     seed: z.string().uuid().optional(),
     generatorVersion: z.literal(1).optional(),
@@ -87,10 +98,10 @@ export const wordCoverSchema = z
       ['hero', 'hero'],
       ['image', 'imageId'],
     ] as const) {
-      if (cover.type === type && !cover[field])
+      if (cover.type === type && !cover[field] && !(type === 'image' && cover.unsplash))
         ctx.addIssue({ code: 'custom', path: [field], message: `Choose ${type} artwork` });
     }
-    if (cover.type === 'image' && !cover.crop)
+    if (cover.type === 'image' && cover.imageId && !cover.crop)
       ctx.addIssue({ code: 'custom', path: ['crop'], message: 'Crop the image before saving' });
   })
   .refine((cover) => !cover.seed || cover.generatorVersion === 1, {
@@ -103,13 +114,44 @@ export const profileSchema = z.object({
   displayName: text,
   monogram: text.max(3),
   role: text,
+  portfolioTitle: text.max(70).optional(),
   headline: text,
   headlineAccent: text.optional(),
   intro: text,
+  researchLead: text.max(100).optional(),
+  researchAccent: text.max(100).optional(),
   bio: z.array(text).min(1),
   isPlaceholder: z.boolean(),
   contactLinks: z.array(z.object({ label: text, href: contactUrl })),
   resume: localAsset.optional(),
+  resumeLabel: text.max(80).optional(),
+  resumeVisible: z.boolean().default(false),
+  certifications: z
+    .array(
+      z
+        .object({
+          name: text.max(120),
+          issuer: text.max(120),
+          issuedAt: isoDate.optional(),
+          expiresAt: isoDate.optional(),
+          credentialId: text.max(120).optional(),
+          url: publicUrl.optional(),
+          pdf: z
+            .string()
+            .regex(
+              /^\/downloads\/certifications\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/,
+              'Upload a certification PDF',
+            )
+            .optional(),
+          visible: z.boolean().default(true),
+        })
+        .refine((item) => !item.expiresAt || !item.issuedAt || item.expiresAt >= item.issuedAt, {
+          path: ['expiresAt'],
+          message: 'Expiry date must not precede issue date',
+        }),
+    )
+    .max(24)
+    .default([]),
   about: z
     .object({
       label: text,

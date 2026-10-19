@@ -28,6 +28,11 @@ for (const extension of [false, true]) {
     }
     for (const path of ['/admin/research/note-01/', '/admin/research/new/', '/admin/profile/']) {
       await page.goto(path);
+      if (path.includes('/new/')) {
+        await page.getByRole('button', { name: 'Unsplash', exact: true }).click();
+        await expect(page.getByRole('search')).toBeVisible();
+        expect(await page.locator('form form').count()).toBe(0);
+      }
       const save = page.getByRole('button', {
         name: path.endsWith('profile/')
           ? 'Save profile'

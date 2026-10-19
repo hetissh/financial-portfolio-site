@@ -6,6 +6,7 @@ out/
 test-results/
 .admin-trash/
 .admin-e2e/
+.admin-data/
 playwright-report/
 *.tsbuildinfo
 .env*
@@ -14,6 +15,7 @@ playwright-report/
 
 # Generated exports of visible research workbooks
 public/downloads/workbooks/
+public/downloads/resumes/
 
 playwright-report-admin/
 

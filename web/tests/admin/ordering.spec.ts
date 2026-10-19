@@ -254,7 +254,7 @@ test('a manual note number persists across design choices, and clearing it retur
     await expect(page.locator('main > .research-art .art-corner')).toHaveText('FIELD NOTES / 24');
     await page.getByRole('link', { name: 'Open public page', exact: true }).click();
     await expect(page).toHaveURL(/\/research\/the-assumptions-underneath\/$/);
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(248, 247, 242)');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 127)');
     await expect(page.locator('main > .research-art .art-corner')).toHaveText('FIELD NOTES / 24');
     await page.goto('/admin/research/note-02/');
     await field.fill('');

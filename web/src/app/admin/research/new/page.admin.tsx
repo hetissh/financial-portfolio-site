@@ -1,5 +1,6 @@
 // Starts a new research draft without writing it until the author saves.
-import { readAdminContent } from '@/lib/admin/store';
+import { adminContent } from '@/lib/admin/data-source';
+import { requireAdminPage } from '@/lib/admin/auth';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -7,7 +8,8 @@ import { ResearchEditor } from '@/components/admin/ResearchEditor';
 import styles from '@/components/admin/admin.module.css';
 
 export const metadata: Metadata = { title: 'New note' };
-export default function NewResearch() {
+export default async function NewResearch() {
+  await requireAdminPage();
   return (
     <main className={`wrap ${styles.page}`} id="main">
       <header className={styles.pageHead}>
@@ -28,7 +30,9 @@ export default function NewResearch() {
         </div>
       </header>
       <ResearchEditor
-        number={readAdminContent().research.filter((item) => item.status !== 'draft').length + 1}
+        number={
+          (await adminContent()).research.filter((item) => item.status !== 'draft').length + 1
+        }
       />
     </main>
   );

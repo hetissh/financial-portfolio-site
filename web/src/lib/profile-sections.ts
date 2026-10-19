@@ -16,6 +16,13 @@ export const contactDefaults = {
 };
 export const profileAbout = (profile: Profile) => ({ ...aboutDefaults, ...profile.about });
 export const profileContact = (profile: Profile) => ({ ...contactDefaults, ...profile.contact });
+// Older profiles keep their public identity until the new home copy is saved in admin.
+export const profileJourney = (profile: Profile) => ({
+  title: profile.portfolioTitle ?? profile.displayName,
+  description: profile.intro,
+  researchLead: profile.researchLead ?? 'The numbers are the beginning.',
+  researchAccent: profile.researchAccent ?? 'The questions come next.',
+});
 export function contactEmailHref(email: string, subject: string) {
   return `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 }

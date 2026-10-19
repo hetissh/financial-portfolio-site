@@ -1,6 +1,90 @@
 # Three maintained showcase notes
 
-Latest update: 9 October 2026 — substantive standards review and admin response validation. Earlier change evidence is retained below.
+## CR: Publish the selected résumé on home — 19 October 2026
+
+The existing uploaded four-page PDF was selected in Profile, but its public
+visibility flag was off. Only that flag was enabled through the validated profile
+save path, which prepared the public PDF download. The résumé now appears above
+Certifications in the home credentials section. No certification, contact,
+research, or other profile value was changed. The three reserved sample notes
+were refreshed with the résumé visibility check and remain `sample`.
+
+Content validation (7 preview notes), `format:check`, lint, public/admin
+TypeScript checks, all 111 unit tests, and the static preview build passed.
+The rebuilt preview contains all three refreshed sample pages and the résumé
+link. Desktop and mobile Chromium showcase checks passed (2 tests). A live
+browser check at 390 and 1440 pixels confirmed that the résumé link is visible
+and its PDF returns 200 with `application/pdf`. The isolated admin résumé test
+could not start because the user's running admin server owns the shared Next.js
+development build folder. The standard `showcase:update` command hit the
+sandbox's `tsx` IPC restriction; its underlying script succeeded with
+`node --import tsx`.
+
+## Final local verification — 19 October 2026
+
+The three reserved sample notes were refreshed again for the certification PDF,
+combined Supabase server, and readable admin controls change. The update kept
+their reserved IDs and `sample` status; all three current CR descriptions were
+present in the rebuilt static preview. The existing profile, personal notes and
+uploaded files were not edited by this update. The admin checkboxes were enlarged
+to 24 pixels after an accessibility run found their targets too small.
+
+Final checks passed: content validation (7 preview notes), `format:check`,
+`comments:check`, lint, public/admin TypeScript, all 111 unit tests, the static
+preview build, the combined cloud build, `git diff --check`, all 35 isolated
+admin Chromium browser checks, and both desktop and mobile Chromium showcase
+checks. The standard `showcase:update` wrapper still encountered the sandbox's
+`tsx` IPC restriction; the same updater completed with `node --import tsx`.
+Admin browser checks used installed Google Chrome because bundled Chromium was
+absent. Cloud operations remain local verification only: the remote Supabase
+project still lacks the portfolio tables and no remote import, Auth binding or
+deployment was performed. The local combined file-backed server was restarted
+on port 3000; home returned 200 and the protected admin returned a 307 sign-in
+redirect.
+
+For the certification PDF and combined cloud server change, the three reserved
+notes were refreshed with the new upload, visibility, and cloud checklist.
+Their IDs remain `qa-formatting`, `qa-images`, and `qa-workflow`, and each status
+remains `sample`. The updater reported that it kept the other notes and profile
+settings; a content diff confirmed only these three notes changed during this
+update. The user's existing résumé source and profile were preserved. The
+rebuilt preview contains all three sample article routes. Desktop and mobile
+Chromium showcase browser checks passed (2 tests), as did four isolated admin
+browser checks covering contact details, résumé publication, certification PDF
+upload and preview, its saved home link, the Credentials anchor, and hiding it.
+
+Content validation passed (7 preview notes). Formatting, purpose comments,
+lint, both TypeScript checks, and all 111 unit tests passed. Static preview
+and combined cloud server builds passed. The import dry run found one profile,
+seven notes (one published), and twelve media objects. All four migrations
+applied to temporary local PostgreSQL. A read-only remote check returned
+`PGRST205` for `portfolio_profile`: the configured project has no portfolio
+tables yet. No remote migration, import, Auth binding, server deployment, or
+cloud browser journey was performed. The exact `npm run showcase:update`
+wrapper failed because this sandbox blocks the `tsx` IPC socket; running its
+underlying script with `node --import tsx` succeeded and updated the same three
+notes. The first browser attempt lacked Playwright's bundled Chromium; rerunning
+against installed Chrome passed.
+
+Latest update: 19 October 2026 — certification PDFs and a combined cloud server
+implementation; remote cutover awaits project database access and deployment.
+
+For the 19 October home-page credentials change, the selected-research count
+label was removed and the résumé/certification display was moved into its own
+home-page section. `node --import tsx scripts/update-showcase-notes.ts` updated
+the same three reserved sample notes; their IDs, slugs, and `sample` statuses
+remain unchanged. Formatting, purpose-comment checks, lint, TypeScript, and
+content validation passed. The standard build wrapper could not start its
+`tsx` subprocess because the sandbox denied its temporary IPC socket; running
+the build generators and Next build directly under Node 24.19.0 succeeded.
+The rebuilt home HTML has no “notes to explore” label and includes the
+dedicated credentials section. All three showcase routes are present in the
+rebuilt preview. Automated test suites and interactive browser checks were not
+run for this change. The showcase updater left the profile and uploaded résumé
+sources untouched; only the reserved sample notes and their managed assets
+were refreshed.
+
+Latest update: 19 October 2026 — added a dedicated home credentials section and removed the research count label. Earlier change evidence is retained below.
 
 | Sample note | Public preview route | Admin record | Examples and checks |
 | --- | --- | --- | --- |
@@ -22,22 +106,243 @@ The command updates the same three reserved records and two managed private illu
 
 ## Current validation
 
-For the latest standards review, the Prettier and purpose-comment checks, lint,
-both TypeScript checks, content validation, the Next.js `16.3.8` static preview
-build, and all 87 unit tests passed. Public browser tests on desktop and
-mobile Chrome passed 39 checks with one desktop touch check skipped. Both
-showcase cases opened all three rebuilt sample notes. The full admin Chrome
-suite passed 27 checks using isolated content. Firefox and WebKit binaries
-were unavailable for this run; earlier cross-browser results below are
-historical.
+For the Supabase admin setup continuation, the configured project URL,
+publishable key, and secret key were present in the ignored, mode-0600
+`web/.env.local`; no values were printed. Read-only project checks found no
+portfolio tables, Storage buckets, or Auth users yet. The first migration still
+needs to be applied remotely. The new second migration for private admin
+sessions applied cleanly to temporary local PostgreSQL with the first migration
+already present, and that test server was stopped. The admin binding command
+is a dry run by default and has not been applied remotely. The cloud session
+module is not connected to live routes; the current local admin remains on its
+private JSON.
 
-The latest showcase update kept all three notes at `sample`. A SHA-256
-comparison showed only those three note JSON files changed among 19
-source-content files; the other 16 files, including profile, personal notes,
-and uploaded assets, remained byte-identical. The two managed illustration
-files also remained byte-identical. No note was published.
+`npm run showcase:update -- "Prepare Supabase Auth binding for the two fixed
+admin slots"` updated only the same three reserved sample notes. All retain
+their reserved IDs, slugs and `sample` status. No personal note, profile or
+uploaded source asset changed. The static preview build, content validation,
+formatting, purpose comments, lint, both TypeScript checks, and all 101 unit
+tests passed. The rebuilt desktop and mobile Chromium showcase checks both
+passed, opening all three notes. Live Supabase login, Resend delivery, admin
+writes, and Cloudflare deployment remain unverified and unavailable.
+
+For the Supabase migration preparation, `npm run showcase:update -- "Prepare
+Supabase-backed live portfolio content"` refreshed the same three reserved
+sample notes and their hosted-editing/media checklists. All three retain their
+reserved IDs, slugs, and `sample` status. Source content review found no edits to
+the profile or personal notes; the generated social image is the only changed
+public asset. The rebuilt static preview contains all three checklists. Focused
+desktop and mobile Chromium showcase checks passed (2 tests total).
+
+The SQL migration applied to a local PostgreSQL test database with stub Supabase
+schemas. Anonymous reads excluded placeholder profiles and drafts; the public
+order function returned published IDs only; fixed-slot triggers blocked deletion
+and disabling the last active admin. The importer dry run found one profile,
+seven notes (one published), and twelve media objects. No remote import or
+Supabase project was used. The ordinary static preview build and a separate
+cloud-mode Next server build with placeholder project values passed; the latter
+shows request-time visitor routes. The placeholder secret key did not appear in
+client build assets. Formatting, purpose comments, lint, both TypeScript checks,
+and all 98 unit tests passed. Full cross-browser Playwright was initially
+unable to start because browser binaries were missing; Chromium was installed
+in temporary storage and the focused showcase checks then passed. Cloud admin
+authentication, writes, uploads, workbook previews, and Workers deployment are
+not implemented or verified, so cloud mode is not ready for release.
+
+For the monogram icon change, the root metadata now produces an encoded SVG
+favicon from the validated profile monogram. `npm run showcase:update -- "Match
+the browser tab icon to the saved monogram"` refreshed the same three reserved
+sample notes and their profile checklist. `npm run format:check`, purpose-comment
+check, lint, both TypeScript checks, all 95 unit tests, content validation, and
+the static preview build passed. Focused Chromium checks passed for the public
+home page and all three showcase notes at desktop and mobile widths. The home
+page browser test confirmed its icon data matches the visible header monogram;
+the running combined site also served the icon in its HTML metadata. The unit
+test verified a changed monogram changes the icon URL and unsafe SVG characters
+are escaped. An actual profile save and non-Chromium browsers were not checked.
+No profile, personal note, or uploaded asset was changed.
+
+For the private account refresh, the operator updated the two fixed account
+slots in the active auth JSON using scrypt hashes. Existing sessions, pending
+reset and email-confirmation links, and rate-limit attempts were cleared. Both
+updated accounts authenticated through the app's `logIn` function and were
+immediately signed out; no plaintext password was saved in tracked files.
+The auth file remains mode 0600. `npm run showcase:update -- "Refresh private
+admin accounts and revoke earlier sessions"` refreshed the same three reserved
+sample notes, whose checklist describes the flow without real credentials.
+Formatting, purpose comments, lint, both TypeScript checks, all 94 unit tests,
+content validation, and the static preview build passed. The rebuilt Chromium
+showcase check passed on all three notes at desktop and mobile widths. The
+isolated admin browser suite was not run while the local admin held Next's
+`.next-admin` development directory; authentication was verified directly by
+the app's store. Git content review found no personal note, profile, or uploaded
+asset changes.
+
+For the private environment configuration change, `web/.env.local` was created
+with mode 0600 and confirmed ignored by Git. It points to the already active
+private auth JSON, which also has mode 0600 and contains exactly two account
+slots. The Resend settings remain unset until a verified sender and key are
+provided. The static export was searched for the configured private auth path;
+there were no matches. `npm run showcase:update -- "Configure admin credentials
+through a private environment file"` refreshed only the three reserved sample
+notes. All retain `sample` status, their IDs and slugs, and the same managed
+illustrations. Git content review found no personal note, profile, or uploaded
+asset edits.
+
+`npm run format:check`, `npm run comments:check`, lint, both TypeScript checks,
+all 94 unit tests, content validation, and the static preview build passed.
+The rebuilt Chromium showcase browser check passed on all three notes at desktop
+and mobile widths. A focused isolated admin browser run could not start because
+the currently running local admin holds Next's `.next-admin` development build
+directory; the live session was left running. Live Resend delivery was not
+verified because no sending credentials are configured.
+
+For the password visibility change, `npm run showcase:update -- "Add Show and
+Hide controls to admin password fields and clarify credential storage"` updated
+the same three sample notes. `npm run format:check`, lint, public and admin type
+checks, the purpose-comment check, content validation, the static preview
+build, and all 94 unit tests passed. The Chromium showcase browser check opened
+all three notes at desktop and mobile widths. A separate live Chrome check at
+390 pixels toggled the password type on login, reset, and Admin management
+forms; the typed login value was preserved, and the login page had no
+horizontal overflow. After the operator supplied passwords meeting the
+12-character requirement, both updated accounts signed in to the local
+preview; logout returned home and reopening Admin required a new sign-in.
+The running preview's private JSON now stores the updated password hashes,
+and all previous sessions were revoked. The repository test fixture was
+returned to disposable credentials. No personal note, profile, or uploaded
+asset changed in source content. The separate admin Playwright suite, Firefox,
+and WebKit were not run for this change.
+
+For the 13 October sign-out fix, the logout route now issues a 303 to the
+validated public origin and expires the session cookie in the same response.
+The focused route unit test passed. A live HTTP request returned 303 with the
+expected Location and cookie expiry. A Chrome browser flow signed in to the
+isolated local admin, signed out to the main page, and reached login when
+reopening Admin. The rebuilt static preview passed its Chromium showcase check
+at desktop and mobile widths, opening all three reserved notes. The public
+build, content validation, lint, public and admin type checks, purpose-comment
+check, and formatting check passed.
+
+The full unit run passed 82 of 93 tests. Eleven existing admin tests could not
+initialize their accounts because the current test fixture contains passwords
+shorter than the 12-character minimum. The admin Playwright suite uses that
+same fixture, so its new sign-out case was checked through the separate live
+Chrome flow above. Firefox and WebKit were not run. The showcase update was
+executed with `node --import tsx scripts/update-showcase-notes.ts` because the
+`tsx` command could not open its IPC pipe inside the sandbox. Only the three
+reserved sample records changed in source content; their IDs, slugs and
+`sample` statuses remained unchanged. No personal note, profile, or uploaded
+asset was changed.
+
+For the Admin navigation change, `npm run format:check`,
+`npm run comments:check`, lint, public and admin TypeScript checks, all 93 unit
+tests, content validation, the static preview build, and the admin server build
+passed. The focused admin Chromium browser suite passed 2 checks: an anonymous
+visitor could use the main navigation to reach login, and a signed-in admin
+could return from the public page to the content desk. The navigation stayed
+visible without horizontal overflow at 320, 390, 768, and 1440 pixels. The
+static export check passed with no Admin link or private admin route. Both
+desktop and mobile Chromium showcase checks opened all three notes in the
+rebuilt preview. Firefox and WebKit were not run for this change.
+
+`npm run showcase:update -- "Add an Admin link to the combined site's main
+navigation and footer"` updated only the three reserved sample notes. Their
+IDs, slugs, and `sample` statuses remain unchanged. No profile, personal note,
+uploaded asset, or managed illustration changed. The generated social image
+was restored after the build. No note was published.
+
+For the earlier 12 October account change, `npm run format:check`,
+`npm run comments:check`, lint, public and admin TypeScript checks, all 93 unit
+tests, the static preview build (including content validation), and the admin
+server build passed. Both public showcase browser checks passed on desktop and
+mobile Chromium against the rebuilt preview, opening all three sample notes.
+The full admin Chromium suite passed 29 checks using isolated content and auth
+files. After adding confirmed email changes for the other account, the focused
+two-case admin browser suite passed again. Firefox and WebKit were not run for
+this change.
+
+`npm run showcase:update -- "Protect the content desk with two fixed admin
+accounts, session revocation, and Resend password recovery"` refreshed the
+same three reserved notes. All remain `sample`. A Git content review found
+changes only in those three note JSON files; no profile, personal note,
+uploaded asset, or managed illustration changed. The generated social image
+was restored after the static build. No note was published.
+
+Live Resend delivery and a hosted production deployment were not verified:
+this workspace has no configured sending domain, API key, or deployment target.
+The unit tests verify the recovery and session behavior with a mocked Resend
+response; browser tests use a local development server.
 
 Visual evidence: [nested points on desktop](writing-workflow/nested-points-desktop.png), [centered image on mobile](writing-workflow/centered-image-mobile.png).
+
+## CR: Profile monogram browser icon — 13 October 2026
+
+The browser tab icon now follows the saved profile monogram on the combined
+site and after each static rebuild. The metadata uses an encoded SVG, so an
+updated monogram has a distinct icon URL without changing a public asset by
+hand. The three sample checklists describe the expected saved-profile flow;
+verification is recorded above.
+
+## CR: Private admin account refresh — 13 October 2026
+
+The two fixed account slots were updated only in the private auth JSON. Their
+passwords were hashed, and previous sessions and recovery links were revoked.
+The showcase checklists explain the expected sign-in behavior without including
+actual account details. Verification is recorded above.
+
+## CR: Private environment configuration — 13 October 2026
+
+The local web app now has a Git-ignored, owner-readable `.env.local` for admin
+origin and the existing auth file path. The template and README explain where
+to provide Resend settings and one-time bootstrap passwords, and to remove
+bootstrap passwords once the hash file exists. The three sample checklists now
+identify this boundary. Verification and the live admin browser limitation are
+recorded above.
+
+## CR: Password visibility and local sign-in — 13 October 2026
+
+Admin password fields now provide Show and Hide actions for the value being
+typed. The local login reads hashed credentials from the private auth JSON;
+the fixture under `tests/fixtures/` is used only by tests. The README now
+identifies that boundary. After the owner supplied longer passwords, the
+running preview's two fixed accounts were synchronized with the private auth
+JSON. Verification is recorded above.
+
+## CR: Return home after admin sign out — 13 October 2026
+
+Signing out now revokes the current session, expires its browser cookie, and
+opens the public main page. The redirect response is built with the cookie
+header at creation because a standard `Response.redirect` has immutable
+headers in this runtime. The destination uses the validated request host so
+the browser stays on the origin it used to open the site. The three sample
+checklists include this path; verification and the fixture limitation are
+recorded above.
+
+## CR: Admin link in combined site navigation — 12 October 2026
+
+The combined site now shows Admin in its main navigation and footer to every
+visitor. The protected route sends a signed-out visitor to login and opens the
+content desk for a signed-in admin. The public static export omits the link
+because it has no admin routes. The same three sample checklists now cover the
+visitor-to-login and signed-in return paths. Validation results are above.
+
+## CR: Fixed admin accounts and password recovery — 12 October 2026
+
+The content desk now requires a server-side session for every admin page,
+write API, image original, and workbook API. Two fixed account slots are
+initialized with private JSON password hashes. Admin management lists both,
+edits their display names, requests confirmed email changes, and removes or
+restores the other account's access;
+the current account cannot remove itself. Password changes, Resend recovery,
+and confirmed email changes revoke older sessions. The JSON file must live on
+private persistent storage served by one writer.
+
+The public static export still excludes admin routes. A separate server build
+serves visitors and authenticated admins on one origin, including visitor
+media and protected draft previews. The three sample checklists now cover
+sign-in, account management, and navigation; automated checks cover token and
+session rules. The validation results and delivery limits are recorded above.
 
 ## CR: Substantive standards review — 9 October 2026
 
@@ -233,3 +538,65 @@ The same three sample notes were refreshed, and workflow adds a reload/editing c
 Validation: content validation, lint, public/admin TypeScript and the static preview build passed; all 82 unit tests passed. The targeted admin regression passed 6 cases in Chromium, Firefox and mobile WebKit, covering clean documents and an extension-like body mutation before hydration. Each checks saved research, New note and Profile, editable fields, dirty-state updates and explicit Reset edits without saving content. All 5 public showcase cases passed across desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit. The exact warning was reproduced before the change and was absent in the final simulated-extension run. This verifies the supplied attribute mismatch rather than installing a real browser extension. No broader hydration warnings were suppressed.
 
 The actual preview was rebuilt and read-only live Chromium checks passed on all three admin editors with cz-shortcut-listen injected before hydration: zero hydration warnings or runtime errors. All three rebuilt sample notes show the current CR. The live check saved no content; all 16 other private-content files remained unchanged after the build.
+
+## CR: Reflective card journey and portfolio palette — 18 October 2026
+
+The public home now opens with the editable portfolio title and short description above a reflective Three.js card. Its rounded face mask matches the curved 3D body. Compact spreadsheet cells reveal faint Excel-style formulas inside the hovered cell. GSAP scroll progress turns and docks the card, raises dashboard bars and other chart widgets, then blurs the dashboard as the editable research introduction appears. The research index, articles and admin use the navy `#00007F`, bright yellow and green palette. Reduced-motion visitors receive the card, dashboard and research introduction in document order. The card has a flat fallback when WebGL is unavailable.
+
+Profile admin now edits Portfolio title, Introduction and both Research introduction lines, and shows an in-form journey preview. These save through the existing validated, versioned profile API and appear in the public header, hero, card, handoff and metadata as appropriate. Existing profile JSON remains valid with display-name and research-line fallbacks. The legacy headline values were preserved in the profile and removed from the home editor because the new hero uses the portfolio title.
+
+The same three reserved showcase notes (`qa-formatting`, `qa-images`, `qa-workflow`) were refreshed with the change description and checks for the card, grid, dashboard, public pages and admin fields. They remain `sample`. A SHA-256 comparison before and after `showcase:update` found all 16 other private-content files unchanged; no additional notes were created or published.
+
+Validation: `format:check`, `comments:check`, lint, public/admin TypeScript checks, 102 unit tests, content validation and the static preview build passed. The public Chromium site suite passed 14 cases with one platform-specific touch case skipped; it covered formula cell containment, staged dashboard and blur, navigation, narrow widths, no-JavaScript reading and accessibility. The three-showcase Chromium browser check passed at mobile and desktop widths. The isolated admin Chromium palette suite passed four cases, including a save/reload/public-render round trip for the four editable fields and accessibility checks. The admin test server initially timed out because the local `ADMIN_ORIGIN` targeted port 3000; its isolated configuration now explicitly sets its own port 4186. Two measured contrast issues in the new palette were corrected before the passing run. The rebuilt local preview was visually inspected at the hero, dashboard and rounded card corners. Browser checks used a local preview and isolated test content, not a deployed site.
+
+## CR: Continuous navy grid and simplified home — 18 October 2026
+
+The blue `#00007F` spreadsheet grid now belongs to the shared page background. It stays visible through the header, card journey, selected research, research index, article pages and footer. The hero's local grid paint was removed while its cell hover formulas remain. Research cards and article text use light reading panels; the admin uses the grid around solid editor panels. A stable admin-shell marker keeps public reading styles out of saved-note previews.
+
+The public home About and Contact sections and their navigation links were removed. Their profile fields remain saved and editable, clearly marked as hidden in admin. The release notice no longer suggests adding contact details for a public section that is not shown. The same three reserved showcase notes were updated by `showcase:update` and remain `sample`. SHA-256 comparison found every other private-content file unchanged.
+
+Checks completed: `format:check`, `comments:check`, lint, public/admin type checks, 102 unit tests, content validation and a static build passed. The public Chromium suite passed 15 cases with one platform-specific native-touch skip; it includes the three rebuilt showcase notes, responsive widths, accessibility, grid formulas and navigation. The isolated admin rich-content checks passed two cases, including save/reload of hidden profile content. The final focused admin palette suite passed four cases, including accessibility, mobile widths, public rendering and the saved-article preview. Visual inspection of the rebuilt local preview confirmed the grid across the home, index, article and footer, with legible research cards and article body.
+
+The final static rebuild after the admin style-scoping correction and removal of unused navigation CSS was not executed: automatic approval review rejected the build command because the account reached its usage limit. This was a review availability failure, not a code safety finding. The current local preview reflects the shared grid and section removal, but it predates those final CSS-scoping edits. The final preview should be rebuilt and its public/admin browser checks rerun when approval review is available.
+
+## CR: Portfolio content desk — 19 October 2026
+
+The admin Overview now presents a compact card preview, real published/draft/release counts, smaller research rows with the existing reorder controls, a Homepage summary, and release blockers before optional detail. The blue grid remains visible behind its panels. `/admin/home/` gives the portfolio title, hero description and research introduction a direct editing route; Profile shows identity, release approval and preserved About/Contact content. Both focused views use the same validated, versioned profile save flow. The three reserved showcase notes were refreshed and remain `sample`; no other private content record or upload changed.
+
+Checks passed: `format:check`, `comments:check`, lint, TypeScript, content validation, 102 unit tests, a fresh static preview build and the admin server build. The rebuilt export contains all three showcase pages with this CR and contains no admin route. Focused admin Chrome checks passed 10 of 11 cases in the first executable-browser run; the remaining case had an older light-background assertion. After updating that assertion for the approved navy grid, it passed on rerun. These checks covered responsive widths, accessibility, homepage save to public rendering, release links, saved article colours, and pointer, keyboard and touch ordering. Playwright's bundled Chromium was absent, so the run used the installed Google Chrome binary. The live admin Overview and Homepage editor were visually inspected on the combined local server; the local admin was restored at port 3000. No production release or deployment was performed.
+
+## CR: Compact pattern thumbnail — 19 October 2026
+
+The `Evidence in pictures` sample uses a 192-pixel jigsaw tile. The 104-pixel admin research thumbnail previously exposed only a cropped fragment. The admin thumbnail now repeats a 56-pixel tile centered in its frame; the saved cover and full-size public artwork are unchanged. The shared checklist in `web/src/lib/showcase-notes.ts` now asks readers to inspect this compact preview. `showcase:update` refreshed only the three reserved sample notes; they retain `sample` status.
+
+Checks passed: `format:check`, `comments:check`, lint, TypeScript, all 102 unit tests, content validation and a fresh static preview build. All three rebuilt showcase pages contain the current change description. The live admin browser showed complete repeated puzzle pieces in the `Evidence in pictures` row, and computed style confirmed the 56-pixel centered tile. `git diff --check` passed. No other content record or upload was edited for this CR.
+
+## CR: Classic ivory and brass palette — 19 October 2026
+
+The shared portfolio palette now pairs warm ivory reading and editing surfaces with restrained brass accents, the existing navy grid, and a deeper green for stronger contrast. The public research cards and article panels use the warm surface and brass-toned borders; the reflective card and dashboard use warmer platinum and champagne details. Admin overview and editor surfaces share the ivory treatment while keeping navy navigation and brass active/focus accents. The same three reserved sample notes were refreshed and remain `sample`; content validation reports seven visible preview notes.
+
+Checks passed: `format:check`, `comments:check`, lint, public and admin TypeScript, 102 unit tests, content validation, static public build, admin production build, and `git diff --check`. The public Chromium suite passed 20 tests with one platform-specific native touch case skipped, including responsive layout, home scroll sequence, showcase notes, and accessibility. The sheet-embed contrast check passed after a first full run identified old built CSS; the current rebuilt export now passes all sheet checks. The isolated admin browser suite could not start because the already-running local admin process holds the shared `.next-admin` dev lock; its production build passed. Profile and other personal content were preserved by the showcase updater; no publish or deployment occurred.
+
+## CR: Unsplash image search — 19 October 2026
+
+The research cover picker now has an Unsplash search tab. Search requests use an authenticated admin route and a server-only `UNSPLASH_ACCESS_KEY`. Selected photos stay hotlinked to the Unsplash CDN, photographer and Unsplash credits appear on public note cards and articles, and selection calls the API's `download_location`. Cover validation and export generation support these remote images without copying them into local assets. The same three reserved notes were updated and remain `sample`.
+
+Checks passed: `format:check`, `comments:check`, lint, public/admin TypeScript, 104 unit tests (including mocked search, attribution, download tracking and invalid-host coverage), content validation, static public build, admin production build, and `git diff --check`. The public Chromium suite passed 20 tests with one platform-specific native touch case skipped; all three rebuilt showcase pages loaded. Live Unsplash search was not verified because no `UNSPLASH_ACCESS_KEY` is configured. The admin browser suite could not start because the user's existing local admin process holds the shared `.next-admin` development lock. No personal notes or uploaded images were changed; no note was published.
+
+## CR: Unsplash search form hydration fix — 19 October 2026
+
+The Unsplash search control in Cover artwork is now a `role="search"` region with a button-driven search action, so it remains valid inside the research editor form. The hydration browser test now opens Unsplash on the new-note page and asserts that no `form` is nested inside another `form`. The same three reserved showcase notes were refreshed and remain `sample`.
+
+Checks passed: `showcase:update`, `validate:content`, `format:check`, `comments:check`, lint, public/admin TypeScript checks, and all 104 unit tests. In the authenticated live admin tab at `/admin/research/new/`, the Unsplash search region, search field and Search button were present after hot reload. The automated admin browser suite was not rerun because it starts a separate Next admin server that shares the `.next-admin` development lock with the user's running admin server. The new hydration assertion is in `tests/admin/hydration.spec.ts`; no live Unsplash request or note save was performed.
+
+## CR: Footer scroll boundary — 19 October 2026
+
+The shared blue grid remains visible, while the root page now prevents vertical rubber-band overscroll so a fast scroll cannot leave a large empty grid below the footer. The same three reserved showcase notes were refreshed with a footer check and remain `sample`; no other source-content record was edited.
+
+Checks passed: `showcase:update`, content validation, `format:check`, `comments:check`, lint, public/admin TypeScript, all 104 unit tests, the static preview build, and `git diff --check`. The rebuilt preview's showcase browser check passed in installed Chrome across all three notes at 320, 390 and 1440 pixels, including accessibility. Two public Back to top browser checks passed. The first Playwright attempt could not launch its absent bundled Chromium; the rerun used the installed Google Chrome executable. In the live admin new-note page, browser inspection at 1548×548 and 390×844 confirmed the footer reached the viewport bottom at the scroll limit, root vertical overscroll was `none`, and the mobile page had no horizontal overflow. The isolated admin browser suite was not run while the user's admin server held its development build directory. No note was published or deployed.
+
+## CR: Contact, résumé and certifications — 19 October 2026
+
+Profile now edits contact links, a PDF résumé and repeatable certifications. The résumé has an upload control, public label and visibility setting. Uploaded PDFs stay in private content storage until a saved profile selects one for public download; hiding or removing the link removes the generated public copy. Certifications have issuer, dates, optional credential ID and verification URL, order controls and individual visibility. The public site renders saved details in a compact section after the page content; an empty profile keeps the section hidden. Existing profile data parses with empty certifications and a hidden résumé. The three reserved showcase notes were refreshed with this CR, retain their reserved IDs and `sample` status, and were verified in the rebuilt preview. Git status showed no changed profile file, personal note, or uploaded content asset; the sample PDF from the isolated upload browser check was removed.
+
+Checks passed: content validation through the Node `tsx` loader, `format:check`, `comments:check`, lint, public and admin TypeScript, all 110 unit tests, the static preview build, and `git diff --check`. The rebuilt public Chrome checks passed for the three showcase notes at mobile and desktop widths and for page rendering at 320–1440 pixels. Three isolated admin Chrome checks passed: add/reset without save, save/reload/public rendering of links and certifications, and private PDF upload, publication, and removal. The populated contact section fit at 320, 390 and 1440 pixels. Playwright's bundled Chromium was absent, so these checks used installed Google Chrome. The repository `tsx` command was blocked from opening its local IPC socket by the sandbox; equivalent scripts ran successfully with `node --import tsx`. No content was published or deployed.

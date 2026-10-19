@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { loadContent } from '@/lib/content';
+import { loadPublicContent } from '@/lib/content';
 import { ResearchCard } from '@/components/ResearchCard';
 export function generateMetadata(): Metadata {
   return {
@@ -11,8 +11,8 @@ export function generateMetadata(): Metadata {
     alternates: process.env.SITE_URL ? { canonical: '/research/' } : undefined,
   };
 }
-export default function ResearchIndex() {
-  const { research, mode } = loadContent();
+export default async function ResearchIndex() {
+  const { research, mode } = await loadPublicContent();
   return (
     <main className="wrap index-page" id="main">
       <Link className="text-link back-link" href="/">

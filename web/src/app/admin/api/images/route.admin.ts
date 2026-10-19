@@ -1,7 +1,8 @@
 // Accepts bounded local image uploads and returns safe validation errors.
-import { adminEnabled, isLocalHost } from '@/lib/admin/guard';
+import { requireAdminRequestAsync, sameOrigin } from '@/lib/admin/auth';
 import { MAX_IMAGE_BYTES, storeCoverImage, storeArticleImage } from '@/lib/admin/images';
 import { UploadInputError, uploadErrorResponse } from '@/lib/admin/upload-errors';
+import { storeCloudImage } from '@/lib/supabase/uploads';
 function cropValue(value: FormDataEntryValue | null) {
   try {
     return JSON.parse(String(value));
@@ -10,13 +11,9 @@ function cropValue(value: FormDataEntryValue | null) {
   }
 }
 export async function POST(request: Request) {
-  if (!adminEnabled()) return Response.json({ message: 'Not found' }, { status: 404 });
-  const host = request.headers.get('host');
-  if (
-    !isLocalHost(host) ||
-    request.headers.get('origin') !== `http://${host}` ||
-    request.headers.get('x-portfolio-admin') !== '1'
-  )
+  const unauthorized = await requireAdminRequestAsync(request);
+  if (unauthorized) return unauthorized;
+  if (!sameOrigin(request) || request.headers.get('x-portfolio-admin') !== '1')
     return Response.json({ message: 'Cross-origin upload blocked.' }, { status: 403 });
   if (!request.headers.get('content-type')?.startsWith('multipart/form-data;'))
     return Response.json({ message: 'Choose an image.' }, { status: 415 });
@@ -59,15 +56,20 @@ export async function POST(request: Request) {
     if (purpose !== null && purpose !== 'article')
       throw new UploadInputError('Choose a valid image upload.');
     const bytes = Buffer.from(await file.arrayBuffer());
+    const crop = form.has('crop') ? cropValue(form.get('crop')) : undefined;
+    const aspect = form.has('aspect') ? Number(form.get('aspect')) : 1.55;
     const result =
-      purpose === 'article'
-        ? await storeArticleImage(
+      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+        ? await storeCloudImage(
             bytes,
             file.name,
-            form.has('crop') ? cropValue(form.get('crop')) : undefined,
-            form.has('aspect') ? Number(form.get('aspect')) : 1.55,
+            crop,
+            purpose === 'article' ? 'article' : 'cover',
+            aspect,
           )
-        : await storeCoverImage(bytes, file.name, cropValue(form.get('crop')));
+        : purpose === 'article'
+          ? await storeArticleImage(bytes, file.name, crop, aspect)
+          : await storeCoverImage(bytes, file.name, crop);
     return Response.json(result, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return uploadErrorResponse(error, 'Unable to import image. Try again.');

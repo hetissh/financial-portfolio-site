@@ -41,23 +41,29 @@ const editorialFont = localFont({
   adjustFontFallback: 'Times New Roman',
 });
 import './globals.css';
-import { loadContent } from '@/lib/content';
+import { loadPublicContent } from '@/lib/content';
+import { monogramIconDataUrl } from '@/lib/monogram-icon';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
-export function generateMetadata(): Metadata {
-  const { profile, mode } = loadContent();
+import { ContactCredentials } from '@/components/ContactCredentials';
+import { profileJourney } from '@/lib/profile-sections';
+export async function generateMetadata(): Promise<Metadata> {
+  const { profile, mode } = await loadPublicContent();
+  const title = profileJourney(profile).title;
   const origin = new URL(process.env.SITE_URL || 'http://127.0.0.1:4173');
   return {
     metadataBase: origin,
     title: {
-      default: `${profile.displayName} — Finance & research`,
-      template: `%s — ${profile.displayName}`,
+      default: `${title} — Finance & research`,
+      template: `%s — ${title}`,
     },
     description: profile.intro,
     robots: { index: mode === 'production', follow: mode === 'production' },
-    icons: { icon: '/favicon.svg' },
+    icons: {
+      icon: { url: monogramIconDataUrl(profile.monogram), type: 'image/svg+xml', sizes: 'any' },
+    },
     openGraph: {
-      title: `${profile.displayName} — Finance & research`,
+      title: `${title} — Finance & research`,
       description: profile.intro,
       type: 'website',
       images: [{ url: '/social.png', width: 1200, height: 630 }],
@@ -65,8 +71,9 @@ export function generateMetadata(): Metadata {
     twitter: { card: 'summary_large_image', images: ['/social.png'] },
   };
 }
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { profile, mode } = loadContent();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { profile, mode } = await loadPublicContent();
+  const title = profileJourney(profile).title;
   // Browser extensions can add body attributes before React starts (e.g. cz-shortcut-listen).
   // Tolerate attributes on this element only; descendant mismatches remain visible.
   return (
@@ -77,7 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <SiteHeader profile={profile} preview={mode === 'preview'} />
         {children}
-        <SiteFooter name={profile.displayName} />
+        <ContactCredentials profile={profile} />
+        <SiteFooter name={title} />
       </body>
     </html>
   );

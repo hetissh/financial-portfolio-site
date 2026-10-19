@@ -1,5 +1,6 @@
 // Checks local admin data conversion, validation, saves, and trash behavior.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import testAdminFixture from '../fixtures/admin-accounts.json' with { type: 'json' };
 import {
   readFileSync,
   mkdtempSync,
@@ -32,6 +33,8 @@ import {
   updateResearch,
 } from '../../src/lib/admin/store';
 import { handleWrite, rejectUnsafeRequest } from '../../src/lib/admin/guard';
+import { initializeAdmins, logIn } from '../../src/lib/admin/auth-store';
+import { profileJourney } from '../../src/lib/profile-sections';
 
 const base = parseResearch([
   {
@@ -40,7 +43,12 @@ const base = parseResearch([
     cover: undefined,
   },
 ])[0];
-const profile = profileSchema.parse(JSON.parse(readFileSync('src/content/profile.json', 'utf8')));
+const profile = profileSchema.parse({
+  ...JSON.parse(readFileSync('src/content/profile.json', 'utf8')),
+  resume: undefined,
+  resumeVisible: false,
+  certifications: [],
+});
 const issuesOf = (action: () => unknown) => {
   try {
     action();
@@ -57,6 +65,41 @@ describe('admin form conversion', () => {
   });
   it('round-trips the profile', () =>
     expect(profileSchema.parse(draftToProfile(profileToDraft(profile)))).toEqual(profile));
+  it('round-trips résumé presentation and editable certifications', () => {
+    const draft = profileToDraft(profile);
+    draft.resume = '/downloads/resume.pdf';
+    draft.resumeVisible = true;
+    draft.resumeLabel = 'Read my CV';
+    draft.certifications.push({
+      key: 1,
+      name: 'Market Analysis',
+      issuer: 'Example Institute',
+      issuedAt: '2026-02-01',
+      expiresAt: '',
+      credentialId: 'ABC123',
+      url: 'https://example.org/verify',
+      pdf: '',
+      visible: true,
+    });
+    const saved = profileSchema.parse(draftToProfile(draft));
+    expect(profileSchema.parse(draftToProfile(profileToDraft(saved)))).toEqual(saved);
+  });
+  it('saves editable card and research copy while retaining old profiles', () => {
+    expect(profileJourney(profile).title).toBe(profile.displayName);
+    const draft = profileToDraft(profile);
+    draft.portfolioTitle = 'A sharper view';
+    draft.intro = 'Research behind a better decision.';
+    draft.researchLead = 'Numbers start the story.';
+    draft.researchAccent = 'Questions take it further.';
+    const saved = profileSchema.parse(draftToProfile(draft));
+    expect(profileJourney(saved)).toEqual({
+      title: 'A sharper view',
+      description: 'Research behind a better decision.',
+      researchLead: 'Numbers start the story.',
+      researchAccent: 'Questions take it further.',
+    });
+    expect(saved.headline).toBe(profile.headline);
+  });
   it('splits paragraphs on blank lines, drops empty list entries and optional blanks', () => {
     expect(splitParagraphs('One\nline wrapped.\n\n\n  Two.  \n \n')).toEqual([
       'One line wrapped.',
@@ -202,11 +245,20 @@ describe('admin content store', () => {
 
 describe('admin request guard', () => {
   const previous = process.env.PORTFOLIO_ADMIN;
+  const previousFile = process.env.PORTFOLIO_AUTH_FILE;
+  let directory: string;
+  let session: string;
   beforeEach(() => {
     process.env.PORTFOLIO_ADMIN = '1';
+    directory = mkdtempSync(path.join(tmpdir(), 'portfolio-guard-'));
+    process.env.PORTFOLIO_AUTH_FILE = path.join(directory, 'auth.json');
+    initializeAdmins([testAdminFixture.accounts[0], testAdminFixture.accounts[1]]);
+    session = logIn(testAdminFixture.accounts[0].email, testAdminFixture.accounts[0].password)!;
   });
   afterEach(() => {
     process.env.PORTFOLIO_ADMIN = previous;
+    process.env.PORTFOLIO_AUTH_FILE = previousFile;
+    rmSync(directory, { recursive: true, force: true });
   });
   const request = (headers: Record<string, string>, method = 'PUT') =>
     new Request('http://127.0.0.1:3000/admin/api/profile/', { method, headers });
@@ -216,36 +268,84 @@ describe('admin request guard', () => {
     'content-type': 'application/json',
   };
 
-  it('accepts same-origin JSON requests to a local host', () => {
-    expect(rejectUnsafeRequest(request(local))).toBeUndefined();
+  it('accepts same-origin JSON requests to a local host', async () => {
     expect(
-      rejectUnsafeRequest(
-        request({ ...local, host: 'localhost:3000', origin: 'http://localhost:3000' }),
+      await rejectUnsafeRequest(
+        request({ ...local, cookie: `portfolio_admin_session=${session}` }),
       ),
     ).toBeUndefined();
     expect(
-      rejectUnsafeRequest(request({ host: local.host, origin: local.origin }, 'DELETE')),
+      await rejectUnsafeRequest(
+        request({
+          ...local,
+          host: 'localhost:3000',
+          origin: 'http://localhost:3000',
+          cookie: `portfolio_admin_session=${session}`,
+        }),
+      ),
+    ).toBeUndefined();
+    expect(
+      await rejectUnsafeRequest(
+        request(
+          { host: local.host, origin: local.origin, cookie: `portfolio_admin_session=${session}` },
+          'DELETE',
+        ),
+      ),
     ).toBeUndefined();
   });
   it('rejects cross-site, rebinding, non-JSON, and disabled-admin requests', async () => {
-    expect(rejectUnsafeRequest(request({ ...local, origin: 'https://evil.test' }))?.status).toBe(
-      403,
-    );
-    expect(rejectUnsafeRequest(request({ ...local, origin: '' }))?.status).toBe(403);
+    expect((await rejectUnsafeRequest(request(local)))?.status).toBe(401);
     expect(
-      rejectUnsafeRequest(
-        request({ ...local, host: 'evil.test:3000', origin: 'http://evil.test:3000' }),
+      (
+        await rejectUnsafeRequest(
+          request({
+            ...local,
+            cookie: `portfolio_admin_session=${session}`,
+            origin: 'https://evil.test',
+          }),
+        )
       )?.status,
     ).toBe(403);
-    expect(rejectUnsafeRequest(request({ ...local, 'content-type': 'text/plain' }))?.status).toBe(
-      415,
-    );
+    expect(
+      (
+        await rejectUnsafeRequest(
+          request({ ...local, cookie: `portfolio_admin_session=${session}`, origin: '' }),
+        )
+      )?.status,
+    ).toBe(403);
+    expect(
+      (
+        await rejectUnsafeRequest(
+          request({
+            ...local,
+            cookie: `portfolio_admin_session=${session}`,
+            host: 'evil.test:3000',
+            origin: 'http://evil.test:3000',
+          }),
+        )
+      )?.status,
+    ).toBe(403);
+    expect(
+      (
+        await rejectUnsafeRequest(
+          request({
+            ...local,
+            cookie: `portfolio_admin_session=${session}`,
+            'content-type': 'text/plain',
+          }),
+        )
+      )?.status,
+    ).toBe(415);
     process.env.PORTFOLIO_ADMIN = '';
-    expect(rejectUnsafeRequest(request(local))?.status).toBe(404);
+    expect((await rejectUnsafeRequest(request(local)))?.status).toBe(404);
   });
   it('turns validation failures into 422 responses with issues', async () => {
     const response = await handleWrite(
-      new Request('http://127.0.0.1:3000/x', { method: 'PUT', headers: local, body: '{}' }),
+      new Request('http://127.0.0.1:3000/x', {
+        method: 'PUT',
+        headers: { ...local, cookie: `portfolio_admin_session=${session}` },
+        body: '{}',
+      }),
       () => {
         throw new ContentValidationError([{ path: 'title', message: 'Required' }]);
       },

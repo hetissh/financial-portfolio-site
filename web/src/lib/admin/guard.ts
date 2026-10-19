@@ -1,24 +1,12 @@
-// Request checks for the local admin. The development server binds to 127.0.0.1, but a
-// page open in the same browser could still send it requests. Writes must target a local
-// host name (blocks DNS rebinding), come from the admin's own origin (blocks cross-site
-// requests), and use a JSON body (forces a CORS preflight, which the admin never approves).
+// Checks every admin content write for an active session, matching Origin, and bounded input.
 import { ContentValidationError, RecordNotFoundError, VersionConflictError } from './store';
+import { requireAdminRequestAsync, sameOrigin } from './auth';
+import { revalidatePath } from 'next/cache';
 
-const localHosts = new Set(['127.0.0.1', 'localhost', '[::1]']);
-export const adminEnabled = () => process.env.PORTFOLIO_ADMIN === '1';
-export function isLocalHost(host: string | null) {
-  return Boolean(host) && localHosts.has(host!.replace(/:\d+$/, ''));
-}
-
-export function rejectUnsafeRequest(request: Request): Response | undefined {
-  if (!adminEnabled()) return Response.json({ message: 'Not found' }, { status: 404 });
-  const host = request.headers.get('host');
-  if (!isLocalHost(host))
-    return Response.json(
-      { message: 'The admin only accepts requests to a local address.' },
-      { status: 403 },
-    );
-  if (request.headers.get('origin') !== `http://${host}`)
+export async function rejectUnsafeRequest(request: Request): Promise<Response | undefined> {
+  const unauthorized = await requireAdminRequestAsync(request);
+  if (unauthorized) return unauthorized;
+  if (!sameOrigin(request))
     return Response.json({ message: 'Cross-origin request blocked.' }, { status: 403 });
   if (
     request.method !== 'DELETE' &&
@@ -59,11 +47,18 @@ async function boundedJson(request: Request) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 export async function handleWrite(request: Request, write: (body: unknown) => unknown) {
-  const rejected = rejectUnsafeRequest(request);
+  const rejected = await rejectUnsafeRequest(request);
   if (rejected) return rejected;
   try {
     const body = request.method === 'DELETE' ? undefined : await boundedJson(request);
-    return Response.json({ record: write(body) });
+    const record = await write(body);
+    // A server build prerenders visitor pages; invalidate them after a successful edit.
+    if (process.env.NODE_ENV === 'production') {
+      revalidatePath('/');
+      revalidatePath('/research');
+      revalidatePath('/research/[slug]', 'page');
+    }
+    return Response.json({ record });
   } catch (error) {
     if (error instanceof ContentValidationError)
       return Response.json(

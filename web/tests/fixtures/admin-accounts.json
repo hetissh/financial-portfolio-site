@@ -1,0 +1,15 @@
+{
+  "$comment": "Throwaway credentials for isolated tests only; never used for local or deployed admin accounts.",
+  "accounts": [
+    {
+      "name": "Test Admin One",
+      "email": "one@example.test",
+      "password": "test-password-one-2026"
+    },
+    {
+      "name": "Test Admin Two",
+      "email": "two@example.test",
+      "password": "test-password-two-2026"
+    }
+  ]
+}

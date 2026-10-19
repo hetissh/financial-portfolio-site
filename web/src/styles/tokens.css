@@ -1,20 +1,24 @@
 /* Defines shared public color, spacing, and typography tokens. */
 :root {
-  --portfolio-paper: #f8f7f2;
+  --portfolio-blue: #00007f;
+  --portfolio-brass: #c4a45e;
+  --portfolio-brass-light: #ddc986;
+  --portfolio-yellow: var(--portfolio-brass-light);
+  --portfolio-paper: #f3eee3;
   --paper: var(--portfolio-paper);
-  --portfolio-ink: #232e29;
+  --portfolio-ink: #151b43;
   --ink: var(--portfolio-ink);
-  --portfolio-muted: #636b64;
+  --portfolio-muted: #565d70;
   --muted: var(--portfolio-muted);
-  --portfolio-green: #2c5141;
+  --portfolio-green: #147055;
   --green: var(--portfolio-green);
-  --portfolio-green-light: #e8ede3;
+  --portfolio-green-light: #e3eee5;
   --green-light: var(--portfolio-green-light);
-  --portfolio-line: #dcdfd5;
+  --portfolio-line: #d6ccb4;
   --line: var(--portfolio-line);
   --button-on-accent: var(--paper);
-  --button-hover: #193b2d;
-  --selection: #dce6cd;
+  --button-hover: #252b56;
+  --selection: #eadcb5;
   --serif: var(--font-editorial), Georgia, serif;
   --sans: var(--font-body), system-ui, sans-serif;
   --mono: 'SFMono-Regular', Consolas, monospace;

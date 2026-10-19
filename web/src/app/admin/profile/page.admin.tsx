@@ -2,13 +2,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { readAdminContent } from '@/lib/admin/store';
+import { adminContent } from '@/lib/admin/data-source';
+import { requireAdminPage } from '@/lib/admin/auth';
 import { ProfileEditor } from '@/components/admin/ProfileEditor';
 import styles from '@/components/admin/admin.module.css';
 
 export const metadata: Metadata = { title: 'Profile' };
-export default function AdminProfile() {
-  const { profile, profileVersion } = readAdminContent();
+export default async function AdminProfile() {
+  await requireAdminPage();
+  const { profile, profileVersion } = await adminContent();
   return (
     <main className={`wrap ${styles.page}`} id="main">
       <header className={styles.pageHead}>

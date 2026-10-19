@@ -1,9 +1,10 @@
 // Exports one visible research article at its stable slug route.
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { loadContent } from '@/lib/content';
+import { loadContent, loadPublicContent } from '@/lib/content';
 import { ResearchArticle } from '@/components/ResearchArticle';
 export function generateStaticParams() {
+  if (process.env.PORTFOLIO_DATA_SOURCE === 'supabase') return [];
   return loadContent().research.map((item) => ({ slug: item.slug }));
 }
 export async function generateMetadata({
@@ -12,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const note = loadContent().research.find((item) => item.slug === slug);
+  const note = (await loadPublicContent()).research.find((item) => item.slug === slug);
   if (!note) return { title: 'Note not found' };
   return {
     title: note.title,
@@ -29,7 +30,7 @@ export async function generateMetadata({
 }
 export default async function ResearchDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { research } = loadContent();
+  const { research } = await loadPublicContent();
   const note = research.find((item) => item.slug === slug);
   if (!note) notFound();
   const next = research[(research.findIndex((item) => item.id === note.id) + 1) % research.length];

@@ -8,15 +8,16 @@ test('release checklist reports every production blocker with working actions an
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/admin/');
-  const release = page.getByRole('region', { name: 'Release', exact: true });
+  const release = page.getByRole('region', { name: 'Release status', exact: true });
   const blockers = await release.getByRole('img', { name: 'Blocking' }).count();
   await expect(release).toContainText(
     blockers
-      ? `${blockers} ${blockers === 1 ? 'item blocks' : 'items block'} a production build.`
+      ? `${blockers} ${blockers === 1 ? 'item needs' : 'items need'} attention before a production build.`
       : 'Content is ready for a production build.',
   );
   await expect(release).toContainText('Profile approved');
   await expect(release).toContainText('Production address');
+  await release.getByText('All release checks').click();
   await expect(release).toContainText('At least one published note');
   await expect(release).toContainText('Citations and résumé are optional.');
   for (const width of [320, 390, 1440]) {
@@ -32,13 +33,12 @@ test('release checklist reports every production blocker with working actions an
         .analyze()
     ).violations,
   ).toEqual([]);
-  await release.getByRole('link', { name: 'Edit profile', exact: true }).click();
+  await release.getByRole('link', { name: 'Edit profile', exact: true }).first().click();
   await expect(page.getByRole('checkbox', { name: /Approved for release/ })).toBeVisible();
   await page.goto('/admin/');
-  await page
-    .getByRole('region', { name: 'Release', exact: true })
-    .getByRole('link', { name: 'Create a note', exact: true })
-    .click();
+  const reopened = page.getByRole('region', { name: 'Release status', exact: true });
+  await reopened.getByText('All release checks').click();
+  await reopened.getByRole('link', { name: 'Create a note', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Start a note.');
   expect(errors).toEqual([]);
 });

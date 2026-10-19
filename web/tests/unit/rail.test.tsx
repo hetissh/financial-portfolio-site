@@ -18,6 +18,6 @@ describe('rail progressive enhancement', () => {
     );
     expect(html).toContain('First note');
     expect(html).toContain('Second note');
-    expect(html).toContain('hidden=""');
+    expect(html).not.toContain('<button');
   });
 });

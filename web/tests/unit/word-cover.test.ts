@@ -9,6 +9,7 @@ import { researchSchema, wordCoverSchema } from '../../src/lib/content-schema';
 import { draftToResearch, researchToDraft } from '../../src/lib/admin/form';
 import { coverDesign, coverInk, coverSeed } from '../../src/lib/word-cover';
 import { ResearchArt } from '../../src/components/ResearchArt';
+import { ResearchCard } from '../../src/components/ResearchCard';
 const base = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
 
 describe('word covers', () => {
@@ -56,6 +57,37 @@ describe('word covers', () => {
     const legacy = renderToStaticMarkup(createElement(ResearchArt, { theme: 'clay' }));
     expect(legacy).toContain('art-clay');
     expect(legacy).not.toContain('data-cover-word');
+  });
+  it('accepts hotlinked Unsplash covers with photographer attribution and no local crop file', () => {
+    const cover = wordCoverSchema.parse({
+      type: 'image',
+      word: 'Markets',
+      color: '#f3eee3',
+      variation: 0,
+      unsplash: {
+        imageUrl: 'https://images.unsplash.com/photo-example?auto=format&fit=crop&w=1200',
+        photoUrl: 'https://unsplash.com/photos/photo-example',
+        photographer: 'A Photographer',
+        photographerUrl: 'https://unsplash.com/@photographer',
+      },
+    });
+    const html = renderToStaticMarkup(createElement(ResearchArt, { theme: 'forest', cover }));
+    expect(html).toContain('https://images.unsplash.com/photo-example');
+    const card = renderToStaticMarkup(
+      createElement(ResearchCard, {
+        item: { ...base, cover },
+        number: 1,
+      }),
+    );
+    expect(card).toContain('Photo by');
+    expect(card).toContain('href="https://unsplash.com/@photographer"');
+    expect(card).toContain('href="https://unsplash.com/photos/photo-example"');
+    expect(
+      wordCoverSchema.safeParse({
+        ...cover,
+        unsplash: { ...cover.unsplash, imageUrl: 'https://example.com/photo.jpg' },
+      }).success,
+    ).toBe(false);
   });
   it('keeps cover text readable on light, dark and mid-tone backgrounds', () => {
     for (let r = 0; r <= 255; r += 17)

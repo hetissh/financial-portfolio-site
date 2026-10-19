@@ -8,14 +8,23 @@ export function ResearchArt({
   cover,
   large = false,
   number = '01',
+  privatePreview = false,
 }: {
   number?: string;
   theme: Research['theme'];
   cover?: Research['cover'];
   large?: boolean;
+  privatePreview?: boolean;
 }) {
   if (cover?.type && cover.type !== 'generated')
-    return <SelectedResearchArt cover={cover} large={large} number={number} />;
+    return (
+      <SelectedResearchArt
+        cover={cover}
+        large={large}
+        number={number}
+        privatePreview={privatePreview}
+      />
+    );
   if (cover) return <WordResearchArt cover={cover} large={large} number={number} />;
   return (
     <div

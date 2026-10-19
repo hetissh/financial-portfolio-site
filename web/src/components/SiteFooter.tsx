@@ -1,6 +1,7 @@
 // Renders site footer links and attribution.
 import Link from 'next/link';
 import { BackToTop } from './BackToTop';
+import { AdminEntry } from './AdminEntry';
 export function SiteFooter({ name }: { name: string }) {
   return (
     <footer className="site-footer wrap">
@@ -16,11 +17,7 @@ export function SiteFooter({ name }: { name: string }) {
         </span>
       </div>
       <nav className="footer-actions" aria-label="Footer">
-        {process.env.PORTFOLIO_ADMIN === '1' && (
-          <Link className="text-link" href="/admin/">
-            Admin
-          </Link>
-        )}
+        {process.env.PORTFOLIO_ADMIN === '1' && <AdminEntry className="text-link" />}
         <BackToTop />
       </nav>
     </footer>

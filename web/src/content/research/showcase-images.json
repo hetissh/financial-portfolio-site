@@ -9,7 +9,7 @@
     "testing"
   ],
   "publishedAt": "2026-09-28",
-  "updatedAt": "2026-10-09",
+  "updatedAt": "2026-10-19",
   "status": "sample",
   "theme": "blue",
   "cover": {
@@ -357,7 +357,21 @@
                       "content": [
                         {
                           "type": "text",
-                          "text": "The copper admin controls must not recolour theme artwork, Hero Patterns, imported images or the saved article preview."
+                          "text": "When hosted media is enabled, only published image crops and downloads should be public; originals and draft media stay private."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The navy admin controls must not recolour theme artwork, Hero Patterns, imported images or the saved article preview."
                         }
                       ]
                     }
@@ -410,7 +424,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Audit codebase standards and validate admin responses and saved workbook previews"
+                  "text": "Show the saved résumé in home credentials"
                 }
               ]
             },
@@ -462,7 +476,329 @@
                       "content": [
                         {
                           "type": "text",
-                          "text": "In local admin, Overview should be active on Overview and research editors, Profile should be active on Profile, and View site should open the public page. Check navigation by keyboard and at mobile width."
+                          "text": "In the content desk, Overview, Homepage, Research, Profile and Admin management each open the expected destination. Research stays active in a research editor. Check keyboard focus and mobile navigation."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Overview keeps the blue grid visible, shows real published, draft and release counts, and lists compact research rows with usable order, edit and preview controls. Sample notes stay labelled as examples."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In Overview, the Evidence in pictures pattern thumbnail shows repeated puzzle pieces at compact size rather than a cropped fragment. Its full research cover keeps the saved pattern appearance."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Check the classic ivory and brass palette across home, research, article, and admin views: keep the navy grid visible, use warm reading and editing surfaces, and reserve brass for accents with readable contrast."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Scroll to the bottom of the home, research, article and admin pages, including with a fast trackpad gesture. The footer should stay at the viewport edge without a large empty grid below it."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "With UNSPLASH_ACCESS_KEY configured in the private server environment, search Unsplash in the cover artwork picker, select a result, save the note and verify it hotlinks the Unsplash image and credits the photographer. Without a key, the picker should explain how to configure it."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On the new-note page, open Unsplash in the cover picker and confirm its search stays inside the editor without nested forms or hydration errors."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Open Homepage from the navigation or yellow overview action. Edit the portfolio title, introduction and two research transition lines; the preview should respond, and saving should update the public page. Profile still edits identity and saved About and Contact content."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On the home page, the selected research rail has no “notes to explore” count label; its arrow controls appear only when the cards overflow. Visible résumé and certifications appear together in their own section after selected research. Hide them in Profile and confirm they disappear from the public home page."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In Profile, attach a PDF up to 5 MB to a certification. Preview it before saving, then save and confirm its PDF action appears in the dedicated home credentials section. Hide the certification and confirm the public PDF link disappears. Invalid files should leave the draft editable."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "When the profile has visible credentials, the Credentials navigation link should take you to their home-page section from home or a research page. Contact should appear only when a contact method exists and should lead to the compact contact area."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In the combined cloud server after the migration, sign in to Admin on the same origin as the public site; save a profile edit, image, workbook and certification PDF, then reload the public page. The saved files and content should persist after a server restart. Keep draft media inaccessible without an admin session."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The overview Release panel shows blockers first and expands to all checks. Its profile action opens Profile; the production address remains an operator setting."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On the combined site, use Admin in the main navigation or footer while signed out: the login form should appear. Sign in, return to the public page, and use Admin again to reach the content desk. The static export should have no Admin link. Admin management should show two account slots and no Remove access action for the current account. Password recovery and session revocation are verified by automated tests."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In the content desk, choose Sign out. The main public page should open, and choosing Admin again should lead to login because the prior session ended."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On login, reset, and Admin management password fields, use Show and Hide to inspect only the value you typed. The control should keep the value and never submit the form. Test fixture credentials do not change a live admin login."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Keep local admin and Resend settings in the private web/.env.local file. Initial passwords are needed only for bootstrap; password changes use Admin management or reset. The live auth JSON contains hashes, and test fixture values never sign in to the live site."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "After an operator updates both private admin accounts, sign in with each updated email and password. Earlier sessions and pending recovery links should no longer grant access. Keep real credentials out of sample notes and test fixtures."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Change the profile monogram, save, then reload a public page: the browser tab icon should show the same initials as the header. Rebuild the static preview to check its icon too."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Edit Portfolio title, Introduction and both Research introduction lines in Profile. The admin journey preview updates before saving; after saving, reload home to see the title in the header, hero and card, the description beneath it, and the two research lines at the end of the scroll sequence."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On home, move over a sheet cell: its faint formula should stay inside that cell. Scroll to turn the reflective card, raise the dashboard bars and reveal the allocation, cash-flow and trend widgets. At the end, the dashboard blurs and the research introduction appears before the selected notes."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Open the notebook index and an article after the home sequence. Check the navy grid, ivory reading surfaces, brass accents, readable article text, and working navigation. Try a small screen and reduced motion."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Follow the blue grid from the hero through selected research, the research index, an article, and the footer. Confirm the grid has no abrupt colour break and that note cards and article text remain readable on light panels."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "The home page ends after selected research. About and Contact no longer appear there or in the main navigation; their saved content remains editable in Profile. The admin keeps a subtle blue grid around solid form panels."
                         }
                       ]
                     }

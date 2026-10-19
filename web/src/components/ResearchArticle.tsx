@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowUpRight, ArrowDown, Clock3 } from 'lucide-react';
 import type { Research } from '@/lib/content-schema';
 import { formatDate, readingTime } from '@/lib/content';
 import { ResearchArt } from './ResearchArt';
+import { visitorAssetUrl } from '@/lib/supabase/assets';
 export function ResearchArticle({
   note,
   next,
@@ -42,6 +43,18 @@ export function ResearchArticle({
         </div>
       </header>
       <ResearchArt theme={note.theme} cover={note.cover} large number={noteNumber(note, number)} />
+      {note.cover?.type === 'image' && note.cover.unsplash && (
+        <p className="image-credit">
+          Photo by{' '}
+          <a href={note.cover.unsplash.photographerUrl} target="_blank" rel="noreferrer">
+            {note.cover.unsplash.photographer}
+          </a>{' '}
+          on{' '}
+          <a href={note.cover.unsplash.photoUrl} target="_blank" rel="noreferrer">
+            Unsplash
+          </a>
+        </p>
+      )}
       <ResearchAttachments attachments={note.attachments} />
       <div className="article-layout">
         <aside className="article-aside">
@@ -101,7 +114,7 @@ export function ResearchArticle({
             </section>
           )}
           {note.download && (
-            <a className="button-primary" href={note.download} download>
+            <a className="button-primary" href={visitorAssetUrl(note.download)} download>
               Download research <ArrowDown size={16} aria-hidden="true" />
             </a>
           )}

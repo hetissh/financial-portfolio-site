@@ -15,6 +15,17 @@ export type SectionDraft = {
 };
 export type SourceDraft = { key: number; title: string; url: string };
 export type LinkDraft = { key: number; label: string; href: string };
+export type CertificationDraft = {
+  key: number;
+  name: string;
+  issuer: string;
+  issuedAt: string;
+  expiresAt: string;
+  credentialId: string;
+  url: string;
+  pdf: string;
+  visible: boolean;
+};
 export type ResearchDraft = {
   id: string;
   slug: string;
@@ -41,15 +52,21 @@ export type ProfileDraft = {
   displayName: string;
   monogram: string;
   role: string;
+  portfolioTitle: string;
   headline: string;
   headlineAccent: string;
   intro: string;
+  researchLead: string;
+  researchAccent: string;
   about: NonNullable<Profile['about']>;
   contact: Omit<NonNullable<Profile['contact']>, 'email'> & { email: string };
   bio: string;
   approved: boolean;
   contactLinks: LinkDraft[];
   resume: string;
+  resumeLabel: string;
+  resumeVisible: boolean;
+  certifications: CertificationDraft[];
 };
 
 let lastKey = 0;
@@ -96,6 +113,17 @@ export const emptySection = (): SectionDraft => ({
 });
 export const emptySource = (): SourceDraft => ({ key: nextKey(), title: '', url: '' });
 export const emptyLink = (): LinkDraft => ({ key: nextKey(), label: '', href: '' });
+export const emptyCertification = (): CertificationDraft => ({
+  key: nextKey(),
+  name: '',
+  issuer: '',
+  issuedAt: '',
+  expiresAt: '',
+  credentialId: '',
+  url: '',
+  pdf: '',
+  visible: true,
+});
 
 export function researchToDraft(record?: Research): ResearchDraft {
   return {
@@ -170,13 +198,27 @@ export function profileToDraft(profile: Profile): ProfileDraft {
     displayName: profile.displayName,
     monogram: profile.monogram,
     role: profile.role,
+    portfolioTitle: profile.portfolioTitle ?? profile.displayName,
     headline: profile.headline,
     headlineAccent: profile.headlineAccent ?? '',
     intro: profile.intro,
+    researchLead: profile.researchLead ?? 'The numbers are the beginning.',
+    researchAccent: profile.researchAccent ?? 'The questions come next.',
     bio: joinParagraphs(profile.bio),
     approved: !profile.isPlaceholder,
     contactLinks: profile.contactLinks.map((link) => ({ key: nextKey(), ...link })),
     resume: profile.resume ?? '',
+    resumeLabel: profile.resumeLabel ?? 'View résumé',
+    resumeVisible: profile.resumeVisible,
+    certifications: profile.certifications.map((item) => ({
+      key: nextKey(),
+      ...item,
+      issuedAt: item.issuedAt ?? '',
+      expiresAt: item.expiresAt ?? '',
+      credentialId: item.credentialId ?? '',
+      url: item.url ?? '',
+      pdf: item.pdf ?? '',
+    })),
   };
 }
 export function draftToProfile(draft: ProfileDraft) {
@@ -184,15 +226,34 @@ export function draftToProfile(draft: ProfileDraft) {
     displayName: draft.displayName,
     monogram: draft.monogram,
     role: draft.role,
+    portfolioTitle: draft.portfolioTitle === draft.displayName ? undefined : draft.portfolioTitle,
     headline: draft.headline,
     headlineAccent: optional(draft.headlineAccent),
     intro: draft.intro,
+    researchLead:
+      draft.researchLead === 'The numbers are the beginning.' ? undefined : draft.researchLead,
+    researchAccent:
+      draft.researchAccent === 'The questions come next.' ? undefined : draft.researchAccent,
     bio: splitParagraphs(draft.bio),
     isPlaceholder: !draft.approved,
     contactLinks: draft.contactLinks
       .filter((link) => link.label.trim() || link.href.trim())
       .map((link) => ({ label: link.label, href: link.href.trim() })),
     resume: optional(draft.resume),
+    resumeLabel: draft.resumeLabel === 'View résumé' ? undefined : optional(draft.resumeLabel),
+    resumeVisible: draft.resumeVisible,
+    certifications: draft.certifications
+      .filter((item) => item.name.trim() || item.issuer.trim())
+      .map((item) => ({
+        name: item.name,
+        issuer: item.issuer,
+        issuedAt: optional(item.issuedAt),
+        expiresAt: optional(item.expiresAt),
+        credentialId: optional(item.credentialId),
+        url: optional(item.url),
+        pdf: optional(item.pdf),
+        visible: item.visible,
+      })),
     about:
       JSON.stringify(draft.about) === JSON.stringify(aboutDefaults)
         ? undefined
@@ -249,20 +310,33 @@ const labels: Record<string, string> = {
   displayName: 'Name',
   monogram: 'Monogram',
   role: 'Role',
+  portfolioTitle: 'Portfolio title',
   headline: 'Headline',
   headlineAccent: 'Headline accent',
   intro: 'Introduction',
+  researchLead: 'Research introduction, first line',
+  researchAccent: 'Research introduction, second line',
   bio: 'Biography',
   isPlaceholder: 'Approval',
   contactLinks: 'Contact links',
   label: 'Label',
   href: 'Link',
   resume: 'Résumé',
+  resumeLabel: 'Résumé link label',
+  certifications: 'Certifications',
+  name: 'Name',
+  issuer: 'Issuer',
+  issuedAt: 'Issue date',
+  expiresAt: 'Expiry date',
+  credentialId: 'Credential ID',
+  pdf: 'Certification PDF',
+  visible: 'Visible',
 };
 const listItems: Record<string, string> = {
   sections: 'Section',
   sources: 'Source',
   contactLinks: 'Contact link',
+  certifications: 'Certification',
   attachments: 'Sheet',
 };
 export function describeField(field: string) {

@@ -1,15 +1,12 @@
 // Accepts bounded Excel uploads and returns safe validation errors.
-import { adminEnabled, isLocalHost } from '@/lib/admin/guard';
+import { requireAdminRequestAsync, sameOrigin } from '@/lib/admin/auth';
 import { MAX_WORKBOOK_BYTES, storeWorkbook } from '@/lib/admin/workbooks';
 import { UploadInputError, uploadErrorResponse } from '@/lib/admin/upload-errors';
+import { storeCloudWorkbook } from '@/lib/supabase/uploads';
 export async function POST(request: Request) {
-  if (!adminEnabled()) return Response.json({ message: 'Not found' }, { status: 404 });
-  const host = request.headers.get('host');
-  if (
-    !isLocalHost(host) ||
-    request.headers.get('origin') !== `http://${host}` ||
-    request.headers.get('x-portfolio-admin') !== '1'
-  )
+  const unauthorized = await requireAdminRequestAsync(request);
+  if (unauthorized) return unauthorized;
+  if (!sameOrigin(request) || request.headers.get('x-portfolio-admin') !== '1')
     return Response.json({ message: 'Cross-origin upload blocked.' }, { status: 403 });
   if (!request.headers.get('content-type')?.startsWith('multipart/form-data;'))
     return Response.json({ message: 'Choose an Excel workbook.' }, { status: 415 });
@@ -56,7 +53,12 @@ export async function POST(request: Request) {
       ].includes(file.type)
     )
       throw new UploadInputError('Choose an .xlsx workbook.');
-    return Response.json(await storeWorkbook(Buffer.from(await file.arrayBuffer()), file.name), {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const result =
+      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+        ? await storeCloudWorkbook(bytes, file.name)
+        : await storeWorkbook(bytes, file.name);
+    return Response.json(result, {
       status: 201,
       headers: { 'Cache-Control': 'no-store' },
     });

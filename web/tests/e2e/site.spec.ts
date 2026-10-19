@@ -10,7 +10,11 @@ test('pages render without runtime or asset errors and fit narrow screens', asyn
     if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
   });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Making sense of what matters.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Financial Portfolio');
+  const monogram = await page.locator('.brand .monogram-text text').textContent();
+  const icon = await page.locator('link[rel="icon"]').getAttribute('href');
+  expect(icon?.startsWith('data:image/svg+xml,')).toBe(true);
+  expect(decodeURIComponent(icon!.split(',')[1])).toContain(`>${monogram}</text>`);
   await expect(page.getByRole('button', { name: 'Next research' })).toBeEnabled();
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -26,6 +30,64 @@ test('pages render without runtime or asset errors and fit narrow screens', asyn
   await expect(page).toHaveURL(/\/research\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Ideas worth');
   expect(errors).toEqual([]);
+});
+
+test('sheet formulas stay within a cell and scroll reveals the dashboard before research', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const grid = page.getByTestId('sheet-grid');
+  const formula = page.getByTestId('sheet-formula');
+  const box = await grid.boundingBox();
+  expect(box).toBeTruthy();
+  await page.mouse.move(box!.x + 20, box!.y + 112);
+  await expect(formula).toContainText(/^=/);
+  const fit = await formula.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.width <= 188 && rect.left >= 0 && rect.right <= innerWidth;
+  });
+  expect(fit).toBe(true);
+  const journey = page.getByRole('region', {
+    name: 'Portfolio introduction and illustrative financial dashboard',
+  });
+  await journey.evaluate((element) =>
+    window.scrollTo(
+      0,
+      element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.68,
+    ),
+  );
+  const dashboard = page.getByTestId('journey-dashboard');
+  await expect
+    .poll(() => dashboard.evaluate((element) => Number(getComputedStyle(element).opacity)))
+    .toBeGreaterThan(0.9);
+  await expect
+    .poll(() =>
+      page
+        .locator('[data-bar]')
+        .last()
+        .evaluate((element) => getComputedStyle(element).transform),
+    )
+    .not.toBe('matrix(1, 0, 0, 0.001, 0, 0)');
+  await journey.evaluate((element) =>
+    window.scrollTo(
+      0,
+      element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.97,
+    ),
+  );
+  await expect
+    .poll(() =>
+      page
+        .getByTestId('research-handoff')
+        .evaluate((element) => Number(getComputedStyle(element).opacity)),
+    )
+    .toBeGreaterThan(0.8);
+  await expect
+    .poll(() =>
+      dashboard.evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).filter.match(/[\d.]+/)?.[0] ?? '0'),
+      ),
+    )
+    .toBeGreaterThan(5);
 });
 
 test('Back to top works repeatedly and preserves keyboard focus', async ({ page }) => {
@@ -244,19 +306,20 @@ test('native touch scrolling works over the research rail', async ({
     .toBeGreaterThan(30);
 });
 
-test('section navigation and browser history preserve usable page scrolling', async ({ page }) => {
+test('research navigation and browser history preserve usable page scrolling', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'About', exact: true }).click();
-  await expect(page.locator('#about')).toBeInViewport();
-  await page.getByRole('link', { name: 'Let’s connect' }).click();
-  await expect(page.locator('#contact')).toBeInViewport();
-  // Clicking a header link first scrolls the header into view. Back may restore
-  // that scroll position instead of re-aligning the old hash target.
+  await expect(page.locator('#about, #contact')).toHaveCount(0);
+  await page.getByRole('link', { name: 'Explore my research' }).click();
+  await expect(page).toHaveURL(/#research$/);
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Research' })
+    .click();
+  await expect(page).toHaveURL(/\/research\/$/);
   await page.goBack();
-  await expect(page).toHaveURL(/#about$/);
+  await expect(page).toHaveURL(/#research$/);
   await page.goForward();
-  await expect(page).toHaveURL(/#contact$/);
-  await expect(page.locator('#contact')).toBeInViewport();
+  await expect(page).toHaveURL(/\/research\/$/);
   await page.getByRole('link', { name: 'Back to top' }).click();
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
 });
@@ -284,6 +347,9 @@ test('example Excel sheets work in the static export and private admin endpoints
   const id = href!.split('/').at(-1)!.replace('.xlsx', '');
   expect((await request.get(`/admin/api/workbooks/${id}/`)).status()).toBe(404);
   expect((await request.get(`/src/content/workbooks/${id}.json`)).status()).toBe(404);
+  await expect(
+    page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Admin' }),
+  ).toHaveCount(0);
   expect(
     (
       await new AxeBuilder({ page })

@@ -1,4 +1,5 @@
 // Edits theme, generated, and imported cover artwork for a draft note.
+/* eslint-disable @next/next/no-img-element -- Unsplash requires using its returned hotlink URLs directly. */
 'use client';
 import { noteNumber } from '@/lib/research-order';
 import { useState } from 'react';
@@ -18,6 +19,17 @@ import { ResearchArt } from '@/components/ResearchArt';
 import { Field } from './fields';
 import { ImageCropDialog } from './ImageCropDialog';
 import styles from './admin.module.css';
+type UnsplashPhoto = {
+  id: string;
+  description: string;
+  imageUrl: string;
+  thumbnailUrl: string;
+  photoUrl: string;
+  downloadLocation: string;
+  photographer: string;
+  photographerUrl: string;
+};
+
 export function ArtworkEditor({
   draft,
   setDraft,
@@ -37,13 +49,17 @@ export function ArtworkEditor({
   error?: string;
   onEdited: () => void;
 }) {
-  const [picker, setPicker] = useState<'theme' | 'hero' | 'image'>(
+  const [picker, setPicker] = useState<'theme' | 'hero' | 'image' | 'unsplash'>(
     draft.cover?.type === 'hero' ? 'hero' : draft.cover?.type === 'image' ? 'image' : 'theme',
   );
   const [query, setQuery] = useState('');
   const [imageError, setImageError] = useState<string>();
   const [cropFile, setCropFile] = useState<File>();
   const [initialCrop, setInitialCrop] = useState<ImageCrop>();
+  const [photos, setPhotos] = useState<UnsplashPhoto[]>([]);
+  const [photoQuery, setPhotoQuery] = useState('');
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState<string>();
   const selected = draft.cover;
   const isHero = selected?.type === 'hero';
   // Older saved covers may not have explicit ink or opacity settings.
@@ -89,6 +105,25 @@ export function ArtworkEditor({
     }
     setInitialCrop(undefined);
     setCropFile(file);
+  }
+  async function searchPhotos() {
+    setPhotoError(undefined);
+    setPhotoBusy(true);
+    try {
+      const response = await fetch(
+        `/admin/api/unsplash/?query=${encodeURIComponent(photoQuery.trim())}`,
+      );
+      const payload = (await response.json()) as {
+        results?: UnsplashPhoto[];
+        message?: string;
+      };
+      if (!response.ok) throw new Error(payload.message ?? 'Could not search Unsplash.');
+      setPhotos(payload.results ?? []);
+    } catch (cause) {
+      setPhotoError(cause instanceof Error ? cause.message : 'Could not search Unsplash.');
+    } finally {
+      setPhotoBusy(false);
+    }
   }
   async function recrop() {
     setImageError(undefined);
@@ -141,9 +176,15 @@ export function ArtworkEditor({
         in the card preview.
       </p>
       <div className={styles.artworkTabs} aria-label="Artwork sources">
-        {(['theme', 'hero', 'image'] as const).map((p) => (
+        {(['theme', 'hero', 'image', 'unsplash'] as const).map((p) => (
           <button type="button" key={p} aria-pressed={picker === p} onClick={() => setPicker(p)}>
-            {p === 'theme' ? 'Theme artwork' : p === 'hero' ? 'Hero Patterns' : 'Import image'}
+            {p === 'theme'
+              ? 'Theme artwork'
+              : p === 'hero'
+                ? 'Hero Patterns'
+                : p === 'image'
+                  ? 'Import image'
+                  : 'Unsplash'}
           </button>
         ))}
       </div>
@@ -153,6 +194,7 @@ export function ArtworkEditor({
           <ResearchArt
             theme={draft.theme}
             cover={selected}
+            privatePreview
             number={noteNumber(
               { noteNumber: draft.noteNumber.trim() ? Number(draft.noteNumber) : undefined },
               number,
@@ -420,7 +462,7 @@ export function ArtworkEditor({
           <p className={styles.hint}>
             JPEG, PNG or WebP · up to 10 MB. Choose a crop before applying.
           </p>
-          {selected?.type === 'image' && (
+          {selected?.type === 'image' && selected.imageId && (
             <button type="button" className={styles.addButton} onClick={() => void recrop()}>
               Adjust image crop
             </button>
@@ -430,6 +472,102 @@ export function ArtworkEditor({
               {imageError}
             </p>
           )}
+        </div>
+      )}
+      {picker === 'unsplash' && (
+        <div className={styles.imageImport}>
+          <div className={styles.unsplashSearch} role="search">
+            <label className={styles.group}>
+              <span className={styles.label}>Search Unsplash photos</span>
+              <input
+                className={styles.input}
+                type="search"
+                value={photoQuery}
+                maxLength={100}
+                required
+                placeholder="Try architecture, markets or nature"
+                onChange={(event) => setPhotoQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    void searchPhotos();
+                  }
+                }}
+              />
+            </label>
+            <button
+              className={styles.addButton}
+              type="button"
+              disabled={photoBusy || !photoQuery.trim()}
+              onClick={() => void searchPhotos()}
+            >
+              {photoBusy ? 'Searching…' : 'Search'}
+            </button>
+          </div>
+          <p className={styles.hint}>
+            Results are served directly from Unsplash. Selecting a photo records the required
+            download event and keeps photographer credit on the public note.
+          </p>
+          {photoError && (
+            <p className={styles.error} role="alert">
+              {photoError}
+            </p>
+          )}
+          <div className={styles.unsplashGrid} aria-live="polite">
+            {photos.map((photo) => (
+              <button
+                key={photo.id}
+                type="button"
+                className={styles.unsplashChoice}
+                disabled={photoBusy}
+                onClick={async () => {
+                  setPhotoError(undefined);
+                  setPhotoBusy(true);
+                  try {
+                    const response = await fetch('/admin/api/unsplash/', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'X-Portfolio-Admin': '1' },
+                      body: JSON.stringify({ downloadLocation: photo.downloadLocation }),
+                    });
+                    const payload = (await response.json()) as { message?: string };
+                    if (!response.ok) throw new Error(payload.message ?? 'Could not select photo.');
+                    choose({
+                      type: 'image',
+                      unsplash: {
+                        imageUrl: photo.imageUrl,
+                        photoUrl: photo.photoUrl,
+                        photographer: photo.photographer,
+                        photographerUrl: photo.photographerUrl,
+                      },
+                      variation: 0,
+                      word: selected?.type === 'image' ? draft.coverWord : imageDefault.word,
+                      color: selected?.type === 'image' ? draft.coverColor : imageDefault.color,
+                    });
+                  } catch (cause) {
+                    setPhotoError(
+                      cause instanceof Error ? cause.message : 'Could not select photo.',
+                    );
+                  } finally {
+                    setPhotoBusy(false);
+                  }
+                }}
+              >
+                <img src={photo.thumbnailUrl} alt="" />
+                <span>{photo.description}</span>
+                <small>Photo by {photo.photographer}</small>
+              </button>
+            ))}
+          </div>
+          {photos.length === 0 && !photoBusy && !photoError && (
+            <p className={styles.hint}>Search to browse landscape photos.</p>
+          )}
+          <p className={styles.hint}>
+            Photos by their respective photographers on{' '}
+            <a href="https://unsplash.com/" target="_blank" rel="noreferrer">
+              Unsplash
+            </a>
+            .
+          </p>
         </div>
       )}
       <details className={styles.generateDetails}>

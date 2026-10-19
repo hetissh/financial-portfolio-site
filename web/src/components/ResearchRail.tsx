@@ -73,10 +73,9 @@ export function ResearchRail({ children, count }: { children: ReactNode; count: 
       >
         {children}
       </ul>
-      {count > 1 && (
+      {bounds.overflow && (
         <div className="rail-toolbar">
-          <span className="small-label">{String(count).padStart(2, '0')} notes to explore</span>
-          <div className="rail-buttons" hidden={!bounds.overflow}>
+          <div className="rail-buttons">
             <button
               aria-label="Previous research"
               aria-controls="research-rail"

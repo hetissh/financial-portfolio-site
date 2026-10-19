@@ -11,7 +11,13 @@ import {
 } from '../../src/lib/content-schema';
 import { loadContent } from '../../src/lib/content';
 const base = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
-const profile = profileSchema.parse(JSON.parse(readFileSync('src/content/profile.json', 'utf8')));
+const profile = profileSchema.parse({
+  ...JSON.parse(readFileSync('src/content/profile.json', 'utf8')),
+  isPlaceholder: true,
+  resume: undefined,
+  resumeVisible: false,
+  certifications: [],
+});
 
 describe('publication boundaries', () => {
   it('excludes drafts in both modes, and samples from production', () => {
@@ -102,6 +108,32 @@ describe('content integrity', () => {
         contactLinks: [{ label: 'Contact', href: 'https://user:secret@example.com/' }],
       }),
     ).toThrow();
+  });
+  it('keeps old profiles valid and validates public credentials', () => {
+    expect(profile.certifications).toEqual([]);
+    expect(profile.resumeVisible).toBe(false);
+    const credential = {
+      name: 'Financial Modelling',
+      issuer: 'Example Institute',
+      issuedAt: '2026-01-15',
+      visible: true,
+      url: 'https://example.org/verify',
+    };
+    expect(
+      profileSchema.parse({ ...profile, certifications: [credential] }).certifications,
+    ).toHaveLength(1);
+    expect(
+      profileSchema.safeParse({
+        ...profile,
+        certifications: [{ ...credential, url: 'javascript:alert(1)' }],
+      }).success,
+    ).toBe(false);
+    expect(
+      profileSchema.safeParse({
+        ...profile,
+        certifications: [{ ...credential, expiresAt: '2025-01-01' }],
+      }).success,
+    ).toBe(false);
   });
   it('allows production publication with empty or omitted citations, but validates any supplied links', () => {
     const approved = { ...profile, isPlaceholder: false };

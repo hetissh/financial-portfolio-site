@@ -1,26 +1,34 @@
 # Remaining work for an end-to-end launch
 
-Repository audit: 28 September 2026. The responsive public site, local admin, rich writing, images/covers, spreadsheet attachments, editable About/Contact and test-note workflow are implemented. This checklist separates launch requirements from additional product features.
+Repository audit updated: 20 October 2026. The responsive public site, local admin, rich writing, images/covers, spreadsheet attachments, and résumé/certification workflow are implemented. This checklist separates a static public release from the requested combined Supabase site and admin release.
 
 ## Required for the current static-site release
 
 | Order | Work | Current evidence | Completion condition |
 | --- | --- | --- | --- |
-| 1 | Finish and approve the real profile and contact information | `profile.json` still has `isPlaceholder: true`; no Contact email or contact links. No résumé is configured. | Review name, role, biography/About and Contact copy; add the desired email/links; tick **Approved for release** in Admin → Profile and save after review (this sets `isPlaceholder` to `false`). A résumé is optional. |
-| 2 | Publish the actual launch research | Seven records are `sample`; zero are `published`. | At least one reviewed note is `published`, with real copy and intended images/sheets/downloads. Citations are optional. Keep the three showcase notes as samples; they are excluded from production. |
-| 3 | Put source and private content under recoverable version control | A reviewed local source checkpoint and verified content snapshot were prepared. An `origin` remote is now configured; its pushed state and off-device backup are not verified here. | Confirm the remote contains the reviewed source and private content, and back up `src/content` including original images and workbooks. Use `npm run content:backup` and `npm run content:restore -- BACKUP NEW-FOLDER` to verify a restore; keep an off-device copy. Avoid committing local caches, generated exports or secrets. |
-| 4 | Run the existing CI on the real repository | `.github/workflows/ci.yml` exists but has not run remotely. | Install from the lockfile and pass validation, lint, type checking, unit/admin/public browser checks. Update content-specific example expectations when replacing samples, or run CI against a maintained fixture dataset. |
-| 5 | Choose and configure the production host/domain | A static-host configuration exists; no local production environment file or real `SITE_URL` is configured. No deployment was created by this work. | Set `SITE_URL` to the chosen HTTPS origin, run `npm run build:release`, deploy the reviewed `out/` artifact and configure domain/HTTPS. The owner supplies the hosting account and domain. |
+| 1 | Finish and approve the real profile and contact information | `profile.json` is marked approved and the release check passes its profile gate, but the visible profile still has `Financial Portfolio`, `test cert 1/2`, and sample/test contact URLs. | Replace or intentionally approve the actual name, links, résumé and certification details before publication. |
+| 2 | Publish the actual launch research | One note is `published`; six are `sample`. The published note still describes itself as an example, contains `dlkjfg;lkasdjg`, and links example financial statements. | Replace the exercise with reviewed research or return it to draft/sample until the actual launch note is ready. Keep the three showcase notes as samples; they are excluded from production. |
+| 3 | Put source and private content under recoverable version control | The local `develop` checkout has 76 modified and 49 untracked paths; these changes are not in the current Git commit or its tracked remote branch. Off-device content backup is unverified. | Review and commit the intended source changes without secrets or private uploads; verify a content backup and restore, and keep an off-device copy. |
+| 4 | Run the existing CI on the real repository | Local checks passed for the combined implementation, but remote CI has not verified the current uncommitted changes. | Run the repository CI on the reviewed commit and verify content validation, lint, types, unit tests and public/admin browser checks. |
+| 5 | Choose and configure the production host/domain | `SITE_URL` is unset, so the read-only release check blocks the production build. The checked-in Vercel configuration is for a static export, not the requested cloud-backed admin. | Select a host and HTTPS domain, configure the real production origin, then build and verify the chosen deployment mode. |
 | 6 | Verify the real deployment and devices | Automated browser, responsive and accessibility checks passed locally; real-phone and manual screen-reader evidence is still open. | Check direct URLs/refresh/404s, fonts/images/downloads, contact links, canonical/social metadata, sitemap/robots and production exclusion of drafts/samples. Test real iPhone/Android scrolling, image paste/crop, Back to top, zoom, keyboard and screen-reader journeys. See `plans/ACCEPTANCE.md`. |
 | 7 | Confirm the publishing and rollback workflow | Shared admin/CLI readiness checks, verified content snapshots/recovery and build/rollback instructions exist; no live rollback exercise has been performed. | Demonstrate local edit → validation → preview → reviewed release; keep a last known-good artifact and verify redeployment/rollback. Refresh the same three showcase notes after each CR. |
 
-Production still requires an approved profile, at least one published note and a valid HTTPS `SITE_URL`. Making citations optional does not bypass those remaining checks. Source entries, when supplied, still require a title and a valid HTTPS URL.
+The profile and published-note checks pass only their machine-readable flags; visible sample content still makes editorial review a blocker. A real HTTPS `SITE_URL` remains a technical blocker; source control, deployment and live checks remain open.
+
+## Required for the requested combined Supabase site and admin
+
+| Work | Current evidence | Completion condition |
+| --- | --- | --- |
+| Apply cloud schema and import content | The configured Supabase project's `portfolio_profile` REST query returned `PGRST205` on 20 October: the table does not exist. The import has only been dry-run locally. | Apply all four reviewed migrations, import the approved profile, notes and media, and reconcile counts and file access. |
+| Establish hosted admin identity and recovery | The fixed account slots are defined locally; remote tables and Auth bindings are not ready. `RESEND_FROM_EMAIL` is unset locally. | Create and bind both Supabase Auth users, configure verified mail delivery, and test sign-in, reset, email change, disabling and session revocation on a protected hosted preview. |
+| Deploy one server for public and admin | `build:cloud` passed locally, but no server host, adapter or production domain has been configured. `web/vercel.json` still builds a static export. | Configure the selected server host with HTTPS, cloud keys and `ADMIN_ORIGIN`; deploy one server and verify public and protected admin routes plus uploads and PDF visibility. |
+| Rehearse cutover and rollback | No live migration, hosted browser journey, domain switch or rollback exercise has been completed. | Freeze local edits for the final import, test the hosted preview, retain a known-good artifact and demonstrate rollback before switching visitors. |
 
 ## Additional features to decide on
 
-These are not required by the current agreed local-admin/static-site design:
+These are optional beyond the requested combined site and admin release:
 
-- **Admin from anywhere:** a hosted editor with sign-in, authorization, persistent content/media storage and a deployment workflow. The current `/admin` runs locally and is intentionally absent from the public export.
 - **Email sent directly from the site:** a contact form, server/provider integration, delivery handling and spam controls. The current email link opens the visitor's email app with the saved recipient and subject; the profile email needs to be supplied.
 - **Guided releases in admin:** add a guided build/release action to the shared profile/publication/domain checks. The existing release process is documented CLI work.
 - **Saved version history and in-app trash restore:** current reset restores unsaved changes; saved versions need Git/backups and deleted notes can be restored from the local trash files.
@@ -30,4 +38,4 @@ No hosting account, domain, repository or third-party service was inspected remo
 
 ## This local preparation
 
-The owner asked to leave deployment pending and to keep all existing notes as samples. The CLI (`npm run release:check`) and admin now share a complete content/address checklist; missing contact options are a notice, not an additional release guard. Content backup/restoration is implemented and tested with file checksums, preserved original assets and refusal to overwrite existing folders. Source control and local verification evidence are recorded in `docs/qa-evidence/LAUNCH_TOOLS.md`. No existing content was approved or published.
+The original 28 September preparation left deployment pending and all notes as samples. Since then, the profile was marked approved and one note was published. The CLI (`npm run release:check`) and admin share the content/address checks; missing contact options are a notice, not an additional release guard. Content backup/restoration is implemented locally, but the current content still needs an off-device backup and hosted recovery exercise. Earlier local evidence is recorded in `docs/qa-evidence/LAUNCH_TOOLS.md`.

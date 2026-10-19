@@ -1,6 +1,6 @@
 # Coding standards
 
-These are the conventions implemented in this repository as of 9 October 2026.
+These are the conventions implemented in this repository as of 18 October 2026.
 `AGENTS.md` is the canonical agent entry point. The relevant defaults copied
 from the attached rules kit live in `docs/ai-rules/`; the architecture and
 decisions documents explain project-specific choices.
@@ -12,8 +12,8 @@ decisions documents explain project-specific choices.
 | Languages | TypeScript/TSX, JavaScript/MJS, CSS, JSON; no Python application code |
 | Runtime | Node `24.19.0` in `web/.nvmrc`; `web/package.json` declares Node `>=22.0.0` |
 | Package manager | npm with committed `web/package-lock.json`; use `npm ci` for reproducible installation |
-| Framework | Next.js `16.3.8` App Router, React/React DOM `19.3.0`; static export for public pages |
-| Key libraries | Zod `4.6.5` for content contracts, Tiptap for rich editing, Sharp `0.35.5` for image processing, SheetJS for workbook previews |
+| Framework | Next.js `16.3.8` App Router, React/React DOM `19.3.0`; static export or combined cloud server |
+| Key libraries | Zod `4.6.5` for content contracts, Tiptap for rich editing, Sharp `0.35.5` for image processing, SheetJS for workbook previews, Supabase JS `2.117.3` for the cloud migration path, Three.js `0.186.1` and GSAP `3.15.0` for the home card journey |
 | Styling | CSS modules, global CSS, and `web/src/styles/tokens.css`; self-hosted fonts |
 | Quality tools | Prettier `3.9.9`, ESLint `9.39.5`, TypeScript `6.0.3`, Vitest `5.0.2`, Playwright `1.63.0` |
 
@@ -21,6 +21,11 @@ Dependencies are pinned in `web/package.json` and the lockfile. Prefer the
 existing stack and add a dependency only for a concrete need. The SheetJS
 tarball comes from its official CDN as recorded in the lockfile. Do not run
 unrelated upgrades while changing features.
+The home page loads Three.js and GSAP in a client component after hydration.
+Keep essential copy and navigation in server-rendered HTML. Animation should
+decorate the content, retain a readable WebGL fallback, respect reduced motion,
+and release render loops, observers, GPU resources, and scroll triggers on
+unmount.
 
 ## Commands (run from `web/`)
 
@@ -28,6 +33,13 @@ unrelated upgrades while changing features.
 | --- | --- |
 | Public development | `npm run dev` |
 | Local admin | `npm run admin` |
+| Bootstrap fixed admin accounts | `npm run admin:bootstrap` (reads private `.env.local`) |
+| Inspect/import local content into a fresh Supabase project | `npm run supabase:import` (dry run), then `npm run supabase:import -- --apply` after setup |
+| Match the two fixed slots to Supabase Auth users | `npm run supabase:bind-admins` (dry run), then `npm run supabase:bind-admins -- --apply` after both users exist |
+| Build combined admin server | `npm run build:admin` |
+| Start combined admin server | `npm run start:admin` |
+| Develop combined cloud server | `npm run admin:cloud` |
+| Build and start combined cloud server | `npm run build:cloud`, then `npm run start:cloud` |
 | Content validation | `npm run validate:content` |
 | Lint | `npm run lint` |
 | Format maintained code | `npm run format` |
@@ -43,7 +55,10 @@ unrelated upgrades while changing features.
 | Release readiness | `npm run release:check` |
 | Production export | `SITE_URL=https://your-real-domain npm run build:release` |
 
-`npm run build` already invokes content validation and the asset generators.
+`npm run build` invokes content validation and the asset generators, including
+visible résumé and certification PDF copy steps. `npm run build:admin` prepares
+those local copies before compiling the combined server. Cloud builds read and
+write managed uploads in Storage and do not generate public file copies.
 Preview and admin browser tests use local servers and isolated ports. Admin
 browser tests copy `src/content` to a temporary directory; they must never
 write to the owner's real content. CI in `.github/workflows/ci.yml` installs
@@ -61,6 +76,13 @@ names, focused functions, and useful comments.
 TypeScript is strict in `web/tsconfig.json`. The public check runs Next type
 generation then `tsc --noEmit`; the separate admin source check avoids mixing
 public and admin generated route types.
+
+The Supabase migration files live under `web/supabase/migrations/`. The
+one-time import command reads `.env.local`; its default dry run makes no remote
+changes. `PORTFOLIO_DATA_SOURCE=supabase` selects the combined server and
+cloud data paths. Keep production on the existing static deployment until the
+remote migrations, import, both admin accounts, recovery email, and server
+deployment have been verified.
 
 The standards apply to maintained source, scripts, tests, configuration, and
 content. Next.js writes temporary compiler output under `web/.next/` and
@@ -90,8 +112,8 @@ still determines whether each explanation is useful and accurate.
 
 - Public routes live in `web/src/app/`, UI in `web/src/components/`, tokens in
   `web/src/styles/`, and domain/content operations in `web/src/lib/`.
-- Local admin routes and handlers use `.admin.tsx` and `.admin.ts` extensions
-  under `web/src/app/admin/`. Keep public and admin build boundaries intact.
+- Admin pages and handlers use `.admin.tsx` and `.admin.ts` extensions under
+  `web/src/app/`. Keep public and admin build boundaries intact.
 - Admin persistence, request guards, uploads, and form helpers live in
   `web/src/lib/admin/`. Build and maintenance commands live in `web/scripts/`.
 - Content is one JSON note per slug under `web/src/content/research/`, with
@@ -116,17 +138,32 @@ results, persisted metadata, and browser responses. Admin editors validate
 successful save and upload payloads before marking drafts saved or using
 returned files; malformed responses keep edits available for retry.
 
-The admin API is local only. Its write routes enforce local Host, same Origin,
-content type/body limits, and `If-Match` versions as applicable. Preserve
+The admin API requires an active session. Its write routes enforce the configured
+Host and same Origin (or a local development origin), content type/body limits,
+and `If-Match` versions as applicable. Preserve
 specific 400/403/404/409/413/415/422 responses for user-correctable errors;
 unexpected failures may be logged server-side but should not expose internal
-details to the browser. For image and workbook uploads, use `UploadInputError`
+details to the browser. The Unsplash access key is server-only and belongs in
+Git-ignored `web/.env.local` or the host environment as `UNSPLASH_ACCESS_KEY`;
+public cover records hotlink Unsplash image URLs and retain attribution. For
+image and workbook uploads, use `UploadInputError`
 for known bad input; `uploadErrorResponse` logs unexpected failures and returns
 a generic 500. If an upload cannot finish writing its metadata, remove only
 files created by that attempt. File-backed JSON writes use temporary files and
 rename; removals go to trash. Do not bypass version checks or write directly
 to generated public asset directories. There is no database or migration
-framework.
+framework. Local secret configuration lives in Git-ignored `web/.env.local`
+(mode 0600) or the host environment; never put real credentials in
+`.env.example`, test fixtures, tracked source, or `NEXT_PUBLIC_` variables.
+Initial admin passwords are supplied only to `admin:bootstrap` and removed
+from the env file afterward. Admin credential hashes live in the private
+`PORTFOLIO_AUTH_FILE` JSON file
+(default `.admin-data/auth.json`), never in `src/content`, `public`, or tracked
+source. Only `admin:bootstrap` creates the two accounts. Passwords are scrypt
+hashes; sessions and one-time tokens are stored by hash and checked at each
+protected request. Resend credentials are server-only environment settings. A
+server build requires one writer and persistent storage; the static export
+still excludes admin and authentication routes.
 
 Upload sources and JSON content stay under `src/content/`; generated assets
 in `public/` are derived for visible notes. Avoid adding private sources to
@@ -177,7 +214,7 @@ commands, versions, or an intentional deviation.
 
 | General expectation | This repository's choice and reason |
 | --- | --- |
-| Server authentication for a hosted editor | The editor is a loopback-only development service, guarded by Host/Origin checks; it is excluded from the public export. Do not deploy it as a public admin. |
-| Persistent application database | JSON and private files are the source of truth for a single-owner static site; no runtime database is needed. |
+| Server authentication for a hosted editor | The admin mode now checks two fixed accounts and revocable sessions. It is excluded from the public export; a hosted server needs persistent private JSON and a configured HTTPS origin. |
+| Persistent application database | Private JSON is the source of truth for the two admin accounts. A single-writer persistent volume is required for a hosted combined server. |
 | Hosted retries and background jobs | There are no server jobs or webhooks. Explicit build commands regenerate derived assets. |
 | Automated formatter | Prettier was added for the explicitly requested codebase-wide standardization; generated output and private content remain excluded. |

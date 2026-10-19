@@ -33,30 +33,37 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173). The preview server binds only to t
 
 ## What's implemented
 
-- Home with desktop two-column composition and stacked mobile layout.
+- Home with a reflective card journey, animated dashboard, continuous blue grid, and selected research.
 - Selected-research rail with native swipe, keyboard access, and arrow controls.
 - Research index, individual reading pages, source links, and a real 404 page.
 - Explicit Back to top scrolling on every activation, keyboard focus restoration, and reduced-motion support.
 - Self-hosted fonts, local illustrations, generated social image, and page metadata.
 - Validated content, draft exclusion, preview/production modes, and automated checks.
-- Local admin for profile/research editing, reset, validation, conflict-safe saves, and trash recovery.
+- Protected admin for profile/research editing, two fixed accounts, password recovery, validation, conflict-safe saves, and trash recovery.
 - Research spreadsheet attachments with inline Google Sheets/Excel embeds, an expanded reader, and local Excel previews/downloads.
 
-The current preview contains three clearly labeled **example notes** and editable profile defaults. No résumé or contact details were supplied, so those links are omitted. The original ChatGPT page was not available: this is a new design based on the confirmed responsive and interaction requirements.
+The current preview contains three clearly labeled **example notes** and editable profile defaults. The former long About and Contact sections are hidden; saved contact methods render in a compact shared section, while visible résumé and certifications have their own section on the home page. The original ChatGPT page was not available: this is a new design based on the confirmed responsive and interaction requirements.
 
 ## Open the local admin
 
-From `web/`, run:
+Use the Git-ignored `web/.env.local` as the local environment configuration for the whole web app. Copy `.env.example` if it does not exist, restrict it to your account (`chmod 600 web/.env.local` from the repository root), and set two different admin emails and initial passwords (`ADMIN_ONE_EMAIL`, `ADMIN_ONE_PASSWORD`, `ADMIN_TWO_EMAIL`, `ADMIN_TWO_PASSWORD`) only for the first bootstrap. Use passwords of at least 12 characters. Then, from `web/`, run:
 
 ```sh
+npm run admin:bootstrap
 npm run admin
 ```
 
-Open [127.0.0.1:3000/admin](http://127.0.0.1:3000/admin/). The local site's footer also has an Admin link. `npm run admin -- --port 3100` uses port 3100 instead.
+Open [127.0.0.1:3000](http://127.0.0.1:3000/) and choose **Admin** in the main navigation or footer. Signed-out visitors reach the login page; signed-in admins reach the content desk. `npm run admin -- --port 3100` uses port 3100 instead. Bootstrap refuses to overwrite an existing auth file. After bootstrap, remove the two initial passwords from `.env.local`; later password changes happen through Admin management or recovery. The private auth JSON at `PORTFOLIO_AUTH_FILE` (default `.admin-data/auth.json`) stores only password hashes, sessions, recovery token hashes and audit events. Keep this file private and on persistent storage. It is ignored by Git and excluded from content backups and the static export.
 
-The admin runs on your own machine. It edits the same JSON content used by the static build; it is deliberately excluded from the exported site. The static preview on port 4173 has no admin routes. Stop the admin before running a release build.
+`web/tests/fixtures/admin-accounts.json` is disposable test data. Editing it does not change either live admin account. Use Admin management to change your password, or the configured reset flow if you cannot sign in. Passwords must be at least 12 characters. The password fields have Show and Hide controls for the value currently typed; stored password hashes cannot be displayed.
 
-You can edit profile/contact details, create research, reorder sections, preview drafts, publish notes, and move notes to `.admin-trash/`. Reset edits restores the last saved version. Unsaved edits prompt before navigating through links or closing the tab. Saves from an older tab are rejected so they cannot overwrite newer edits; reload to review the saved version.
+The Admin management tab lists exactly two fixed account slots. Either signed-in admin can edit display names, request a confirmed email change for either account using their own password, and disable or restore the other account; neither can disable their own. Disabling ends that account's sessions. Your password can be changed with the current password. A disabled account cannot sign in or request recovery.
+
+For forgot-password and email confirmation, set `ADMIN_ORIGIN` (locally `http://127.0.0.1:3000`), `RESEND_API_KEY`, and `RESEND_FROM_EMAIL` in `.env.local` or the host's environment. Restart the admin server after changing these settings. Verify the sender domain in Resend. A reset link expires after 15 minutes, works once, and signs out existing sessions. If both passwords or an admin mailbox are unavailable, recovery requires restoring the protected auth file or operator access to the host; there is no open sign-up or public recovery override. Never prefix admin secrets with `NEXT_PUBLIC_` or put real values in `.env.example`, fixtures, or tracked source.
+
+The admin edits the same JSON content used by the public build. The static preview on port 4173 has no admin or login routes. Stop the admin before running a static release build. For a combined public site and admin server, `npm run build:admin` and `npm run start:admin` create and run a server build. That host must provide a single writable instance with persistent storage for `PORTFOLIO_AUTH_FILE` and `src/content`, HTTPS, `ADMIN_ORIGIN`, and the Resend settings. The checked-in `vercel.json` still deploys only the public static export; no hosted admin deployment is configured.
+
+The admin Overview shows published and draft counts, release blockers, and compact research ordering. Use **Homepage** for the portfolio title, hero description, and research introduction; **Profile** holds identity, release approval, and preserved About/Contact content. You can create research, reorder sections, preview drafts, publish notes, and move notes to `.admin-trash/`. Reset edits restores the last saved version. Unsaved edits prompt before navigating through links or closing the tab. Saves from an older tab are rejected so they cannot overwrite newer edits; reload to review the saved version.
 
 ### Arrange cards and number notes
 
@@ -107,7 +114,7 @@ Edits appear on the admin server immediately. To update the static preview on po
 
 ## Edit the content
 
-Change `web/src/content/profile.json` for name, headline, biography, and contact links. Each contact link has a `label` and an HTTPS or `mailto:` `href`. Optional `resume` points to a file in `web/public/`, for example `/downloads/resume.pdf`.
+Change `web/src/content/profile.json` for name, monogram, headline, biography, and contact links. The browser tab icon uses the saved monogram; reload the combined site after saving it, or rebuild the static site to update its icon. Each contact link has a `label` and an HTTPS or `mailto:` `href`. In Admin → Profile, you can upload a PDF résumé or a PDF for each certification (up to 5 MB per file), set their visibility, and add certification dates, IDs, and HTTPS verification links. The existing `resume` path remains supported for files already in `web/public/`. Local uploads are private under `src/content/resumes/` and `src/content/certifications/`; saving visible entries copies only their PDFs into generated public download directories. Hiding an entry removes its public copy. Content backups retain the private sources. In cloud mode, managed PDFs are stored in private Supabase Storage and served only while their profile entries are visible.
 
 Research lives in `web/src/content/research/*.json`. Use one record per note, with a unique `id` and `slug`, a summary, body sections, and optional source links. Citations are optional for published notes and production releases. An optional `download` uses a local public-file path. Three statuses are supported:
 
@@ -152,6 +159,19 @@ A GitHub Actions workflow is provided in `.github/workflows/ci.yml`. It runs che
 ## Release
 
 Read [release and rollback instructions](docs/release.md). A production build requires an approved profile, at least one published research item, and a real HTTPS `SITE_URL`. Preview builds are marked `noindex` and include example labels. No website has been publicly deployed.
+
+The combined Supabase server implementation is available through
+`npm run build:cloud` and `npm run start:cloud`. It serves the public site and protected
+admin from one origin, with cloud content, authentication, and managed uploads.
+The remote migrations, import, account binding, and deployment still need to be
+applied and verified. Create the two
+password-owning accounts in Supabase Dashboard → Authentication → Users after
+configuring Resend custom SMTP. The fixed `admin-1`/`admin-2` slots are rows in
+`portfolio_admins`; `npm run supabase:bind-admins` checks that each configured
+email matches an Auth user, and `-- --apply` fills only empty bindings. The
+local JSON password hashes cannot be imported as Supabase Auth passwords.
+Keep `PORTFOLIO_DATA_SOURCE` unset for current workflows until cutover. See
+[release instructions](docs/release.md) for the preparation boundary.
 
 The initial specification and checklist remain in [the build plan](plans/BUILD_PLAN.md) and [acceptance checklist](plans/ACCEPTANCE.md). Implementation decisions are recorded in [decisions](docs/decisions.md).
 

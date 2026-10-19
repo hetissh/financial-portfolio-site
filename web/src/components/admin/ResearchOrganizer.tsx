@@ -230,9 +230,11 @@ export function ResearchOrganizer({ notes, version }: { notes: OrganizerNote[]; 
   return (
     <form ref={form} onSubmit={save} autoComplete="off" data-order-version={currentVersion}>
       <p className={styles.organizerHint} id="organizer-help">
-        Drag a handle to arrange the cards, then save the order. Use the arrow buttons, or focus a
-        handle and press an arrow key. Home and End move to the first and last positions; Escape
-        cancels a drag.
+        Drag a handle or use the arrows to change the reading order, then save.
+        <span className={styles.srOnly}>
+          Focus a handle and press an arrow key. Home and End move to the first and last positions;
+          Escape cancels a drag.
+        </span>
       </p>
       <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {announcement}
@@ -292,9 +294,6 @@ export function ResearchOrganizer({ notes, version }: { notes: OrganizerNote[]; 
                 <GripVertical size={18} aria-hidden="true" />
                 <span className="small-label">{String(index + 1).padStart(2, '0')}</span>
               </button>
-              <span className={`${styles.badge} ${styles[`badge-${note.status}`]}`}>
-                {labels[note.status]}
-              </span>
               <div className={styles.iconButtons}>
                 <button
                   className={styles.iconButton}
@@ -323,13 +322,18 @@ export function ResearchOrganizer({ notes, version }: { notes: OrganizerNote[]; 
                 number={noteNumber(note, automaticNoteNumber(draft, note.id))}
               />
             </div>
-            <Link
-              className={styles.noteTitle}
-              href={`/admin/research/${encodeURIComponent(note.id)}/`}
-            >
-              {note.title}
-            </Link>
-            <span className={styles.noteMeta}>{note.category}</span>
+            <div className={styles.organizerCopy}>
+              <span className={`${styles.badge} ${styles[`badge-${note.status}`]}`}>
+                {labels[note.status]}
+              </span>
+              <Link
+                className={styles.noteTitle}
+                href={`/admin/research/${encodeURIComponent(note.id)}/`}
+              >
+                {note.title}
+              </Link>
+              <span className={styles.noteMeta}>{note.category}</span>
+            </div>
             <div className={styles.rowActions}>
               <Link
                 href={`/admin/research/${encodeURIComponent(note.id)}/`}

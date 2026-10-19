@@ -2,6 +2,8 @@
 import { richImageIds } from '../rich-content';
 import { imageExists } from './images';
 import { workbookExists } from './workbooks';
+import { isManagedResume, resumeExists, syncPublishedResume } from './resumes';
+import { certificationExists, syncPublishedCertifications } from './certifications';
 import { createHash, randomUUID } from 'node:crypto';
 // Reads and writes content files for the local admin. Every write validates the full
 // collection with the same schema the build uses, so the admin cannot save content
@@ -136,13 +138,39 @@ export function saveProfile(
   input: unknown,
   { root = contentRoot(), expectedVersion }: StoreOptions = {},
 ): Profile {
-  checkVersion(profileSchema.parse(readProfileFile(root)), expectedVersion);
+  const previous = profileSchema.parse(readProfileFile(root));
+  checkVersion(previous, expectedVersion);
   const parsed = profileSchema.safeParse(input);
   if (!parsed.success) throw new ContentValidationError(toIssues(parsed.error, input));
-  if (parsed.data.resume && !assetExists(parsed.data.resume))
+  if (
+    parsed.data.resume &&
+    !(isManagedResume(parsed.data.resume)
+      ? resumeExists(parsed.data.resume, root)
+      : assetExists(parsed.data.resume))
+  )
     throw new ContentValidationError([
       { path: 'resume', message: `No file at public${parsed.data.resume}` },
     ]);
+  parsed.data.certifications.forEach((item, index) => {
+    if (item.pdf && !certificationExists(item.pdf, root))
+      throw new ContentValidationError([
+        {
+          path: `certifications.${index}.pdf`,
+          message: 'Upload this certification PDF again; its source is missing',
+        },
+      ]);
+  });
+  if (isManagedResume(previous.resume ?? '') || isManagedResume(parsed.data.resume ?? ''))
+    syncPublishedResume(parsed.data, root, process.env.PORTFOLIO_ADMIN_TEST_PUBLIC || undefined);
+  if (
+    previous.certifications.some((item) => item.pdf) ||
+    parsed.data.certifications.some((item) => item.pdf)
+  )
+    syncPublishedCertifications(
+      parsed.data,
+      root,
+      process.env.PORTFOLIO_ADMIN_TEST_PUBLIC || undefined,
+    );
   writeJson(path.join(root, 'profile.json'), parsed.data);
   return parsed.data;
 }
@@ -191,7 +219,11 @@ function validateResearch(
     issues.push({ path: 'id', message: 'Another note already uses this ID' });
   if (record.download && !assetExists(record.download))
     issues.push({ path: 'download', message: `No file at public${record.download}` });
-  if (record.cover?.type === 'image' && !imageExists(record.cover.imageId!, root))
+  if (
+    record.cover?.type === 'image' &&
+    !record.cover.unsplash &&
+    !imageExists(record.cover.imageId!, root)
+  )
     issues.push({
       path: 'cover.imageId',
       message: 'Import this image again; its source is missing',

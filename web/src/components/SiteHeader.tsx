@@ -2,7 +2,10 @@
 import { MonogramText } from '@/components/MonogramText';
 import Link from 'next/link';
 import type { Profile } from '@/lib/content-schema';
+import { AdminEntry } from './AdminEntry';
+import { profileJourney } from '@/lib/profile-sections';
 export function SiteHeader({ profile, preview }: { profile: Profile; preview: boolean }) {
+  const journey = profileJourney(profile);
   return (
     <>
       {preview && (
@@ -11,21 +14,25 @@ export function SiteHeader({ profile, preview }: { profile: Profile; preview: bo
         </div>
       )}
       <header className="site-header wrap">
-        <Link href="/" className="brand" aria-label={`${profile.displayName} home`}>
+        <Link href="/" className="brand" aria-label={`${journey.title} home`}>
           <span className="monogram" aria-hidden="true">
             <MonogramText value={profile.monogram} />
           </span>
           <span>
-            {profile.displayName}
+            {journey.title}
             <span className="brand-role">{profile.role}</span>
           </span>
         </Link>
         <nav aria-label="Main navigation">
           <Link href="/research/">Research</Link>
-          <Link href="/#about">About</Link>
-          <Link className="nav-contact" href="/#contact">
-            Let’s connect <span aria-hidden="true">↗</span>
-          </Link>
+          {(profile.contact?.email || profile.contactLinks.length > 0) && (
+            <a href="#contact">Contact</a>
+          )}
+          {((profile.resumeVisible && profile.resume) ||
+            profile.certifications.some((item) => item.visible)) && (
+            <Link href="/#credentials">Credentials</Link>
+          )}
+          {process.env.PORTFOLIO_ADMIN === '1' && <AdminEntry />}
         </nav>
       </header>
     </>

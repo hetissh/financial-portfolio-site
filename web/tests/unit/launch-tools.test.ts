@@ -31,9 +31,7 @@ describe('release readiness', () => {
       'address',
       'research',
     ]);
-    expect(report.notices).toContain(
-      'No contact email or links are configured. Add them in Admin → Profile if visitors should be able to contact you.',
-    );
+    expect(report.notices.some((notice) => notice.includes('contact'))).toBe(false);
     const approved = { ...profile, isPlaceholder: false };
     const records = parseResearch([{ ...base, status: 'published', sources: [] }]);
     expect(releaseReadiness(approved, records, 'https://portfolio.test').ready).toBe(true);

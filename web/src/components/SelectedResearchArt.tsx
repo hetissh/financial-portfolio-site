@@ -6,14 +6,17 @@ import { heroBackground, legacyHeroOpacity } from '@/lib/artwork';
 import { coverInk } from '@/lib/word-cover';
 import { ThemeDrawing } from './ThemeDrawing';
 import { ProceduralCoverDrawing } from './ProceduralCoverDrawing';
+import { visitorAssetUrl } from '@/lib/supabase/assets';
 export function SelectedResearchArt({
   cover,
   large = false,
   number = '01',
+  privatePreview = false,
 }: {
   number?: string;
   cover: WordCover;
   large?: boolean;
+  privatePreview?: boolean;
 }) {
   const color = /^#[0-9a-fA-F]{6}$/.test(cover.color) ? cover.color : '#dbe3d5';
   const ink = coverInk(color);
@@ -49,9 +52,15 @@ export function SelectedResearchArt({
         <img
           className="cover-image"
           src={
-            process.env.NEXT_PUBLIC_PORTFOLIO_ADMIN === '1'
-              ? `/admin/api/images/${cover.imageId}/`
-              : `/images/covers/${cover.imageId}.webp`
+            cover.unsplash
+              ? cover.unsplash.imageUrl
+              : process.env.NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE === 'supabase' && !privatePreview
+                ? visitorAssetUrl(`/images/covers/${cover.imageId}.webp`)
+                : process.env.NEXT_PUBLIC_PORTFOLIO_ADMIN === '1'
+                  ? privatePreview
+                    ? `/admin/api/images/${cover.imageId}/`
+                    : `/media/images/${cover.imageId}/`
+                  : `/images/covers/${cover.imageId!}.webp`
           }
           alt=""
         />

@@ -11,7 +11,9 @@ fs.mkdirSync(directory, { recursive: true });
 for (const file of fs.readdirSync(directory))
   if (/^[0-9a-f-]{36}\.webp$/.test(file)) fs.unlinkSync(path.join(directory, file));
 const ids = new Set(
-  research.filter((n) => n.cover?.type === 'image').map((n) => n.cover!.imageId!),
+  research
+    .filter((n) => n.cover?.type === 'image' && n.cover.imageId)
+    .map((n) => n.cover!.imageId!),
 );
 for (const id of ids) fs.writeFileSync(path.join(directory, `${id}.webp`), readCoverImage(id));
 console.log(`Prepared ${ids.size} visible cover images.`);

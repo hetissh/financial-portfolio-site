@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import sharp from 'sharp';
 
-test('About and Contact settings save, render, reset and validate the email', async ({
+test('saved About and Contact settings persist with the public contact link', async ({
   page,
 }, info) => {
   await page.goto('/admin/profile/');
@@ -29,7 +29,7 @@ test('About and Contact settings save, render, reset and validate the email', as
   await page.getByLabel('Email link label', { exact: true }).fill('Ask a question');
   await page.getByLabel('Email subject', { exact: true }).fill('Evidence & ideas');
   await page.getByRole('button', { name: 'Save profile', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Saved to');
+  await expect(page.getByRole('status')).toContainText('Profile saved');
   await page.reload();
   await expect(page.getByLabel('About heading', { exact: true })).toHaveValue(
     `Behind the research ${info.project.name}`,
@@ -41,14 +41,9 @@ test('About and Contact settings save, render, reset and validate the email', as
     `Behind the research ${info.project.name}`,
   );
   await page.goto('/');
-  await expect(page.locator('#about-title')).toContainText(
-    `Behind the research ${info.project.name}`,
-  );
-  await expect(page.getByText('My research story.', { exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Ask a question', exact: true })).toHaveAttribute(
-    'href',
-    'mailto:research@example.com?subject=Evidence%20%26%20ideas',
-  );
+  await expect(page.locator('#about')).toHaveCount(0);
+  await expect(page.locator('#contact')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Ask a question', exact: true })).toBeVisible();
   await page.goto('/admin/profile/');
   await page.getByLabel('About heading', { exact: true }).fill(heading);
   await page.getByLabel('Biography', { exact: true }).fill(biography);
@@ -57,7 +52,7 @@ test('About and Contact settings save, render, reset and validate the email', as
   await page.getByLabel('Email link label', { exact: true }).fill(emailLabel);
   await page.getByLabel('Email subject', { exact: true }).fill(subject);
   await page.getByRole('button', { name: 'Save profile', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Saved to');
+  await expect(page.getByRole('status')).toContainText('Profile saved');
   expect(
     (
       await new AxeBuilder({ page })
@@ -204,11 +199,13 @@ test('formatted research, lettered lists and inline images persist, crop, render
   await expect(page.getByRole('heading', { name: 'A deeper question', exact: true })).toBeVisible();
   await expect(page.getByAltText('A portrait chart example')).toBeVisible();
   await expect(page.getByText('Evidence illustration', { exact: true })).toBeVisible();
-  expect(
-    await page
-      .getByAltText('A portrait chart example')
-      .evaluate((img) => (img as HTMLImageElement).naturalWidth),
-  ).toBe(200);
+  await expect
+    .poll(() =>
+      page
+        .getByAltText('A portrait chart example')
+        .evaluate((img) => (img as HTMLImageElement).naturalWidth),
+    )
+    .toBe(200);
   await page.goto(editUrl);
   page.once('dialog', (d) => d.accept());
   await page.getByRole('button', { name: 'Remove', exact: true }).click();

@@ -3,14 +3,16 @@ import { automaticNoteNumber } from '@/lib/research-order';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { readAdminContent } from '@/lib/admin/store';
+import { adminContent } from '@/lib/admin/data-source';
+import { requireAdminPage } from '@/lib/admin/auth';
 import { ResearchArticle } from '@/components/ResearchArticle';
 import styles from '@/components/admin/admin.module.css';
 
 type Props = { params: Promise<{ id: string }> };
 const findNote = async ({ params }: Props) => {
+  await requireAdminPage();
   const { id } = await params;
-  return readAdminContent().research.find((item) => item.id === id);
+  return (await adminContent()).research.find((item) => item.id === id);
 };
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const note = await findNote(props);
@@ -29,7 +31,7 @@ export default async function PreviewResearch(props: Props) {
     <div className={styles.publicPreview}>
       <ResearchArticle
         note={note}
-        number={automaticNoteNumber(readAdminContent().research, note.id)}
+        number={automaticNoteNumber((await adminContent()).research, note.id)}
         back={{ href: editHref, label: 'Back to editor' }}
         notice={
           <p className={styles.notice} role="note">

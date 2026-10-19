@@ -15,6 +15,19 @@
 | Use native rail scrolling and explicit Back to top | Preserve normal touch behavior and reliable repeated activation |
 | Separate preview and production content | Samples remain visible locally; drafts never render; production excludes samples and requires completed profile/content |
 
+## 12 October 2026: fixed two-admin access
+
+The owner replaced the earlier local-only, no-login editor decision with two
+fixed admin identities, editable account details, a ban on self-removal, and
+Resend password recovery. The two IDs live in code; a private JSON file stores
+emails, scrypt password hashes, revocable sessions, recovery tokens, and audit
+events. Removing an account disables its access, since exactly two identity
+slots must remain. Each admin may change names and disable or restore the other;
+email changes require the account holder's password and confirmation at the new
+address. The admin mode now supports a server build while the checked-in static
+release configuration remains public-only. A combined deployment requires a
+single writer and persistent storage; none is configured here.
+
 ## 27 September 2026: local admin
 
 | Decision | Basis |

@@ -1,5 +1,6 @@
 // Checks upload safety, content conflicts, and admin request regressions.
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
+import testAdminFixture from '../fixtures/admin-accounts.json' with { type: 'json' };
 import fs, { mkdtempSync, readFileSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -21,6 +22,7 @@ import {
   getWorkbook,
 } from '../../src/lib/admin/workbooks';
 import { handleWrite } from '../../src/lib/admin/guard';
+import { initializeAdmins, logIn } from '../../src/lib/admin/auth-store';
 import { savedVersion, sendJson } from '../../src/components/admin/fields';
 import {
   articleUploadSchema,
@@ -29,6 +31,10 @@ import {
 } from '../../src/lib/admin/client-response';
 import { POST as uploadImage } from '../../src/app/admin/api/images/route.admin';
 import { POST as uploadWorkbook } from '../../src/app/admin/api/workbooks/route.admin';
+import {
+  GET as searchUnsplash,
+  POST as trackUnsplashSelection,
+} from '../../src/app/admin/api/unsplash/route.admin';
 import { storeCoverImage } from '../../src/lib/admin/images';
 const base = parseResearch([
   {
@@ -37,7 +43,12 @@ const base = parseResearch([
     cover: undefined,
   },
 ])[0];
-const profile = profileSchema.parse(JSON.parse(readFileSync('src/content/profile.json', 'utf8')));
+const profile = profileSchema.parse({
+  ...JSON.parse(readFileSync('src/content/profile.json', 'utf8')),
+  resume: undefined,
+  resumeVisible: false,
+  certifications: [],
+});
 let root: string;
 beforeEach(() => {
   root = mkdtempSync(path.join(tmpdir(), 'portfolio-fixes-'));
@@ -50,6 +61,98 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe('reviewed admin fixes', () => {
+  it('searches Unsplash through the authenticated proxy and tracks a selected photo', async () => {
+    const prior = {
+      admin: process.env.PORTFOLIO_ADMIN,
+      authFile: process.env.PORTFOLIO_AUTH_FILE,
+      key: process.env.UNSPLASH_ACCESS_KEY,
+    };
+    process.env.PORTFOLIO_ADMIN = '1';
+    process.env.PORTFOLIO_AUTH_FILE = path.join(root, 'auth.json');
+    process.env.UNSPLASH_ACCESS_KEY = 'test-server-key';
+    initializeAdmins([testAdminFixture.accounts[0], testAdminFixture.accounts[1]]);
+    const token = logIn(testAdminFixture.accounts[0].email, testAdminFixture.accounts[0].password)!;
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json({
+          results: [
+            {
+              id: 'photo-1',
+              alt_description: 'Blue hour city',
+              urls: {
+                small: 'https://images.unsplash.com/small',
+                regular: 'https://images.unsplash.com/regular',
+              },
+              links: {
+                html: 'https://unsplash.com/photos/photo-1',
+                download_location: 'https://api.unsplash.com/photos/photo-1/download',
+              },
+              user: {
+                name: 'Photographer',
+                links: { html: 'https://unsplash.com/@photographer' },
+              },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(Response.json({ url: 'https://images.unsplash.com/regular' }));
+    vi.stubGlobal('fetch', mockFetch);
+    const headers = {
+      host: '127.0.0.1:3000',
+      cookie: `portfolio_admin_session=${token}`,
+    };
+    try {
+      const result = await searchUnsplash(
+        new Request('http://127.0.0.1:3000/admin/api/unsplash/?query=city', { headers }),
+      );
+      expect(result.status).toBe(200);
+      expect(await result.json()).toMatchObject({
+        results: [
+          { imageUrl: 'https://images.unsplash.com/regular', photographer: 'Photographer' },
+        ],
+      });
+      expect(mockFetch.mock.calls[0]?.[1]).toMatchObject({
+        headers: { Authorization: 'Client-ID test-server-key' },
+      });
+      const tracked = await trackUnsplashSelection(
+        new Request('http://127.0.0.1:3000/admin/api/unsplash/', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            origin: 'http://127.0.0.1:3000',
+            'content-type': 'application/json',
+            'x-portfolio-admin': '1',
+          },
+          body: JSON.stringify({
+            downloadLocation: 'https://api.unsplash.com/photos/photo-1/download',
+          }),
+        }),
+      );
+      expect(tracked.status).toBe(200);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      const rejected = await trackUnsplashSelection(
+        new Request('http://127.0.0.1:3000/admin/api/unsplash/', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            origin: 'http://127.0.0.1:3000',
+            'content-type': 'application/json',
+            'x-portfolio-admin': '1',
+          },
+          body: JSON.stringify({ downloadLocation: 'https://example.com/private' }),
+        }),
+      );
+      expect(rejected.status).toBe(400);
+    } finally {
+      if (prior.admin === undefined) delete process.env.PORTFOLIO_ADMIN;
+      else process.env.PORTFOLIO_ADMIN = prior.admin;
+      if (prior.authFile === undefined) delete process.env.PORTFOLIO_AUTH_FILE;
+      else process.env.PORTFOLIO_AUTH_FILE = prior.authFile;
+      if (prior.key === undefined) delete process.env.UNSPLASH_ACCESS_KEY;
+      else process.env.UNSPLASH_ACCESS_KEY = prior.key;
+    }
+  });
   it('blocks stale note saves, stale deletes, and stale profile saves', () => {
     const version = recordVersion(base);
     updateResearch(base.id, { ...base, title: 'Newer change' }, { root, expectedVersion: version });
@@ -111,7 +214,11 @@ describe('reviewed admin fixes', () => {
   });
   it('bounds JSON bodies even without Content-Length', async () => {
     const prior = process.env.PORTFOLIO_ADMIN;
+    const priorFile = process.env.PORTFOLIO_AUTH_FILE;
     process.env.PORTFOLIO_ADMIN = '1';
+    process.env.PORTFOLIO_AUTH_FILE = path.join(root, 'auth.json');
+    initializeAdmins([testAdminFixture.accounts[0], testAdminFixture.accounts[1]]);
+    const token = logIn(testAdminFixture.accounts[0].email, testAdminFixture.accounts[0].password)!;
     try {
       const response = await handleWrite(
         new Request('http://127.0.0.1:3000/x', {
@@ -120,6 +227,7 @@ describe('reviewed admin fixes', () => {
             host: '127.0.0.1:3000',
             origin: 'http://127.0.0.1:3000',
             'content-type': 'application/json',
+            cookie: `portfolio_admin_session=${token}`,
           },
           body: JSON.stringify({ huge: 'x'.repeat(1024 * 1024) }),
         }),
@@ -131,6 +239,8 @@ describe('reviewed admin fixes', () => {
     } finally {
       if (prior === undefined) delete process.env.PORTFOLIO_ADMIN;
       else process.env.PORTFOLIO_ADMIN = prior;
+      if (priorFile === undefined) delete process.env.PORTFOLIO_AUTH_FILE;
+      else process.env.PORTFOLIO_AUTH_FILE = priorFile;
     }
   });
   it('restricts spreadsheet links to Google Sheets HTTPS sharing URLs', () => {
@@ -239,9 +349,13 @@ describe('local upload responses', () => {
   });
   it('shows input errors but hides filesystem failures in image and workbook uploads', async () => {
     const priorAdmin = process.env.PORTFOLIO_ADMIN;
+    const priorFile = process.env.PORTFOLIO_AUTH_FILE;
     const priorRoot = process.env.PORTFOLIO_CONTENT_DIR;
     const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
     process.env.PORTFOLIO_ADMIN = '1';
+    process.env.PORTFOLIO_AUTH_FILE = path.join(root, 'auth.json');
+    initializeAdmins([testAdminFixture.accounts[0], testAdminFixture.accounts[1]]);
+    const token = logIn(testAdminFixture.accounts[0].email, testAdminFixture.accounts[0].password)!;
     const blockedRoot = path.join(root, 'not-a-directory');
     writeFileSync(blockedRoot, 'file');
     process.env.PORTFOLIO_CONTENT_DIR = blockedRoot;
@@ -255,6 +369,7 @@ describe('local upload responses', () => {
           host: '127.0.0.1:3000',
           origin: 'http://127.0.0.1:3000',
           'x-portfolio-admin': '1',
+          cookie: `portfolio_admin_session=${token}`,
         },
         body,
       });
@@ -294,6 +409,8 @@ describe('local upload responses', () => {
     } finally {
       if (priorAdmin === undefined) delete process.env.PORTFOLIO_ADMIN;
       else process.env.PORTFOLIO_ADMIN = priorAdmin;
+      if (priorFile === undefined) delete process.env.PORTFOLIO_AUTH_FILE;
+      else process.env.PORTFOLIO_AUTH_FILE = priorFile;
       if (priorRoot === undefined) delete process.env.PORTFOLIO_CONTENT_DIR;
       else process.env.PORTFOLIO_CONTENT_DIR = priorRoot;
       errorLog.mockRestore();
