@@ -220,10 +220,12 @@ with Reload and Open original; the site does not proxy provider content.
 `web/vercel.json` configures a production static export to `out/`; any host
 serving that directory with directory indexes and real 404 responses can serve
 the public site. `docs/release.md` describes release prerequisites and rollback.
-The repository has an `origin` remote and CI on pushes and pull requests, but
-repository evidence does not establish an active hosting project, domain, or
-deployed URL. Deployment remains an owner decision. `SITE_MODE=preview` builds
-are non-indexable and include samples; they are not an access-control mechanism.
+GitHub Actions checks pushes and pull requests and can be started manually. A
+passing push to `develop` or a manual run selected on `develop` deploys the
+preview Response Store Worker and site Worker through the `cloudflare-preview`
+environment. `SITE_MODE=preview` builds are non-indexable and include samples;
+they are not an access-control mechanism. Production deployment remains a
+separate owner decision.
 
 The local file-backed combined server needs a single writable instance and
 persistent volume for credentials and content. Multiple writers to one JSON

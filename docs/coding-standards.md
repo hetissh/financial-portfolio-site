@@ -71,9 +71,10 @@ Server settings must use `runtimeSetting()` so the same routes read from
 `process.env` on Node and Cloudflare bindings inside the Worker RSC runtime.
 Keep the Worker-specific `cloudflare:workers` implementation out of Node
 execution and tests; the Vite alias selects it only for the Cloudflare build.
-GitHub Actions also builds the Worker on pushes and pull requests. A passing
-push to `develop` deploys the preview Response Store and site Worker using the
-`cloudflare-preview` environment's Cloudflare token and account ID.
+GitHub Actions also builds the Worker on pushes and pull requests, and supports
+manual runs from the Actions UI. A passing push to `develop` or manual run
+selected on `develop` deploys the preview Response Store and site Worker using
+the `cloudflare-preview` environment's Cloudflare token and account ID.
 Preview and admin browser tests use local servers and isolated ports. Admin
 browser tests copy `src/content` to a temporary directory, then seed their
 disposable sample notes and workbook there; they must never write to the owner's
