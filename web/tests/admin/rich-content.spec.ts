@@ -84,9 +84,17 @@ test('formatted research, lettered lists and inline images persist, crop, render
   await editor.fill('A formatted thought.');
   await editor.focus();
   await expect(editor).toBeFocused();
-  await editor.press(
-    info.project.name === 'mobile-webkit' || process.platform === 'darwin' ? 'Meta+a' : 'Control+a',
-  );
+  if (info.project.name === 'mobile-webkit') {
+    // Mobile Safari emulation has no platform select-all shortcut; seed the editor selection.
+    await editor.evaluate((element) => {
+      const instance = (
+        element as HTMLElement & { editor: { commands: { selectAll: () => void } } }
+      ).editor;
+      instance.commands.selectAll();
+    });
+  } else {
+    await editor.press(process.platform === 'darwin' ? 'Meta+a' : 'Control+a');
+  }
   await toolbar.getByRole('button', { name: 'Bold', exact: true }).click();
   await toolbar.getByRole('button', { name: 'Italic', exact: true }).click();
   await expect(editor.locator('strong')).toContainText('A formatted thought.');

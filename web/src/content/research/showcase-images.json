@@ -424,7 +424,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Make admin test evidence portable across browser platforms"
+                  "text": "Use deterministic text selection in mobile Safari browser checks"
                 }
               ]
             },
