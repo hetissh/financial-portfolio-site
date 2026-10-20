@@ -198,9 +198,6 @@ test('import, crop, customise, re-crop, cancel, failure recovery and persist ima
       true,
     );
   }
-  await page.screenshot({
-    path: `/private/tmp/artwork-image-${info.project.name}.png`,
-    fullPage: true,
-  });
+  await page.screenshot({ path: info.outputPath('artwork-image.png') });
   expect(errors).toEqual([]);
 });
