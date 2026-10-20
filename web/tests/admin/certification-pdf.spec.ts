@@ -41,6 +41,8 @@ test('certification PDF publishes with its entry and disappears when hidden', as
   await page.getByRole('button', { name: 'Save profile' }).click();
   await expect(page.getByRole('status')).toContainText('Profile saved');
   await page.goto('/');
-  await expect(page.locator('.home-credentials')).not.toContainText('Sample PDF award');
+  await expect(
+    page.locator('.home-credentials li').filter({ hasText: 'Sample PDF award' }),
+  ).toHaveCount(0);
   expect(existsSync(publishedFile)).toBe(false);
 });

@@ -437,6 +437,9 @@ export function RichTextEditor({
         onMouseDown={(event) => {
           if ((event.target as HTMLElement).closest('button')) event.preventDefault();
         }}
+        onPointerDown={(event) => {
+          if ((event.target as HTMLElement).closest('button')) event.preventDefault();
+        }}
       >
         <button
           type="button"

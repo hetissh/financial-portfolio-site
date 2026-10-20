@@ -128,7 +128,7 @@ test('import, crop, customise, re-crop, cancel, failure recovery and persist ima
         .analyze()
     ).violations,
   ).toEqual([]);
-  await page.screenshot({ path: `/private/tmp/artwork-crop-${info.project.name}.png` });
+  await page.screenshot({ path: info.outputPath('artwork-crop.png') });
   await dialog.getByRole('button', { name: 'Use this crop', exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await expect(preview).toHaveAttribute('data-cover-type', 'image');

@@ -76,8 +76,8 @@ test('signing out returns to the main page and ends the admin session', async ({
   });
   const page = await context.newPage();
   await page.goto('/login/');
-  await page.getByLabel('Email').fill(testAdminFixture.accounts[0].email);
-  await page.getByLabel('Password', { exact: true }).fill(testAdminFixture.accounts[0].password);
+  await page.getByLabel('Email').fill(testAdminFixture.accounts[1].email);
+  await page.getByLabel('Password', { exact: true }).fill(testAdminFixture.accounts[1].password);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page).toHaveURL(/\/admin\/$/);
   await page.getByRole('button', { name: 'Sign out' }).click();

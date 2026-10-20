@@ -1106,7 +1106,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Fix private admin image previews and seed isolated browser checks"
+                  "text": "Make admin browser checks portable across Safari and CI runners"
                 }
               ]
             },
