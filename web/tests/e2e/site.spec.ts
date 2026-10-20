@@ -51,10 +51,11 @@ test('sheet formulas stay within a cell and scroll reveals the dashboard before 
     name: 'Portfolio introduction and illustrative financial dashboard',
   });
   await journey.evaluate((element) =>
-    window.scrollTo(
-      0,
-      element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.68,
-    ),
+    window.scrollTo({
+      top:
+        element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.65,
+      behavior: 'instant',
+    }),
   );
   const dashboard = page.getByTestId('journey-dashboard');
   await expect
@@ -71,10 +72,11 @@ test('sheet formulas stay within a cell and scroll reveals the dashboard before 
     )
     .not.toBe('matrix(1, 0, 0, 0.001, 0, 0)');
   await journey.evaluate((element) =>
-    window.scrollTo(
-      0,
-      element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.97,
-    ),
+    window.scrollTo({
+      top:
+        element.getBoundingClientRect().top + scrollY + (element.clientHeight - innerHeight) * 0.97,
+      behavior: 'instant',
+    }),
   );
   await expect
     .poll(() =>

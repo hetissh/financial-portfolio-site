@@ -1106,7 +1106,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Make admin browser checks portable across Safari and CI runners"
+                  "text": "Harden scroll animation across Safari viewport conditions"
                 }
               ]
             },
