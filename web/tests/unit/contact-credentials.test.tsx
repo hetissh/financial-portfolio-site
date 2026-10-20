@@ -12,7 +12,15 @@ describe('public professional details', () => {
   it('does not add an empty section to the current site', () => {
     const emptyContactProfile = profileSchema.parse({
       ...profile,
-      contact: { ...profile.contact, email: undefined },
+      contact: {
+        label: 'Contact',
+        heading: 'Hello',
+        accent: '',
+        intro: 'Say hello',
+        email: undefined,
+        emailLabel: 'Email',
+        emailSubject: 'Research question',
+      },
       contactLinks: [],
     });
     expect(renderToStaticMarkup(<ContactCredentials profile={emptyContactProfile} />)).toBe('');
