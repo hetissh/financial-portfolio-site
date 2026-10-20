@@ -9,6 +9,18 @@
     "This is a space for reading closely, questioning assumptions, and turning complex ideas into clear research.",
     "The starting point is a good question. The work is in following the evidence, making uncertainty visible, and leaving room to change your mind."
   ],
-  "isPlaceholder": true,
-  "contactLinks": []
+  "isPlaceholder": false,
+  "contactLinks": [],
+  "resume": "/downloads/resumes/87aca88f-1fff-4a5c-b186-996d46d397f8.pdf",
+  "resumeVisible": true,
+  "certifications": [],
+  "contact": {
+    "label": "03 / KEEP THE CONVERSATION GOING",
+    "heading": "Good questions\ndeserve",
+    "accent": "good company.",
+    "intro": "Have a perspective to share or a question worth exploring? Get in touch.",
+    "email": "hetissh007@gmail.com",
+    "emailLabel": "Email me",
+    "emailSubject": "Hello from your research notebook"
+  }
 }
