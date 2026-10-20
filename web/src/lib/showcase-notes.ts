@@ -87,6 +87,9 @@ export function makeShowcaseNotes(date: string, change = currentChange): Researc
         'In the content desk, Overview, Homepage, Research, Profile and Admin management each open the expected destination. Research stays active in a research editor. Check keyboard focus and mobile navigation.',
       ),
       item(
+        'In the admin editor and Overview, newly uploaded cover art loads through the authenticated preview route before publication and after reload; no broken image or hydration warning appears.',
+      ),
+      item(
         'Overview keeps the blue grid visible, shows real published, draft and release counts, and lists compact research rows with usable order, edit and preview controls. Sample notes stay labelled as examples.',
       ),
       item(

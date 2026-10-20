@@ -9,7 +9,7 @@
     "testing"
   ],
   "publishedAt": "2026-09-28",
-  "updatedAt": "2026-10-19",
+  "updatedAt": "2026-10-20",
   "status": "sample",
   "theme": "forest",
   "cover": {
@@ -587,7 +587,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Prepare image and workbook uploads for Cloudflare Workers"
+                  "text": "Fix private admin image previews and seed isolated browser checks"
                 }
               ]
             },
@@ -640,6 +640,20 @@
                         {
                           "type": "text",
                           "text": "In the content desk, Overview, Homepage, Research, Profile and Admin management each open the expected destination. Research stays active in a research editor. Check keyboard focus and mobile navigation."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "In the admin editor and Overview, newly uploaded cover art loads through the authenticated preview route before publication and after reload; no broken image or hydration warning appears."
                         }
                       ]
                     }

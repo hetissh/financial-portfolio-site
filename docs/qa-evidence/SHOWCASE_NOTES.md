@@ -1,5 +1,29 @@
 # Showcase note evidence — site content cleared 20 October 2026
 
+## CR: restore deployment gate with isolated admin browser data — 20 October 2026
+
+The site retains the three reserved `sample` showcase notes; the removed
+personal/demo notes and unrelated test uploads remain cleared. The admin
+browser setup now creates its legacy editing records and a small workbook only
+inside its temporary content copy, so the tests work without restoring those
+records to the real site. The checklist generator also records the expected
+authenticated cover preview and hydration behavior. Rebuilt static HTML
+contains the updated checklist in all three showcase routes.
+
+The admin editor now routes cover images in private previews through its
+authenticated image endpoint. The Overview uses the same endpoint for saved
+cover images, so server and client render the same URL and avoid a hydration
+mismatch. The release-readiness browser check selects the first of the two
+intentional “Create a note” actions.
+
+Passed locally: content validation (3 visible preview notes), formatting,
+purpose-comment check, lint, public/admin TypeScript checks, all 114 unit tests,
+Cloudflare Worker build, static Next build, all 35 admin Chromium browser checks,
+and `git diff --check`. A focused admin run also passed the previously failing
+cover import/crop and release-readiness checks. Full Firefox/WebKit admin and
+public cross-browser checks are delegated to the required GitHub Actions run;
+Cloudflare deployment is pending that gate.
+
 ## Local demo content cleanup — 20 October 2026
 
 At the user's request, removed all seven demo/test research records, their managed showcase illustrations, the demo workbook and its generated download, the test certification PDF and generated copy, and fake profile links/certification entries. Preserved the saved profile and email, both résumé sources and the visible résumé download, and the unrelated uploaded wallpaper. Automated unit tests now read a neutral fixture under `web/tests/fixtures/`, outside the content importer; the tests still exercise showcase generation in temporary folders without restoring showcase records to site content.

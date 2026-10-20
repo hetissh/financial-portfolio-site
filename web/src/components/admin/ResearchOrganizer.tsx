@@ -320,6 +320,7 @@ export function ResearchOrganizer({ notes, version }: { notes: OrganizerNote[]; 
                 theme={note.theme}
                 cover={note.cover}
                 number={noteNumber(note, automaticNoteNumber(draft, note.id))}
+                privatePreview
               />
             </div>
             <div className={styles.organizerCopy}>

@@ -38,7 +38,7 @@ test('release checklist reports every production blocker with working actions an
   await page.goto('/admin/');
   const reopened = page.getByRole('region', { name: 'Release status', exact: true });
   await reopened.getByText('All release checks').click();
-  await reopened.getByRole('link', { name: 'Create a note', exact: true }).click();
+  await reopened.getByRole('link', { name: 'Create a note', exact: true }).first().click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Start a note.');
   expect(errors).toEqual([]);
 });

@@ -1,5 +1,6 @@
 // Runs admin browser tests against an isolated copy of private content.
 import { defineConfig, devices } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -17,6 +18,12 @@ process.env.PORTFOLIO_ADMIN_TEST_PUBLIC = path.join(directory, 'public');
 process.env.PORTFOLIO_AUTH_FILE = path.join(directory, 'auth.json');
 if (!workerDirectory)
   initializeAdmins([testAdminFixture.accounts[0], testAdminFixture.accounts[1]]);
+if (!workerDirectory)
+  execFileSync(
+    process.execPath,
+    ['--import', 'tsx', 'scripts/seed-admin-browser-content.ts', directory],
+    { stdio: 'inherit' },
+  );
 const testSession = workerDirectory
   ? undefined
   : logIn(testAdminFixture.accounts[0].email, testAdminFixture.accounts[0].password);

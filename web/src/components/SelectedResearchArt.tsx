@@ -55,13 +55,13 @@ export function SelectedResearchArt({
           src={
             cover.unsplash
               ? cover.unsplash.imageUrl
-              : runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase' && !privatePreview
-                ? visitorAssetUrl(`/images/covers/${cover.imageId}.webp`)
-                : runtimeSetting('PORTFOLIO_ADMIN') === '1'
-                  ? privatePreview
-                    ? `/admin/api/images/${cover.imageId}/`
-                    : `/media/images/${cover.imageId}/`
-                  : `/images/covers/${cover.imageId!}.webp`
+              : privatePreview
+                ? `/admin/api/images/${cover.imageId}/`
+                : runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
+                  ? visitorAssetUrl(`/images/covers/${cover.imageId}.webp`)
+                  : runtimeSetting('PORTFOLIO_ADMIN') === '1'
+                    ? `/media/images/${cover.imageId}/`
+                    : `/images/covers/${cover.imageId!}.webp`
           }
           alt=""
         />

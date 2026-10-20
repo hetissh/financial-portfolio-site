@@ -75,10 +75,11 @@ GitHub Actions also builds the Worker on pushes and pull requests. A passing
 push to `develop` deploys the preview Response Store and site Worker using the
 `cloudflare-preview` environment's Cloudflare token and account ID.
 Preview and admin browser tests use local servers and isolated ports. Admin
-browser tests copy `src/content` to a temporary directory; they must never
-write to the owner's real content. CI in `.github/workflows/ci.yml` installs
-from the lockfile, then runs formatting and purpose-comment checks, lint, both type checks, unit tests, build, and
-public/admin browser tests on pushes and pull requests.
+browser tests copy `src/content` to a temporary directory, then seed their
+disposable sample notes and workbook there; they must never write to the owner's
+real content. CI in `.github/workflows/ci.yml` installs from the lockfile, then
+runs formatting and purpose-comment checks, lint, both type checks, unit tests,
+build, and public/admin browser tests on pushes and pull requests.
 
 Prettier is pinned and configured by `web/.prettierrc.json` (100-column print
 width, two-space indentation, single quotes in JavaScript/TypeScript, and
