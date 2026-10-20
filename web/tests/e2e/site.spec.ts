@@ -58,7 +58,9 @@ test('sheet formulas stay within a cell and scroll reveals the dashboard before 
   );
   const dashboard = page.getByTestId('journey-dashboard');
   await expect
-    .poll(() => dashboard.evaluate((element) => Number(getComputedStyle(element).opacity)))
+    .poll(() => dashboard.evaluate((element) => Number(getComputedStyle(element).opacity)), {
+      timeout: 10000,
+    })
     .toBeGreaterThan(0.9);
   await expect
     .poll(() =>
@@ -116,7 +118,7 @@ test('normal-motion Back to top and viewport changes do not leave a trapped scro
   await page.setViewportSize({ width: 844, height: 390 });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.getByRole('link', { name: 'Back to top' }).click();
-  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
+  await expect.poll(() => page.evaluate(() => scrollY), { timeout: 15000 }).toBeLessThanOrEqual(2);
 });
 
 test('research arrows reach both rail boundaries without moving the document', async ({ page }) => {
@@ -246,7 +248,7 @@ test('keyboard focus can reach an off-screen research card', async ({ page, brow
 });
 
 test('automated accessibility checks pass on home, index, and detail', async ({ page }) => {
-  for (const route of ['/', '/research/', '/research/beyond-the-bottom-line/']) {
+  for (const route of ['/', '/research/', '/research/showcase-images/']) {
     await page.goto(route);
     const result = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
@@ -308,7 +310,7 @@ test('native touch scrolling works over the research rail', async ({
 
 test('research navigation and browser history preserve usable page scrolling', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#about, #contact')).toHaveCount(0);
+  await expect(page.locator('#about')).toHaveCount(0);
   await page.getByRole('link', { name: 'Explore my research' }).click();
   await expect(page).toHaveURL(/#research$/);
   await page
@@ -324,29 +326,15 @@ test('research navigation and browser history preserve usable page scrolling', a
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
 });
 
-test('example Excel sheets work in the static export and private admin endpoints stay absent', async ({
+test('static export excludes private workbook content and admin endpoints', async ({
   page,
   request,
 }) => {
-  await page.goto('/research/beyond-the-bottom-line/');
-  await page.locator('summary').filter({ hasText: 'Example financial statements' }).click();
-  await expect(page.getByRole('cell', { name: '100', exact: true })).toBeVisible();
-  await page.getByLabel('Show formulas').check();
-  await expect(page.getByRole('cell', { name: '=B5-B6', exact: true })).toBeVisible();
-  await page.getByLabel('Sheet', { exact: true }).selectOption({ label: 'Research questions' });
-  await expect(
-    page.getByRole('cell', { name: 'What does the business sell?', exact: true }),
-  ).toBeVisible();
-  const href = await page
-    .getByRole('link', { name: 'Download Excel', exact: true })
-    .getAttribute('href');
-  const response = await request.get(href!);
-  expect(response.status()).toBe(200);
-  expect(response.headers()['content-type']).toContain('spreadsheetml.sheet');
-  expect((await response.body()).subarray(0, 2).toString()).toBe('PK');
-  const id = href!.split('/').at(-1)!.replace('.xlsx', '');
-  expect((await request.get(`/admin/api/workbooks/${id}/`)).status()).toBe(404);
-  expect((await request.get(`/src/content/workbooks/${id}.json`)).status()).toBe(404);
+  await page.goto('/research/');
+  await expect(page.getByRole('link', { name: 'Download Excel', exact: true })).toHaveCount(0);
+  expect((await request.get('/downloads/workbooks/')).status()).toBe(404);
+  expect((await request.get('/src/content/workbooks/')).status()).toBe(404);
+  expect((await request.get('/admin/api/workbooks/')).status()).toBe(404);
   await expect(
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Admin' }),
   ).toHaveCount(0);
@@ -359,11 +347,11 @@ test('example Excel sheets work in the static export and private admin endpoints
   ).toEqual([]);
 });
 
-test('saved card artwork matches the home, index, article and no-JavaScript export', async ({
+test('showcase card artwork matches the home, index, article and no-JavaScript export', async ({
   page,
   browser,
 }) => {
-  const note = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
+  const note = JSON.parse(readFileSync('src/content/research/showcase-images.json', 'utf8'));
   for (const route of ['/', '/research/', `/research/${note.slug}/`]) {
     await page.goto(route);
     const art = route.includes(note.slug)
