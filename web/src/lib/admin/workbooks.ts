@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { contentRoot } from '../content';
 import { workbookPreviewSchema, type WorkbookPreview } from '../workbook-preview';
 import { UploadInputError } from './upload-errors';
+import { MAX_WORKBOOK_BYTES } from './upload-limits';
+export { MAX_WORKBOOK_BYTES } from './upload-limits';
 export type { WorkbookPreview } from '../workbook-preview';
 const workbookMetadataSchema = z.object({
   filename: z
@@ -16,7 +18,6 @@ const workbookMetadataSchema = z.object({
     .regex(/^[\w. ()-]+$/),
   preview: workbookPreviewSchema,
 });
-export const MAX_WORKBOOK_BYTES = 5 * 1024 * 1024;
 const validId = (id: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id);
 // Only messages from this allowlist can cross the worker boundary to the browser.

@@ -7,6 +7,7 @@ import { ArrowUpRight, CircleAlert, CircleCheck, Info, Plus } from 'lucide-react
 import { adminContent } from '@/lib/admin/data-source';
 import { requireAdminPage } from '@/lib/admin/auth';
 import styles from '@/components/admin/admin.module.css';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export default async function AdminOverview() {
   await requireAdminPage();
@@ -14,7 +15,7 @@ export default async function AdminOverview() {
   const portfolioTitle = profile.portfolioTitle || profile.displayName;
   const count = (status: (typeof notes)[number]['status']) =>
     notes.filter((item) => item.status === status).length;
-  const { checks, notices } = releaseReadiness(profile, notes, process.env.SITE_URL);
+  const { checks, notices } = releaseReadiness(profile, notes, runtimeSetting('SITE_URL'));
   const blockers = checks.filter((check) => !check.ok);
 
   return (

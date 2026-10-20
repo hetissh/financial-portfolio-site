@@ -1,12 +1,13 @@
 // Keeps the Unsplash credential private and records compliant photo selections.
 import { requireAdminRequestAsync, sameOrigin, smallJson } from '@/lib/admin/auth';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 const apiRoot = 'https://api.unsplash.com';
 
 export async function GET(request: Request) {
   const unauthorized = await requireAdminRequestAsync(request);
   if (unauthorized) return unauthorized;
-  const key = process.env.UNSPLASH_ACCESS_KEY;
+  const key = runtimeSetting('UNSPLASH_ACCESS_KEY');
   if (!key)
     return Response.json(
       { message: 'Add UNSPLASH_ACCESS_KEY to web/.env.local to enable search.' },
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
   if (unauthorized) return unauthorized;
   if (!sameOrigin(request) || request.headers.get('x-portfolio-admin') !== '1')
     return Response.json({ message: 'Cross-origin request blocked.' }, { status: 403 });
-  const key = process.env.UNSPLASH_ACCESS_KEY;
+  const key = runtimeSetting('UNSPLASH_ACCESS_KEY');
   if (!key)
     return Response.json({ message: 'Unsplash search is not configured.' }, { status: 503 });
   try {

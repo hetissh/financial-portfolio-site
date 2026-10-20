@@ -1,4 +1,4 @@
-# Verifies maintained code and the static/public and local-admin boundaries on every change.
+# Checks the public/admin builds and deploys the Cloudflare preview after successful develop pushes.
 name: Portfolio checks
 on:
   push:
@@ -8,7 +8,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: web
@@ -29,6 +29,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run typecheck:admin
       - run: npm run test:unit
+      - run: npm run build:vinext
       - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:e2e
@@ -41,3 +42,40 @@ jobs:
             web/playwright-report
             web/playwright-report-admin
           retention-days: 7
+
+  deploy-preview:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: cloudflare-preview
+    concurrency:
+      group: cloudflare-preview
+      cancel-in-progress: true
+    defaults:
+      run:
+        working-directory: web
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Check Cloudflare credentials
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "Add CLOUDFLARE_API_TOKEN to the cloudflare-preview GitHub environment." >&2; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Add CLOUDFLARE_ACCOUNT_ID as a variable in the cloudflare-preview GitHub environment." >&2; exit 1; }
+      - name: Build Cloudflare Workers
+        run: npm run build:vinext
+      - name: Deploy Response Store Worker
+        run: npm run deploy:response-store
+      - name: Deploy site Worker
+        run: npm run deploy:vinext

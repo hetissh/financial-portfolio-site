@@ -14,6 +14,8 @@ import { ListItem, OrderedList } from '@tiptap/extension-list';
 import { articleImageId, safeRichLink, type RichDocument, type RichNode } from '@/lib/rich-content';
 import { articleUploadSchema, responseMessage } from '@/lib/admin/client-response';
 import type { ImageCrop } from '@/lib/image-crop';
+import { centeredCrop } from '@/lib/image-crop';
+import { processImage, type ProcessedImage } from '@/lib/image-process';
 import { ImageCropDialog } from './ImageCropDialog';
 import styles from './admin.module.css';
 
@@ -324,7 +326,7 @@ export function RichTextEditor({
     else
       editor!.chain().focus().toggleOrderedList().updateAttributes('orderedList', { type }).run();
   }
-  async function upload(file: File, crop?: ImageCrop, aspect?: number) {
+  async function upload(file: File, crop?: ImageCrop, aspect?: number, prepared?: ProcessedImage) {
     if (!alt.trim()) {
       setError('Add alternative text before importing an image.');
       return;
@@ -335,10 +337,16 @@ export function RichTextEditor({
       const body = new FormData();
       body.set('file', file);
       body.set('purpose', 'article');
-      if (crop) {
-        body.set('crop', JSON.stringify(crop));
-        body.set('aspect', String(aspect));
-      }
+      const processed = prepared ?? (await processImage(file, crop ?? centeredCrop, aspect));
+      body.set('crop', JSON.stringify(crop ?? centeredCrop));
+      body.set('aspect', String(aspect ?? processed.width / processed.height));
+      body.set('original', new File([processed.original], 'original.webp', { type: 'image/webp' }));
+      body.set(
+        'processed',
+        new File([processed.cropped], 'processed.webp', { type: 'image/webp' }),
+      );
+      body.set('processedWidth', String(processed.width));
+      body.set('processedHeight', String(processed.height));
       const response = await fetch('/admin/api/images/', {
         method: 'POST',
         headers: { 'X-Portfolio-Admin': '1' },
@@ -675,8 +683,8 @@ export function RichTextEditor({
           article
           file={cropFile}
           onCancel={() => setCropFile(undefined)}
-          onApply={async (crop, aspect) => {
-            await upload(cropFile, crop, aspect);
+          onApply={async (crop, aspect, processed) => {
+            await upload(cropFile, crop, aspect, processed);
           }}
         />
       )}

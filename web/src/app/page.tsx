@@ -9,8 +9,9 @@ import { ResearchCard } from '@/components/ResearchCard';
 import { ResearchRail } from '@/components/ResearchRail';
 import { HomeCredentials } from '@/components/HomeCredentials';
 import styles from './page.module.css';
+import { runtimeSetting } from '@/lib/runtime-env';
 export function generateMetadata(): Metadata {
-  return { alternates: process.env.SITE_URL ? { canonical: '/' } : undefined };
+  return { alternates: runtimeSetting('SITE_URL') ? { canonical: '/' } : undefined };
 }
 export default async function Home() {
   const { profile, research } = await loadPublicContent();

@@ -10,7 +10,12 @@ const profile = profileSchema.parse(JSON.parse(readFileSync('src/content/profile
 
 describe('public professional details', () => {
   it('does not add an empty section to the current site', () => {
-    expect(renderToStaticMarkup(<ContactCredentials profile={profile} />)).toBe('');
+    const emptyContactProfile = profileSchema.parse({
+      ...profile,
+      contact: { ...profile.contact, email: undefined },
+      contactLinks: [],
+    });
+    expect(renderToStaticMarkup(<ContactCredentials profile={emptyContactProfile} />)).toBe('');
   });
   it('shows saved links, résumé and visible certifications', () => {
     const sample = profileSchema.parse({

@@ -1,4 +1,36 @@
-# Three maintained showcase notes
+# Showcase note evidence — site content cleared 20 October 2026
+
+## Local demo content cleanup — 20 October 2026
+
+At the user's request, removed all seven demo/test research records, their managed showcase illustrations, the demo workbook and its generated download, the test certification PDF and generated copy, and fake profile links/certification entries. Preserved the saved profile and email, both résumé sources and the visible résumé download, and the unrelated uploaded wallpaper. Automated unit tests now read a neutral fixture under `web/tests/fixtures/`, outside the content importer; the tests still exercise showcase generation in temporary folders without restoring showcase records to site content.
+
+Content validation passed with zero visible research notes. The Supabase importer dry run reports one profile, zero notes (zero published), and five media objects; no remote import was applied. Formatting, lint, public and admin TypeScript checks, purpose-comment checks, all 111 unit tests, `git diff --check`, and the static export build passed. The static export includes the normal `/research/` index with no demo notes and a generated not-found sentinel route required by Next.js when exporting an empty dynamic route. The regular `npm run build` wrapper could not start because the sandbox denies the temporary IPC socket used by its `tsx` runner; invoking its build generators directly with Node 24.19.0 and then Next's build completed successfully. The standard content-validation wrapper has the same sandbox limitation; its underlying script passed directly with Node 24.19.0. The three reserved showcase notes were intentionally deleted and not regenerated, as requested.
+
+For the profile-matched tab icon follow-up, the favicon SVG now uses the public monogram badge palette (brass `#ddc986` background and navy `#00007f` initials) while retaining the saved profile initials. Formatting, lint, public/admin TypeScript checks, purpose-comment checks, content validation, all 111 unit tests, `git diff --check`, and the static export build passed. Inspection of exported home metadata confirmed the icon carries both colors and the current `FP` monogram. Showcase notes remain cleared per the cleanup request.
+
+Latest update: 20 October 2026 — profile-matched favicon palette; local demo/test notes and assets remain cleared; remote Supabase remains unchanged.
+
+## CR: Cloudflare Workers compatibility checks — 20 October 2026
+
+The combined public/admin Worker build now has a Cloudflare runtime settings
+adapter and Worker-safe upload paths. Browser image normalization and workbook
+preview generation keep local Sharp and Node worker-thread dependencies out of
+Worker upload routes; images, workbooks and PDFs are validated and sent directly
+to private Supabase Storage. The three reserved showcase records were refreshed
+by the required showcase updater and remain `sample`; content validation reports
+three visible preview notes. No other content files were changed by that updater.
+
+Checks passed: Cloudflare Worker production build, `format:check`, `comments:check`,
+lint, public and admin TypeScript checks, all 114 unit tests, content validation,
+and `git diff --check`. A local Worker smoke check returned 200 for `/`,
+`/research/`, `/login/`, and `/forgot-password/`; protected `/admin/`,
+`/admin/profile/`, and `/admin/research/new/` redirected to login, and an
+unauthenticated image upload returned 401. The isolated admin Playwright suite
+could not start because the user's existing Next.js development server owns the
+shared `.next-admin` build directory. Authenticated upload flows and a deployed
+Cloudflare preview were not tested; no deploy was performed. The generated local
+Worker secrets file is private and ignored by Git.
+
 
 ## CR: Publish the selected résumé on home — 19 October 2026
 

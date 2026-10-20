@@ -1,8 +1,9 @@
 // Creates server-side Supabase clients; the secret key must never enter browser code.
 import { createClient } from '@supabase/supabase-js';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 function projectUrl() {
-  const value = process.env.SUPABASE_URL;
+  const value = runtimeSetting('SUPABASE_URL');
   if (!value) throw new Error('SUPABASE_URL is required for cloud mode.');
   const url = new URL(value);
   if (url.origin !== value || (url.protocol !== 'https:' && url.hostname !== 'localhost'))
@@ -11,7 +12,7 @@ function projectUrl() {
 }
 
 function key(name: 'SUPABASE_PUBLISHABLE_KEY' | 'SUPABASE_SECRET_KEY') {
-  const value = process.env[name];
+  const value = runtimeSetting(name);
   if (!value) throw new Error(`${name} is required for cloud mode.`);
   return value;
 }

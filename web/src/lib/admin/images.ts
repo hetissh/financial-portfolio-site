@@ -7,7 +7,8 @@ import { contentRoot } from '../content';
 import { cropSchema } from '../content-schema';
 import { cropRectangle } from '../image-crop';
 import { UploadInputError } from './upload-errors';
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+export { MAX_IMAGE_BYTES } from './upload-limits';
+import { MAX_IMAGE_BYTES } from './upload-limits';
 const validId = (id: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id);
 function imagePath(id: string, original: boolean, root: string) {

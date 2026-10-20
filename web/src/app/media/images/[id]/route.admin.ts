@@ -5,6 +5,7 @@ import { readCoverImage } from '@/lib/admin/images';
 import { loadPublicContent } from '@/lib/content';
 import { richImageIds } from '@/lib/rich-content';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,7 +23,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!referenced) return new Response('Not found', { status: 404 });
   try {
     const bytes =
-      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+      runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
         ? await downloadPrivate(`images/${id}.webp`)
         : readCoverImage(id);
     if (!bytes) return new Response('Not found', { status: 404 });

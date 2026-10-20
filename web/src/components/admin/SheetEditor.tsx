@@ -10,6 +10,7 @@ import {
   workbookUploadSchema,
 } from '@/lib/admin/client-response';
 import type { WorkbookPreview } from '@/lib/workbook-preview';
+import { parseWorkbookInProcess } from '@/lib/workbook-parser.mjs';
 import { WorkbookViewer } from '@/components/WorkbookViewer';
 import { SheetEmbed } from '@/components/SheetEmbed';
 import { Field } from './fields';
@@ -49,6 +50,10 @@ export function SheetEditor({
     try {
       const body = new FormData();
       body.set('file', file);
+      if (process.env.NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE === 'supabase') {
+        const previewData = parseWorkbookInProcess(new Uint8Array(await file.arrayBuffer()));
+        body.set('preview', JSON.stringify(previewData));
+      }
       const result = await fetch('/admin/api/workbooks/', {
         method: 'POST',
         headers: { 'X-Portfolio-Admin': '1' },

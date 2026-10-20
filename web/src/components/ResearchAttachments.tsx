@@ -7,10 +7,11 @@ import { SheetEmbed } from './SheetEmbed';
 import { sheetEmbed } from '@/lib/sheet-embed';
 import { visitorAssetUrl } from '@/lib/supabase/assets';
 import { getCloudWorkbook } from '@/lib/supabase/workbooks';
+import { runtimeSetting } from '@/lib/runtime-env';
 export async function ResearchAttachments({ attachments }: { attachments: Attachment[] }) {
   if (!attachments.length) return null;
-  const localAdmin = process.env.PORTFOLIO_ADMIN === '1';
-  const cloud = process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+  const localAdmin = runtimeSetting('PORTFOLIO_ADMIN') === '1';
+  const cloud = runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase';
   const previews = new Map(
     cloud
       ? await Promise.all(
@@ -42,7 +43,7 @@ export async function ResearchAttachments({ attachments }: { attachments: Attach
                   <a
                     className="text-link"
                     href={
-                      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+                      runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
                         ? visitorAssetUrl(`/downloads/workbooks/${attachment.id}.xlsx`)
                         : localAdmin
                           ? `/media/workbooks/${attachment.id}/`
@@ -93,7 +94,7 @@ export async function ResearchAttachments({ attachments }: { attachments: Attach
                     <a
                       className="text-link"
                       href={
-                        process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+                        runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
                           ? visitorAssetUrl(`/downloads/workbooks/${attachment.id}.xlsx`)
                           : localAdmin
                             ? `/media/workbooks/${attachment.id}/`

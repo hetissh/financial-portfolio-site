@@ -10,7 +10,7 @@ import { draftToResearch, researchToDraft } from '../../src/lib/admin/form';
 import { coverDesign, coverInk, coverSeed } from '../../src/lib/word-cover';
 import { ResearchArt } from '../../src/components/ResearchArt';
 import { ResearchCard } from '../../src/components/ResearchCard';
-const base = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
+const base = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
 
 describe('word covers', () => {
   it('keeps legacy theme-only notes valid and round-trips saved covers', () => {

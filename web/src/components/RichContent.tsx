@@ -2,14 +2,15 @@
 import Image from 'next/image';
 import { articleImageId, safeRichLink, type RichNode } from '@/lib/rich-content';
 import { visitorAssetUrl } from '@/lib/supabase/assets';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 function ArticleImage({ node }: { node: RichNode }) {
   const attrs = node.attrs!,
     id = articleImageId(attrs.src)!;
   const src =
-    process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+    runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
       ? visitorAssetUrl(String(attrs.src))
-      : process.env.PORTFOLIO_ADMIN === '1'
+      : runtimeSetting('PORTFOLIO_ADMIN') === '1'
         ? `/media/images/${id}/`
         : String(attrs.src);
   const image = (

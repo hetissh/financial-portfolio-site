@@ -1,0 +1,24 @@
+{
+  "id": "note-01",
+  "slug": "fixture-research-note",
+  "title": "Research fixture",
+  "summary": "A neutral note used by automated tests.",
+  "category": "Research process",
+  "tags": [
+    "Decision journal",
+    "Method"
+  ],
+  "publishedAt": "2026-09-25",
+  "status": "published",
+  "theme": "blue",
+  "question": "What should the test verify?",
+  "sections": [
+    {
+      "heading": "Fixture section",
+      "paragraphs": [
+        "This content exists only to support unit tests."
+      ]
+    }
+  ],
+  "sources": []
+}

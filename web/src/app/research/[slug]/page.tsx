@@ -3,9 +3,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { loadContent, loadPublicContent } from '@/lib/content';
 import { ResearchArticle } from '@/components/ResearchArticle';
+import { runtimeSetting } from '@/lib/runtime-env';
 export function generateStaticParams() {
-  if (process.env.PORTFOLIO_DATA_SOURCE === 'supabase') return [];
-  return loadContent().research.map((item) => ({ slug: item.slug }));
+  if (runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase') return [];
+  const research = loadContent().research;
+  // Static export requires one generated param for a dynamic route; this sentinel builds a 404 when the collection is empty.
+  return research.length > 0
+    ? research.map((item) => ({ slug: item.slug }))
+    : [{ slug: '__empty' }];
 }
 export async function generateMetadata({
   params,
@@ -18,7 +23,7 @@ export async function generateMetadata({
   return {
     title: note.title,
     description: note.summary,
-    alternates: process.env.SITE_URL ? { canonical: `/research/${slug}/` } : undefined,
+    alternates: runtimeSetting('SITE_URL') ? { canonical: `/research/${slug}/` } : undefined,
     openGraph: {
       title: note.title,
       description: note.summary,
@@ -30,6 +35,7 @@ export async function generateMetadata({
 }
 export default async function ResearchDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (slug === '__empty') notFound();
   const { research } = await loadPublicContent();
   const note = research.find((item) => item.slug === slug);
   if (!note) notFound();

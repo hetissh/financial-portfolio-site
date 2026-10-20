@@ -20,7 +20,7 @@ import {
 import { ResearchArt } from '../../src/components/ResearchArt';
 
 const base = researchSchema.parse({
-  ...JSON.parse(fs.readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8')),
+  ...JSON.parse(fs.readFileSync('tests/fixtures/research-note.json', 'utf8')),
   cover: undefined,
   attachments: [],
 });

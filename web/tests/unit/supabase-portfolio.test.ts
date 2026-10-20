@@ -8,7 +8,7 @@ const profile = {
   ...JSON.parse(readFileSync('src/content/profile.json', 'utf8')),
   isPlaceholder: true,
 };
-const note = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
+const note = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
 
 describe('Supabase public content', () => {
   it('requires an approved profile and excludes unpublished notes', () => {
@@ -45,12 +45,12 @@ describe('Supabase public content', () => {
 
 it('routes published media through the public bucket and rejects path traversal', () => {
   const previous = {
-    source: process.env.NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE,
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    source: process.env.PORTFOLIO_DATA_SOURCE,
+    url: process.env.SUPABASE_URL,
   };
   try {
-    process.env.NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE = 'supabase';
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
+    process.env.PORTFOLIO_DATA_SOURCE = 'supabase';
+    process.env.SUPABASE_URL = 'https://example.supabase.co';
     expect(visitorAssetUrl('/images/covers/example.webp')).toBe(
       'https://example.supabase.co/storage/v1/object/public/portfolio-public/images/covers/example.webp',
     );
@@ -59,8 +59,8 @@ it('routes published media through the public bucket and rejects path traversal'
     );
   } finally {
     for (const [name, value] of [
-      ['NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE', previous.source],
-      ['NEXT_PUBLIC_SUPABASE_URL', previous.url],
+      ['PORTFOLIO_DATA_SOURCE', previous.source],
+      ['SUPABASE_URL', previous.url],
     ] as const) {
       if (value === undefined) delete process.env[name];
       else process.env[name] = value;

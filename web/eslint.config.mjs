@@ -8,6 +8,9 @@ export default defineConfig([
   globalIgnores([
     '.next/**',
     '.next-admin/**',
+    '.cloudflare/**',
+    '.vinext/**',
+    'dist/**',
     'out/**',
     'node_modules.incomplete/**',
     'next-env.d.ts',

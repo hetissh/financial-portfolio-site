@@ -2,6 +2,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { centeredCrop, cropRectangle, type ImageCrop } from '@/lib/image-crop';
+import { processImage, type ProcessedImage } from '@/lib/image-process';
 import styles from './admin.module.css';
 export function ImageCropDialog({
   file,
@@ -14,7 +15,7 @@ export function ImageCropDialog({
   initialCrop?: ImageCrop;
   article?: boolean;
   onCancel: () => void;
-  onApply: (crop: ImageCrop, aspect?: number) => Promise<void>;
+  onApply: (crop: ImageCrop, aspect: number, processed: ProcessedImage) => Promise<void>;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [url, setUrl] = useState<string>();
@@ -51,7 +52,7 @@ export function ImageCropDialog({
     setBusy(true);
     setError(undefined);
     try {
-      await onApply(crop, aspect);
+      await onApply(crop, aspect, await processImage(file, crop, aspect, article ? 1600 : 1200));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not import this image.');
       setBusy(false);

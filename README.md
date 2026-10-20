@@ -61,7 +61,26 @@ The Admin management tab lists exactly two fixed account slots. Either signed-in
 
 For forgot-password and email confirmation, set `ADMIN_ORIGIN` (locally `http://127.0.0.1:3000`), `RESEND_API_KEY`, and `RESEND_FROM_EMAIL` in `.env.local` or the host's environment. Restart the admin server after changing these settings. Verify the sender domain in Resend. A reset link expires after 15 minutes, works once, and signs out existing sessions. If both passwords or an admin mailbox are unavailable, recovery requires restoring the protected auth file or operator access to the host; there is no open sign-up or public recovery override. Never prefix admin secrets with `NEXT_PUBLIC_` or put real values in `.env.example`, fixtures, or tracked source.
 
-The admin edits the same JSON content used by the public build. The static preview on port 4173 has no admin or login routes. Stop the admin before running a static release build. For a combined public site and admin server, `npm run build:admin` and `npm run start:admin` create and run a server build. That host must provide a single writable instance with persistent storage for `PORTFOLIO_AUTH_FILE` and `src/content`, HTTPS, `ADMIN_ORIGIN`, and the Resend settings. The checked-in `vercel.json` still deploys only the public static export; no hosted admin deployment is configured.
+The admin edits the same JSON content used by the public build. The static preview on port 4173 has no admin or login routes. Stop the admin before running a static release build. For a combined public site and admin server, `npm run build:admin` and `npm run start:admin` create and run a server build. That host must provide a single writable instance with persistent storage for `PORTFOLIO_AUTH_FILE` and `src/content`, HTTPS, `ADMIN_ORIGIN`, and the Resend settings. The checked-in `vercel.json` still deploys only the public static export; the Cloudflare Workers pipeline is documented below.
+
+### Cloudflare Workers CI/CD
+
+`.github/workflows/ci.yml` runs the project checks and a Cloudflare Worker build
+for pushes and pull requests. A successful push to `develop` also deploys the
+preview Worker and its Response Store. To enable deployment, create a GitHub
+Actions environment named `cloudflare-preview`, then add:
+
+- Secret `CLOUDFLARE_API_TOKEN`: for first deployment, an account-scoped token with Workers **Admin** and Workers R2 Storage **Edit** permissions. The initial run creates the two Workers and Response Store bucket. After they exist, replace it with a token scoped to those Workers with **Edit** plus R2 Storage **Edit**.
+- Variable `CLOUDFLARE_ACCOUNT_ID`: the account ID shown in the Cloudflare dashboard.
+
+After the first run creates the site Worker, configure its runtime secrets
+before hosted testing: `SITE_URL`, `ADMIN_ORIGIN`, `SUPABASE_URL`,
+`SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, and
+`RESEND_FROM_EMAIL`. Add `UNSPLASH_ACCESS_KEY` if admin image search is needed.
+These application secrets stay in Cloudflare; the GitHub deploy job only needs
+the Cloudflare deployment token. The preview remains in `SITE_MODE=preview` and
+is not a production release. Production automation should be enabled only after
+the release checklist and hosted admin/upload verification pass.
 
 The admin Overview shows published and draft counts, release blockers, and compact research ordering. Use **Homepage** for the portfolio title, hero description, and research introduction; **Profile** holds identity, release approval, and preserved About/Contact content. You can create research, reorder sections, preview drafts, publish notes, and move notes to `.admin-trash/`. Reset edits restores the last saved version. Unsaved edits prompt before navigating through links or closing the tab. Saves from an older tab are rejected so they cannot overwrite newer edits; reload to review the saved version.
 

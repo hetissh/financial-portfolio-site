@@ -14,9 +14,7 @@ import { parseResearch, profileSchema, validateRelease } from '../../src/lib/con
 const profile = profileSchema.parse(
   JSON.parse(fs.readFileSync('src/content/profile.json', 'utf8')),
 );
-const base = JSON.parse(
-  fs.readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'),
-);
+const base = JSON.parse(fs.readFileSync('tests/fixtures/research-note.json', 'utf8'));
 
 describe('release readiness', () => {
   it('reports all blockers together without treating citations or contact as required', () => {

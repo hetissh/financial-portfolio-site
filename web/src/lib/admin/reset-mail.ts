@@ -1,8 +1,9 @@
 // Sends short-lived recovery links through Resend; credentials stay on the server.
+import { runtimeSetting } from '@/lib/runtime-env';
 export async function sendResetEmail(to: string, token: string) {
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
-  const origin = process.env.ADMIN_ORIGIN;
+  const key = runtimeSetting('RESEND_API_KEY');
+  const from = runtimeSetting('RESEND_FROM_EMAIL');
+  const origin = runtimeSetting('ADMIN_ORIGIN');
   if (!key || !from || !origin) throw new Error('Resend recovery is not configured.');
   const link = new URL('/reset-password/', origin);
   link.searchParams.set('token', token);
@@ -21,9 +22,9 @@ export async function sendResetEmail(to: string, token: string) {
 }
 
 export async function sendEmailConfirmation(to: string, token: string) {
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
-  const origin = process.env.ADMIN_ORIGIN;
+  const key = runtimeSetting('RESEND_API_KEY');
+  const from = runtimeSetting('RESEND_FROM_EMAIL');
+  const origin = runtimeSetting('ADMIN_ORIGIN');
   if (!key || !from || !origin) throw new Error('Resend email confirmation is not configured.');
   const link = new URL('/confirm-email/', origin);
   link.searchParams.set('token', token);

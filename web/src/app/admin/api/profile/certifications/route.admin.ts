@@ -10,6 +10,7 @@ import { contentRoot } from '@/lib/content';
 import { UploadInputError, uploadErrorResponse } from '@/lib/admin/upload-errors';
 import { storeCloudPdf } from '@/lib/supabase/uploads';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export async function POST(request: Request) {
   const unauthorized = await requireAdminRequestAsync(request);
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
       throw new UploadInputError('Choose a certification PDF.');
     const bytes = Buffer.from(await file.arrayBuffer());
     const pdf =
-      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+      runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
         ? await storeCloudPdf(bytes, file.name, 'certification')
         : storeCertification(bytes, file.name, contentRoot());
     return Response.json({ pdf }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
     return Response.json({ message: 'Certification PDF not found.' }, { status: 404 });
   try {
     const bytes =
-      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+      runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
         ? await downloadPrivate(`certifications/${asset.split('/').at(-1)}`)
         : readCertification(asset, contentRoot());
     if (!bytes) return Response.json({ message: 'Certification PDF not found.' }, { status: 404 });

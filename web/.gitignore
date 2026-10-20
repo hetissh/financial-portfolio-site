@@ -11,6 +11,7 @@ playwright-report/
 *.tsbuildinfo
 .env*
 !.env.example
+.dev.vars*
 .DS_Store
 
 # Generated exports of visible research workbooks
@@ -33,3 +34,6 @@ playwright-report-admin/
 
 # Next.js generates route references for the active public/admin server.
 /next-env.d.ts
+/dist/
+.vinext/
+.cloudflare/

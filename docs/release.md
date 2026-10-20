@@ -74,19 +74,20 @@ Preview builds use `npm run build` and remain non-indexable. `noindex` and `robo
 
 ### Supabase migration preparation
 
-The combined cloud server implementation is ready for migration verification;
-the remote project and deployment have not been cut over. `web/supabase/migrations/202610140001_portfolio.sql` defines the
+The combined cloud server implementation is ready for hosted verification. The
+four reviewed migrations and initial content import were applied to the linked
+Supabase project on 20 October 2026; the server deployment has not been cut over. `web/supabase/migrations/202610140001_portfolio.sql` defines the
 initial database tables, public read policies, fixed admin slots, and Storage
 buckets. `web/supabase/migrations/202610140002_admin_sessions.sql` adds private
-revocable session storage. Apply `202610190001_admin_content.sql` for atomic
-trash and notebook-order versioning, then `202610190002_admin_recovery.sql`
-for one-time recovery and email-change links.
-From `web/`, `npm run supabase:import` reports what a one-time import
-would copy without sending data. After creating a Supabase project, applying
-the reviewed SQL migration, and configuring `SUPABASE_URL` and
-`SUPABASE_SECRET_KEY` privately in `.env.local`, the explicit
-`npm run supabase:import -- --apply` command copies local content and media. It
-compares existing data and refuses to overwrite changed cloud rows or objects.
+revocable session storage. `202610190001_admin_content.sql` adds atomic trash
+and notebook-order versioning, and `202610190002_admin_recovery.sql` adds
+one-time recovery and email-change links. All four migrations are applied to the
+linked project.
+The import dry run reported one profile, zero research notes, and five media
+objects. The explicit `npm run supabase:import -- --apply` command completed
+successfully after all four migrations were applied. It compares existing data
+and refuses to overwrite changed cloud rows or objects. Verify imported rows
+and Storage objects through the dashboard before hosted testing.
 Do not run this command against a project containing unrelated content.
 
 `PORTFOLIO_DATA_SOURCE=supabase` selects cloud visitor, admin, upload, and
@@ -102,10 +103,10 @@ replaces an existing user ID. Supabase Auth email delivery requires a verified
 Resend sender configured as custom SMTP. This preparation does not change the
 current release procedure below.
 
-For the cloud cutover, keep the current static deployment serving visitors while
-applying all four migrations to a fresh Supabase project. Run the content import
-dry run, then apply it and compare the resulting profile, seven current notes,
-and private media against local sources. Invite the two Auth users, bind them to
+For the cloud cutover, keep the current static deployment serving visitors.
+The four migrations and initial import are complete; the imported content is one
+profile, zero research notes, and five media objects. Verify the profile and
+private media against local sources. Invite the two Auth users, bind them to
 the fixed slots, and test sign-in, recovery, disabled access, profile edits,
 research publication, image and workbook uploads, and résumé and certification
 PDF visibility on a protected combined-server preview. Configure `SITE_URL`,
@@ -115,11 +116,16 @@ PDF visibility on a protected combined-server preview. Configure `SITE_URL`,
 only after those checks pass, retain the static artifact for rollback, and
 stop local file-backed edits during the final import to avoid diverging copies.
 
-The existing `vercel.json` configures only the static export. Cloudflare Pages
-can also host `out/` after a static release build, but live admin edits require
-a server runtime. Cloudflare Workers is the intended dynamic target; its
-adapter and deployment configuration are not implemented yet. The current
-production validation deliberately will not publish the placeholder profile.
+The existing `vercel.json` configures only the static export. Cloudflare Workers
+is the combined server target. GitHub Actions checks the Worker build on pushes
+and pull requests; after checks pass, pushes to `develop` deploy the preview
+Response Store and site Worker. Configure the GitHub `cloudflare-preview`
+environment with a Cloudflare API token and account ID, and configure the
+application runtime secrets on the Worker. The pipeline deploys preview mode
+only. Production deployment remains a manual release decision until the
+production checklist and hosted admin, recovery, and upload checks pass. The
+current production validation deliberately will not publish the placeholder
+profile.
 
 A generic static host can also serve the generated `out/` directory. Configure directory indexes, trailing-slash redirects, and a real 404 response. Do not use a catch-all SPA rewrite to the home page.
 

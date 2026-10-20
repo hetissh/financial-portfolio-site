@@ -36,7 +36,7 @@ it('updates the same reserved files, preserving personal content and refusing co
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'showcase-update-'));
   try {
     fs.mkdirSync(path.join(root, 'research'));
-    const personal = fs.readFileSync('src/content/research/test.json');
+    const personal = fs.readFileSync('tests/fixtures/research-note.json');
     fs.writeFileSync(path.join(root, 'research/personal.json'), personal);
     fs.writeFileSync(path.join(root, 'profile.json'), 'personal profile sentinel');
     await updateShowcaseNotes({ root, date: '2026-09-28', change: 'First request.' });

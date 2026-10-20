@@ -3,19 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { UploadInputError } from './upload-errors';
+import { validatePdf } from './pdf-upload';
 import type { Profile } from '../content-schema';
 
-export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
-export function validatePdf(buffer: Buffer, filename: string, label = 'PDF') {
-  if (
-    !/\.pdf$/i.test(filename) ||
-    buffer.length < 8 ||
-    buffer.length > MAX_RESUME_BYTES ||
-    !buffer.subarray(0, 5).equals(Buffer.from('%PDF-')) ||
-    !buffer.subarray(Math.max(0, buffer.length - 2048)).includes(Buffer.from('%%EOF'))
-  )
-    throw new UploadInputError(`Choose a valid ${label} up to 5 MB.`);
-}
+export { MAX_RESUME_BYTES, validatePdf } from './pdf-upload';
 const managedResume =
   /^\/downloads\/resumes\/([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\.pdf$/;
 

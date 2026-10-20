@@ -21,7 +21,7 @@ import {
 import { contactEmailHref } from '../../src/lib/profile-sections';
 import { storeArticleImage, readCoverImage } from '../../src/lib/admin/images';
 
-const base = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
+const base = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
 const profile = JSON.parse(readFileSync('src/content/profile.json', 'utf8'));
 const body: RichDocument = {
   version: 1,

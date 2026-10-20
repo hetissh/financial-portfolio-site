@@ -8,6 +8,7 @@ import {
 } from '@/lib/admin/auth';
 import { logOut } from '@/lib/admin/auth-store';
 import { cloudLogOut } from '@/lib/supabase/admin-auth';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export async function POST(request: Request) {
   const origin = allowedAdminOrigin(request.headers.get('host'));
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     status: 303,
     headers: {
       Location: new URL('/', origin).toString(),
-      'Set-Cookie': `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${process.env.ADMIN_ORIGIN?.startsWith('https://') ? '; Secure' : ''}`,
+      'Set-Cookie': `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${runtimeSetting('ADMIN_ORIGIN')?.startsWith('https://') ? '; Secure' : ''}`,
     },
   });
 }

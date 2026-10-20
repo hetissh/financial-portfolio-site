@@ -38,7 +38,7 @@ import { profileJourney } from '../../src/lib/profile-sections';
 
 const base = parseResearch([
   {
-    ...JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8')),
+    ...JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8')),
     attachments: [],
     cover: undefined,
   },

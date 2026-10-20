@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { BackToTop } from './BackToTop';
 import { AdminEntry } from './AdminEntry';
+import { runtimeSetting } from '@/lib/runtime-env';
 export function SiteFooter({ name }: { name: string }) {
   return (
     <footer className="site-footer wrap">
@@ -17,7 +18,7 @@ export function SiteFooter({ name }: { name: string }) {
         </span>
       </div>
       <nav className="footer-actions" aria-label="Footer">
-        {process.env.PORTFOLIO_ADMIN === '1' && <AdminEntry className="text-link" />}
+        {runtimeSetting('PORTFOLIO_ADMIN') === '1' && <AdminEntry className="text-link" />}
         <BackToTop />
       </nav>
     </footer>

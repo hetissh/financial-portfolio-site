@@ -20,8 +20,9 @@ keep these routes out of the public static export. Admin mode uses a separate
 `.next-admin` build directory and TypeScript configuration. The static export
 cannot save content or use admin credentials.
 
-The combined cloud mode uses one Next server for visitors and admins
-(`build:cloud` / `start:cloud`). Supabase Postgres owns profile, research,
+The combined cloud mode uses one application runtime for visitors and admins
+(`build:cloud` / `start:cloud` on Node, or `build:vinext` on Cloudflare Workers).
+Supabase Postgres owns profile, research,
 notebook order, fixed admin slots, sessions, and recovery links. Supabase Auth
 owns passwords; private Storage owns uploaded images, workbooks, résumés, and
 certification PDFs. Visitor pages read approved profile and published research
@@ -30,9 +31,10 @@ current visible reference; manual public downloads use the public Storage
 bucket. The admin uses the same validated editors with cloud persistence and
 version checks. `supabase:import` copies local content and source uploads into
 an empty project without overwriting different remote data; `supabase:bind-admins`
-connects the two fixed slots to existing Supabase Auth users. The remote
-migrations, import, account binding, and deployed runtime have not yet been
-applied or verified, so cloud mode is not yet the public release.
+connects the two fixed slots to existing Supabase Auth users. The four remote migrations and initial content import were applied to the linked
+Supabase project on 20 October 2026 (one profile, zero research notes, five media
+objects). Admin account binding and the deployed runtime remain unverified, so
+cloud mode is not yet the public release.
 
 | Area | Main paths | Responsibility |
 | --- | --- | --- |
@@ -44,7 +46,7 @@ applied or verified, so cloud mode is not yet the public release.
 | Source content | `web/src/content/` | Profile, notes, saved order, private image originals/crops, and workbook sources |
 | Export preparation | `web/scripts/` | Validate content and generate public assets, discovery files, and static build |
 | Tests | `web/tests/unit/`, `web/tests/e2e/`, `web/tests/admin/` | Unit, public export, and isolated admin browser checks |
-| Operations | `docs/release.md`, `.github/workflows/ci.yml`, `web/vercel.json` | Release requirements, verification, and proposed static hosting |
+| Operations | `docs/release.md`, `.github/workflows/ci.yml`, `web/cloudflare.config.ts` | Release requirements, verification, Cloudflare Worker preview deployment |
 
 ## Content ownership and identifiers
 
@@ -127,9 +129,14 @@ Research cards and article text use light reading surfaces over the grid.
    temporary file and rename. A slug change changes the filename. Deletes move
    note JSON into ignored `.admin-trash/`. A successful server-mode edit
    revalidates visitor pages; saving content does not rebuild the static export.
-3. **Uploads and embeds:** Sharp normalizes/crops accepted local images. Excel
-   uploads are bounded and parsed in a worker; a shared schema validates the
-   worker result, saved metadata, and browser preview before use. The local
+3. **Uploads and embeds:** Sharp normalizes/crops accepted local images. In
+   Cloudflare Workers, the browser normalizes images to bounded WebP objects
+   before upload, and the Worker stores them directly in private Supabase
+   Storage without local disk or Sharp. Excel uploads are bounded and parsed
+   in a Node worker locally; in Workers, the browser creates a bounded preview
+   and the Worker validates the workbook ZIP structure and preview schema
+   before storing the source and metadata. A shared schema validates saved
+   metadata and browser responses before use. The local
    preview uses cached workbook values, not formula recalculation. Google Sheets and Microsoft
    embed input is reduced to a validated HTTPS provider URL; the public page
    displays provider iframes and original links. Provider access remains under
@@ -153,14 +160,22 @@ Research cards and article text use light reading surfaces over the grid.
 6. **Cloud mode:** The same guarded admin routes select Postgres records and
    Supabase Auth sessions when `PORTFOLIO_DATA_SOURCE=supabase`. Content writes
    compare validated record hashes and database row versions before updating.
-   Image and workbook processors use temporary local space, then upload their
-   source and metadata to private Storage; a partial upload removes only that
-   attempt's completed objects. PDFs are validated and uploaded directly to
+   The Cloudflare Worker adapter does not load Node-only Sharp or filesystem
+   modules into upload routes. Browser image normalization and workbook preview
+   generation keep those uploads within the Worker runtime; server validation
+   and bounded payloads remain in place. Image and workbook uploads go directly
+   to private Storage; a partial upload removes only that attempt's completed
+   objects. PDFs are validated and uploaded directly to
    private Storage. Public media routes check the current approved profile or
    published note before streaming a managed object. Uploaded objects that are
    not yet referenced can remain private; the importer refuses to replace an
    object with different bytes. A failed cloud request returns an error and
-   leaves the editor draft available for retry.
+   leaves the editor draft available for retry. Runtime configuration is read
+   through a shared setting accessor: Node modes use `process.env`, while the
+   Worker build resolves Cloudflare bindings inside the app's RSC/server runtime.
+   The Worker entrypoint stays on Vinext's fetch handler so bindings remain
+   available in that runtime; browser-visible mode flags are separately
+   compiled into the client bundle.
 
 ## Security and failure boundaries
 
@@ -214,7 +229,8 @@ The local file-backed combined server needs a single writable instance and
 persistent volume for credentials and content. Multiple writers to one JSON
 file and ephemeral filesystems are unsupported in that mode. The cloud server
 uses Postgres, Auth, and Storage and can run without persistent application
-files; its migrations and hosted behavior have not been verified remotely.
+files; its four migrations and initial content import are applied remotely, but
+its hosted behavior remains unverified.
 `ADMIN_ORIGIN` must match the external HTTPS origin;
 `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are needed for email flows. The current
 static release path stays separate. Update this document when verified changes

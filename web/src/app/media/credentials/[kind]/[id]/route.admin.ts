@@ -1,12 +1,13 @@
 // Serves only résumé and certification PDFs currently approved in the public profile.
 import { loadPublicContent } from '@/lib/content';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 type Context = { params: Promise<{ kind: string; id: string }> };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export async function GET(_request: Request, { params }: Context) {
-  if (process.env.PORTFOLIO_DATA_SOURCE !== 'supabase')
+  if (runtimeSetting('PORTFOLIO_DATA_SOURCE') !== 'supabase')
     return new Response('Not found', { status: 404 });
   const { kind, id } = await params;
   if (!uuid.test(id) || !['resume', 'certification'].includes(kind))

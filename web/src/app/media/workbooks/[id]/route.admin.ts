@@ -5,6 +5,7 @@ import { getWorkbook, readWorkbookFile } from '@/lib/admin/workbooks';
 import { loadPublicContent } from '@/lib/content';
 import { getCloudWorkbook } from '@/lib/supabase/workbooks';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,7 +21,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     )
   )
     return new Response('Not found', { status: 404 });
-  const cloud = process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+  const cloud = runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase';
   const workbook = cloud ? await getCloudWorkbook(id) : getWorkbook(id);
   if (!workbook) return new Response('Not found', { status: 404 });
   const bytes = cloud ? await downloadPrivate(`workbooks/${id}.xlsx`) : readWorkbookFile(id);

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Profile } from '@/lib/content-schema';
 import { AdminEntry } from './AdminEntry';
 import { profileJourney } from '@/lib/profile-sections';
+import { runtimeSetting } from '@/lib/runtime-env';
 export function SiteHeader({ profile, preview }: { profile: Profile; preview: boolean }) {
   const journey = profileJourney(profile);
   return (
@@ -32,7 +33,7 @@ export function SiteHeader({ profile, preview }: { profile: Profile; preview: bo
             profile.certifications.some((item) => item.visible)) && (
             <Link href="/#credentials">Credentials</Link>
           )}
-          {process.env.PORTFOLIO_ADMIN === '1' && <AdminEntry />}
+          {runtimeSetting('PORTFOLIO_ADMIN') === '1' && <AdminEntry />}
         </nav>
       </header>
     </>

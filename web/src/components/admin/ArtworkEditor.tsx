@@ -139,12 +139,24 @@ export function ArtworkEditor({
       onBusy(false);
     }
   }
-  async function applyCrop(crop: ImageCrop) {
+  async function applyCrop(
+    crop: ImageCrop,
+    aspect: number,
+    processed: import('@/lib/image-process').ProcessedImage,
+  ) {
     onBusy(true);
     try {
       const body = new FormData();
       body.set('file', cropFile!);
       body.set('crop', JSON.stringify(crop));
+      body.set('aspect', String(aspect));
+      body.set('original', new File([processed.original], 'original.webp', { type: 'image/webp' }));
+      body.set(
+        'processed',
+        new File([processed.cropped], 'processed.webp', { type: 'image/webp' }),
+      );
+      body.set('processedWidth', String(processed.width));
+      body.set('processedHeight', String(processed.height));
       const response = await fetch('/admin/api/images/', {
         method: 'POST',
         headers: { 'X-Portfolio-Admin': '1' },

@@ -3,13 +3,14 @@ import { requireAdminRequestAsync } from '@/lib/admin/auth';
 import { getWorkbook, readWorkbookFile } from '@/lib/admin/workbooks';
 import { getCloudWorkbook } from '@/lib/supabase/workbooks';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const unauthorized = await requireAdminRequestAsync(request);
   if (unauthorized) return unauthorized;
   if (request.headers.get('sec-fetch-site') === 'cross-site')
     return new Response('Cross-origin read blocked', { status: 403 });
   const { id } = await params;
-  const cloud = process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+  const cloud = runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase';
   const book = cloud ? await getCloudWorkbook(id) : getWorkbook(id);
   if (!book) return new Response('Not found', { status: 404 });
   if (new URL(request.url).searchParams.get('preview') === '1')

@@ -1106,7 +1106,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Show the saved résumé in home credentials"
+                  "text": "Prepare image and workbook uploads for Cloudflare Workers"
                 }
               ]
             },

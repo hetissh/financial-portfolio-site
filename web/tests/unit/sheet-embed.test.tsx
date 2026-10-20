@@ -16,9 +16,7 @@ const id = '11111111-1111-4111-8111-111111111111';
 const google =
   'https://docs.google.com/spreadsheets/d/e/published-demo/pubhtml?gid=123&range=A1%3AD20&widget=false';
 const excel = 'https://onedrive.live.com/embed?resid=DEMO%21123&authkey=DEMO';
-const base = JSON.parse(
-  fs.readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'),
-);
+const base = JSON.parse(fs.readFileSync('tests/fixtures/research-note.json', 'utf8'));
 
 describe('provider embeds and existing spreadsheet attachments', () => {
   it('accepts published Google URLs and preserves sheet/range/display settings', () => {

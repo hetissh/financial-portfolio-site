@@ -16,9 +16,10 @@ import {
   type SiteMode,
 } from './content-schema';
 import { readPublicPortfolio } from './supabase/reader';
+import { runtimeSetting } from './runtime-env';
 
 export function getSiteMode(): SiteMode {
-  const value = process.env.SITE_MODE || 'preview';
+  const value = runtimeSetting('SITE_MODE') || 'preview';
   if (value !== 'preview' && value !== 'production')
     throw new Error('SITE_MODE must be preview or production.');
   return value;
@@ -26,7 +27,7 @@ export function getSiteMode(): SiteMode {
 // PORTFOLIO_CONTENT_DIR lets the local admin's browser tests edit a copy of the content.
 export function contentRoot() {
   const override =
-    process.env.PORTFOLIO_ADMIN === '1' ? process.env.PORTFOLIO_CONTENT_DIR : undefined;
+    runtimeSetting('PORTFOLIO_ADMIN') === '1' ? runtimeSetting('PORTFOLIO_CONTENT_DIR') : undefined;
   return override ? path.resolve(override) : path.join(process.cwd(), 'src/content');
 }
 export function readProfileFile(root = contentRoot()): unknown {
@@ -95,14 +96,14 @@ export function loadContent() {
           if (!imageExists(id, root))
             throw new Error(`Missing article image for ${record.slug}: ${id}`);
   const mode = getSiteMode();
-  if (mode === 'production') validateRelease(profile, records, process.env.SITE_URL);
+  if (mode === 'production') validateRelease(profile, records, runtimeSetting('SITE_URL'));
   return { profile, research: visibleResearch(records, mode, readResearchOrder(root)), mode };
 }
 
 // Cloud requests read current published rows; local static builds keep their
 // validated file source and existing export behavior.
 export async function loadPublicContent() {
-  if (process.env.PORTFOLIO_DATA_SOURCE === 'supabase') {
+  if (runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase') {
     await connection();
     return readPublicPortfolio();
   }

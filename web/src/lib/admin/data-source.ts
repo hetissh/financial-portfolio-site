@@ -15,8 +15,9 @@ import {
   trashCloudResearch,
   updateCloudResearch,
 } from '@/lib/supabase/cloud-store';
+import { runtimeSetting } from '@/lib/runtime-env';
 
-const cloud = () => process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+const cloud = () => runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase';
 
 export async function adminContent() {
   return cloud() ? readCloudAdminContent() : readAdminContent();

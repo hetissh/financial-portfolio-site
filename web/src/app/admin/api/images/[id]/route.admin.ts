@@ -2,6 +2,7 @@
 import { requireAdminRequestAsync } from '@/lib/admin/auth';
 import { readCoverImage } from '@/lib/admin/images';
 import { downloadPrivate } from '@/lib/supabase/storage';
+import { runtimeSetting } from '@/lib/runtime-env';
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const unauthorized = await requireAdminRequestAsync(request);
   if (unauthorized) return unauthorized;
@@ -11,7 +12,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     const original = new URL(request.url).searchParams.get('original') === '1';
     const bytes =
-      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
+      runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase'
         ? await downloadPrivate(`images/${id}${original ? '.original' : ''}.webp`)
         : readCoverImage(id, original);
     if (!bytes) return new Response('Image not found', { status: 404 });

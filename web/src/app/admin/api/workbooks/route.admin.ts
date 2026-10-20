@@ -1,8 +1,10 @@
 // Accepts bounded Excel uploads and returns safe validation errors.
 import { requireAdminRequestAsync, sameOrigin } from '@/lib/admin/auth';
-import { MAX_WORKBOOK_BYTES, storeWorkbook } from '@/lib/admin/workbooks';
+import { MAX_WORKBOOK_BYTES } from '@/lib/admin/upload-limits';
 import { UploadInputError, uploadErrorResponse } from '@/lib/admin/upload-errors';
+import { workbookPreviewSchema } from '@/lib/workbook-preview';
 import { storeCloudWorkbook } from '@/lib/supabase/uploads';
+import { runtimeSetting } from '@/lib/runtime-env';
 export async function POST(request: Request) {
   const unauthorized = await requireAdminRequestAsync(request);
   if (unauthorized) return unauthorized;
@@ -54,10 +56,21 @@ export async function POST(request: Request) {
     )
       throw new UploadInputError('Choose an .xlsx workbook.');
     const bytes = Buffer.from(await file.arrayBuffer());
-    const result =
-      process.env.PORTFOLIO_DATA_SOURCE === 'supabase'
-        ? await storeCloudWorkbook(bytes, file.name)
-        : await storeWorkbook(bytes, file.name);
+    let result;
+    if (runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase') {
+      let preview: unknown;
+      try {
+        preview = JSON.parse(String(form.get('preview')));
+      } catch {
+        throw new UploadInputError('Prepare the workbook preview in the browser and try again.');
+      }
+      const parsedPreview = workbookPreviewSchema.safeParse(preview);
+      if (!parsedPreview.success)
+        throw new UploadInputError('The workbook preview is invalid. Try uploading it again.');
+      result = await storeCloudWorkbook(bytes, file.name, parsedPreview.data);
+    } else {
+      result = await (await import('@/lib/admin/workbooks')).storeWorkbook(bytes, file.name);
+    }
     return Response.json(result, {
       status: 201,
       headers: { 'Cache-Control': 'no-store' },

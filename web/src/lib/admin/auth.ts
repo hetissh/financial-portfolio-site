@@ -3,14 +3,15 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { activeAdmin, type PublicAdmin } from './auth-store';
 import { cloudActiveAdmin } from '@/lib/supabase/admin-auth';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export const SESSION_COOKIE = 'portfolio_admin_session';
-export const adminEnabled = () => process.env.PORTFOLIO_ADMIN === '1';
-export const cloudAdminEnabled = () => process.env.PORTFOLIO_DATA_SOURCE === 'supabase';
+export const adminEnabled = () => runtimeSetting('PORTFOLIO_ADMIN') === '1';
+export const cloudAdminEnabled = () => runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase';
 
 export function allowedAdminOrigin(host: string | null) {
   if (!host || !adminEnabled()) return undefined;
-  const configured = process.env.ADMIN_ORIGIN;
+  const configured = runtimeSetting('ADMIN_ORIGIN');
   if (configured) {
     const origin = new URL(configured);
     if (

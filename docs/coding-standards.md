@@ -12,8 +12,8 @@ decisions documents explain project-specific choices.
 | Languages | TypeScript/TSX, JavaScript/MJS, CSS, JSON; no Python application code |
 | Runtime | Node `24.19.0` in `web/.nvmrc`; `web/package.json` declares Node `>=22.0.0` |
 | Package manager | npm with committed `web/package-lock.json`; use `npm ci` for reproducible installation |
-| Framework | Next.js `16.3.8` App Router, React/React DOM `19.3.0`; static export or combined cloud server |
-| Key libraries | Zod `4.6.5` for content contracts, Tiptap for rich editing, Sharp `0.35.5` for image processing, SheetJS for workbook previews, Supabase JS `2.117.3` for the cloud migration path, Three.js `0.186.1` and GSAP `3.15.0` for the home card journey |
+| Framework | Next.js `16.3.8` App Router, React/React DOM `19.3.1`; static export, combined Node server, or Vinext on Cloudflare Workers |
+| Key libraries | Zod `4.6.5` for content contracts, Tiptap for rich editing, Sharp `0.35.5` for local image processing, SheetJS for workbook previews, Supabase JS `2.117.3` for cloud data and uploads, Three.js `0.186.1` and GSAP `3.15.0` for the home card journey |
 | Styling | CSS modules, global CSS, and `web/src/styles/tokens.css`; self-hosted fonts |
 | Quality tools | Prettier `3.9.9`, ESLint `9.39.5`, TypeScript `6.0.3`, Vitest `5.0.2`, Playwright `1.63.0` |
 
@@ -40,6 +40,10 @@ unmount.
 | Start combined admin server | `npm run start:admin` |
 | Develop combined cloud server | `npm run admin:cloud` |
 | Build and start combined cloud server | `npm run build:cloud`, then `npm run start:cloud` |
+| Cloudflare Worker development | `npm run dev:vinext` |
+| Build Cloudflare Workers | `npm run build:vinext` |
+| Deploy the Response Store Worker | `npm run deploy:response-store` |
+| Deploy the site Worker | `npm run deploy:vinext` |
 | Content validation | `npm run validate:content` |
 | Lint | `npm run lint` |
 | Format maintained code | `npm run format` |
@@ -58,7 +62,18 @@ unmount.
 `npm run build` invokes content validation and the asset generators, including
 visible résumé and certification PDF copy steps. `npm run build:admin` prepares
 those local copies before compiling the combined server. Cloud builds read and
-write managed uploads in Storage and do not generate public file copies.
+write managed uploads in Storage and do not generate public file copies. The
+Cloudflare Worker build uses Vinext and its Response Store adapter; browser-side
+image normalization and workbook preview generation keep Sharp and Node worker
+threads out of Worker upload routes. Worker secrets are supplied through the
+Cloudflare secret manager or private `.dev.vars` during local Worker development.
+Server settings must use `runtimeSetting()` so the same routes read from
+`process.env` on Node and Cloudflare bindings inside the Worker RSC runtime.
+Keep the Worker-specific `cloudflare:workers` implementation out of Node
+execution and tests; the Vite alias selects it only for the Cloudflare build.
+GitHub Actions also builds the Worker on pushes and pull requests. A passing
+push to `develop` deploys the preview Response Store and site Worker using the
+`cloudflare-preview` environment's Cloudflare token and account ID.
 Preview and admin browser tests use local servers and isolated ports. Admin
 browser tests copy `src/content` to a temporary directory; they must never
 write to the owner's real content. CI in `.github/workflows/ci.yml` installs

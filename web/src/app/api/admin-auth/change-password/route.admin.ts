@@ -10,6 +10,7 @@ import {
 } from '@/lib/admin/auth';
 import { AuthInputError, changePassword } from '@/lib/admin/auth-store';
 import { cloudChangePassword } from '@/lib/supabase/admin-auth';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 export async function POST(request: Request) {
   const unauthorized = await requireAdminRequestAsync(request);
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
     const response = Response.json({ message: 'Password changed. Sign in again.' });
     response.headers.set(
       'Set-Cookie',
-      `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${process.env.ADMIN_ORIGIN?.startsWith('https://') ? '; Secure' : ''}`,
+      `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${runtimeSetting('ADMIN_ORIGIN')?.startsWith('https://') ? '; Secure' : ''}`,
     );
     return response;
   } catch (error) {

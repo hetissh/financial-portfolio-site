@@ -7,6 +7,7 @@ import { coverInk } from '@/lib/word-cover';
 import { ThemeDrawing } from './ThemeDrawing';
 import { ProceduralCoverDrawing } from './ProceduralCoverDrawing';
 import { visitorAssetUrl } from '@/lib/supabase/assets';
+import { runtimeSetting } from '@/lib/runtime-env';
 export function SelectedResearchArt({
   cover,
   large = false,
@@ -54,9 +55,9 @@ export function SelectedResearchArt({
           src={
             cover.unsplash
               ? cover.unsplash.imageUrl
-              : process.env.NEXT_PUBLIC_PORTFOLIO_DATA_SOURCE === 'supabase' && !privatePreview
+              : runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase' && !privatePreview
                 ? visitorAssetUrl(`/images/covers/${cover.imageId}.webp`)
-                : process.env.NEXT_PUBLIC_PORTFOLIO_ADMIN === '1'
+                : runtimeSetting('PORTFOLIO_ADMIN') === '1'
                   ? privatePreview
                     ? `/admin/api/images/${cover.imageId}/`
                     : `/media/images/${cover.imageId}/`

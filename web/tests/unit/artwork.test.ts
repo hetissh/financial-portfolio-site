@@ -60,9 +60,7 @@ describe('artwork catalogues', () => {
     const cover = wordCoverSchema.parse(input);
     expect(cover.color).toBe('#e4daef');
     expect(cover.foregroundColor).toBe('#7141a6');
-    const base = JSON.parse(
-      readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'),
-    );
+    const base = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
     expect(
       researchSchema.parse(
         draftToResearch(researchToDraft(researchSchema.parse({ ...base, cover }))),
@@ -209,9 +207,7 @@ describe('image crop and storage', () => {
     await expect(
       storeCoverImage(Buffer.alloc(10 * 1024 * 1024 + 1), 'Huge.png', centeredCrop, root),
     ).rejects.toThrow();
-    const base = JSON.parse(
-      readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'),
-    );
+    const base = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
     expect(() =>
       createResearch(
         {

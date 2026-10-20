@@ -9,6 +9,7 @@ import {
 } from '@/lib/admin/auth';
 import { logIn } from '@/lib/admin/auth-store';
 import { cloudLogIn } from '@/lib/supabase/admin-auth';
+import { runtimeSetting } from '@/lib/runtime-env';
 
 const schema = z.object({ email: z.email(), password: z.string().min(1).max(256) });
 export async function POST(request: Request) {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     const response = Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
     response.headers.append(
       'Set-Cookie',
-      `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200${process.env.ADMIN_ORIGIN?.startsWith('https://') ? '; Secure' : ''}`,
+      `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200${runtimeSetting('ADMIN_ORIGIN')?.startsWith('https://') ? '; Secure' : ''}`,
     );
     return response;
   } catch (error) {

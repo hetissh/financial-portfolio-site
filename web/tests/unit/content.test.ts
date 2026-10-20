@@ -10,7 +10,7 @@ import {
   validateRelease,
 } from '../../src/lib/content-schema';
 import { loadContent } from '../../src/lib/content';
-const base = JSON.parse(readFileSync('src/content/research/beyond-the-bottom-line.json', 'utf8'));
+const base = JSON.parse(readFileSync('tests/fixtures/research-note.json', 'utf8'));
 const profile = profileSchema.parse({
   ...JSON.parse(readFileSync('src/content/profile.json', 'utf8')),
   isPlaceholder: true,
