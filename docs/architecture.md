@@ -173,6 +173,11 @@ Research cards and article text use light reading surfaces over the grid.
    leaves the editor draft available for retry. Runtime configuration is read
    through a shared setting accessor: Node modes use `process.env`, while the
    Worker build resolves Cloudflare bindings inside the app's RSC/server runtime.
+   On the first Cloudflare deployment, the deploy CLI needs required Worker
+   secrets in a private temporary secrets file because the Worker does not yet
+   exist for `wrangler secret put`. GitHub Actions creates that file from the
+   `cloudflare-preview` environment secrets and does not upload it as an artifact.
+   Unsplash search remains optional.
    The Worker entrypoint stays on Vinext's fetch handler so bindings remain
    available in that runtime; browser-visible mode flags are separately
    compiled into the client bundle.

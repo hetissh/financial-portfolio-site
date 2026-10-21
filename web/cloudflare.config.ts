@@ -36,7 +36,6 @@ export default defineConfig({
       RESEND_API_KEY: { type: 'secret' },
       RESEND_FROM_EMAIL: { type: 'secret' },
       ADMIN_ORIGIN: { type: 'secret' },
-      UNSPLASH_ACCESS_KEY: { type: 'secret' },
     },
   }),
 });

@@ -121,9 +121,13 @@ is the combined server target. GitHub Actions checks the Worker build on pushes,
 pull requests, and manual workflow runs; after checks pass, pushes to `develop`
 and manual runs selected on `develop` deploy the preview Response Store and site
 Worker. Configure the GitHub `cloudflare-preview`
-environment with a Cloudflare API token and account ID, and configure the
-application runtime secrets on the Worker. The pipeline deploys preview mode
-only. Production deployment remains a manual release decision until the
+environment with a Cloudflare API token, account ID variable, and the required
+application secrets: `SITE_URL`, `ADMIN_ORIGIN`, `SUPABASE_URL`,
+`SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, and
+`RESEND_FROM_EMAIL`. For the Workers preview, set `SITE_URL` and `ADMIN_ORIGIN`
+to the site's `workers.dev` origin. `UNSPLASH_ACCESS_KEY` is optional. The
+workflow passes these values to the first site Worker deployment through a
+private temporary secrets file, then deploys preview mode only. Production deployment remains a manual release decision until the
 production checklist and hosted admin, recovery, and upload checks pass. The
 current production validation deliberately will not publish the placeholder
 profile.

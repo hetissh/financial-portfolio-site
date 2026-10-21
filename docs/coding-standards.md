@@ -43,7 +43,7 @@ unmount.
 | Cloudflare Worker development | `npm run dev:vinext` |
 | Build Cloudflare Workers | `npm run build:vinext` |
 | Deploy the Response Store Worker | `npm run deploy:response-store` |
-| Deploy the site Worker | `npm run deploy:vinext` |
+| Deploy the prebuilt site Worker | `npm run deploy:vinext` (pass `--secrets-file <path>` on first deployment) |
 | Content validation | `npm run validate:content` |
 | Lint | `npm run lint` |
 | Format maintained code | `npm run format` |
@@ -74,7 +74,10 @@ execution and tests; the Vite alias selects it only for the Cloudflare build.
 GitHub Actions also builds the Worker on pushes and pull requests, and supports
 manual runs from the Actions UI. A passing push to `develop` or manual run
 selected on `develop` deploys the preview Response Store and site Worker using
-the `cloudflare-preview` environment's Cloudflare token and account ID.
+the `cloudflare-preview` environment's Cloudflare token, account ID and
+application secrets. The site deploy writes those secrets to a mode-0600 file
+under the runner's temporary directory and passes it to `cf deploy`; never
+print, upload or commit that file. `UNSPLASH_ACCESS_KEY` is optional.
 Preview and admin browser tests use local servers and isolated ports. Admin
 browser tests copy `src/content` to a temporary directory, then seed their
 disposable sample notes and workbook there; they must never write to the owner's
