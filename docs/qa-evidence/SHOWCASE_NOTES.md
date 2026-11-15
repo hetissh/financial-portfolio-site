@@ -27,7 +27,13 @@ and the public site and showcase checks were then run successfully. The local
 production Worker preview returned 200 for `/`, `/research/`, and
 `/favicon.ico`; the home response had no React error digest and the favicon was
 served as `image/vnd.microsoft.icon`. Cloudflare production deployment is
-pending the `develop` CI workflow.
+pending the `develop` CI workflow. GitHub Actions run 18 completed both builds
+but its cross-browser suite failed one mobile WebKit scroll-reveal assertion
+and marked one WebKit scroll-to-top assertion flaky, so the deploy job was
+skipped. The instantaneous scroll test now disables CSS smooth scrolling
+before measuring scroll-driven animation, and the actual smooth-scroll check
+allows 15 seconds. Both WebKit checks and the mobile WebKit reveal check passed
+locally after this adjustment; the next `develop` run is the deployment gate.
 
 ## CR: restore deployment gate with isolated admin browser data — 20 October 2026
 

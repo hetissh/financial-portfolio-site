@@ -36,6 +36,10 @@ test('sheet formulas stay within a cell and scroll reveals the dashboard before 
   page,
 }) => {
   await page.goto('/');
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.scrollBehavior = 'auto';
+  });
   const grid = page.getByTestId('sheet-grid');
   const formula = page.getByTestId('sheet-formula');
   const box = await grid.boundingBox();
@@ -102,7 +106,9 @@ test('Back to top works repeatedly and preserves keyboard focus', async ({ page 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(200);
     await page.getByRole('link', { name: 'Back to top' }).click();
-    await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);
+    await expect
+      .poll(() => page.evaluate(() => scrollY), { timeout: 15000 })
+      .toBeLessThanOrEqual(2);
   }
   const back = page.getByRole('link', { name: 'Back to top' });
   await back.focus();
