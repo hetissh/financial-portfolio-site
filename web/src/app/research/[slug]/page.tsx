@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { loadContent, loadPublicContent } from '@/lib/content';
 import { ResearchArticle } from '@/components/ResearchArticle';
 import { runtimeSetting } from '@/lib/runtime-env';
+import { canonicalPath } from '@/lib/metadata-url';
 export function generateStaticParams() {
   if (runtimeSetting('PORTFOLIO_DATA_SOURCE') === 'supabase') return [];
   const research = loadContent().research;
@@ -23,7 +24,7 @@ export async function generateMetadata({
   return {
     title: note.title,
     description: note.summary,
-    alternates: runtimeSetting('SITE_URL') ? { canonical: `/research/${slug}/` } : undefined,
+    alternates: canonicalPath(runtimeSetting('SITE_URL'), `/research/${slug}/`),
     openGraph: {
       title: note.title,
       description: note.summary,

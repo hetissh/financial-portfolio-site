@@ -1,5 +1,34 @@
 # Showcase note evidence — site content cleared 20 October 2026
 
+## CR: prevent the Cloudflare page render and favicon failures — 15 November 2026
+
+The deployed Worker previously returned HTTP 500 for `/favicon.ico`; the root
+response included React server-render digest `760404222` even though its HTTP
+status was 200. A missing static icon caused the favicon failure under the
+Worker's `notFoundHandling: none` setting. The metadata origin parser also
+constructed a `URL` directly from `SITE_URL`, so malformed deployment values
+could throw while React streamed metadata. Added a real brass-and-navy `FP`
+favicon ICO asset and validate configured origins before building metadata;
+invalid origins now use the local metadata fallback and omit canonical URLs.
+
+The three reserved showcase notes were refreshed with `npm run showcase:update
+-- "Guard metadata origin and add static favicon asset"`; their `sample`
+status, IDs, and slugs remain unchanged. The rebuilt static output contains the
+updated checklist in all three note routes. Review confirmed no profile,
+personal note, or unrelated uploaded asset changes.
+
+Passed locally: `format:check`, lint, public and admin TypeScript checks, all
+117 unit tests, content validation (3 visible preview notes), purpose-comment
+check, static production build, Cloudflare Worker production build, and
+`git diff --check`. Focused Chromium public browser checks passed (15 passed, 1
+skipped). The full multi-browser Playwright command was attempted but could not
+launch because Firefox and WebKit binaries are absent; Chromium was installed
+and the public site and showcase checks were then run successfully. The local
+production Worker preview returned 200 for `/`, `/research/`, and
+`/favicon.ico`; the home response had no React error digest and the favicon was
+served as `image/vnd.microsoft.icon`. Cloudflare production deployment is
+pending the `develop` CI workflow.
+
 ## CR: restore deployment gate with isolated admin browser data — 20 October 2026
 
 The site retains the three reserved `sample` showcase notes; the removed

@@ -10,8 +10,9 @@ import { ResearchRail } from '@/components/ResearchRail';
 import { HomeCredentials } from '@/components/HomeCredentials';
 import styles from './page.module.css';
 import { runtimeSetting } from '@/lib/runtime-env';
+import { canonicalPath } from '@/lib/metadata-url';
 export function generateMetadata(): Metadata {
-  return { alternates: runtimeSetting('SITE_URL') ? { canonical: '/' } : undefined };
+  return { alternates: canonicalPath(runtimeSetting('SITE_URL'), '/') };
 }
 export default async function Home() {
   const { profile, research } = await loadPublicContent();

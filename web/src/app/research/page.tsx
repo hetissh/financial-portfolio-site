@@ -5,11 +5,12 @@ import { ArrowLeft } from 'lucide-react';
 import { loadPublicContent } from '@/lib/content';
 import { ResearchCard } from '@/components/ResearchCard';
 import { runtimeSetting } from '@/lib/runtime-env';
+import { canonicalPath } from '@/lib/metadata-url';
 export function generateMetadata(): Metadata {
   return {
     title: 'The research notebook',
     description: 'Research notes on businesses, assumptions, and asking better questions.',
-    alternates: runtimeSetting('SITE_URL') ? { canonical: '/research/' } : undefined,
+    alternates: canonicalPath(runtimeSetting('SITE_URL'), '/research/'),
   };
 }
 export default async function ResearchIndex() {

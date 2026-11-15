@@ -1,6 +1,7 @@
 // Defines the public document shell, metadata, fonts, and shared navigation.
 import type { Metadata } from 'next';
 import { runtimeSetting } from '@/lib/runtime-env';
+import { metadataBase } from '@/lib/metadata-url';
 import localFont from 'next/font/local';
 const bodyFont = localFont({
   src: [
@@ -51,9 +52,8 @@ import { profileJourney } from '@/lib/profile-sections';
 export async function generateMetadata(): Promise<Metadata> {
   const { profile, mode } = await loadPublicContent();
   const title = profileJourney(profile).title;
-  const origin = new URL(runtimeSetting('SITE_URL') || 'http://127.0.0.1:4173');
   return {
-    metadataBase: origin,
+    metadataBase: metadataBase(runtimeSetting('SITE_URL')),
     title: {
       default: `${title} — Finance & research`,
       template: `%s — ${title}`,
