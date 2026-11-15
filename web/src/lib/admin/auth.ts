@@ -13,15 +13,24 @@ export function allowedAdminOrigin(host: string | null) {
   if (!host || !adminEnabled()) return undefined;
   const configured = runtimeSetting('ADMIN_ORIGIN');
   if (configured) {
-    const origin = new URL(configured);
+    let origin: URL;
+    try {
+      origin = new URL(configured);
+    } catch {
+      return undefined;
+    }
+    const localHttp =
+      origin.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(origin.hostname);
     if (
-      origin.origin !== configured ||
-      (origin.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(origin.hostname))
+      (origin.protocol !== 'https:' && !localHttp) ||
+      origin.username ||
+      origin.password ||
+      origin.pathname !== '/' ||
+      origin.search ||
+      origin.hash
     )
-      throw new Error(
-        'ADMIN_ORIGIN must be an HTTPS origin, or a local HTTP origin for development.',
-      );
-    return origin.host === host ? configured : undefined;
+      return undefined;
+    return origin.host === host ? origin.origin : undefined;
   }
   // Local development remains safe without a domain; hosted admin requires ADMIN_ORIGIN.
   return /^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(host) ? `http://${host}` : undefined;

@@ -37,6 +37,29 @@ locally after this adjustment. The production Worker smoke check returned 200
 for `/`, `/research/`, and `/favicon.ico`; the home response had no React error
 digest, and the favicon returned `image/vnd.microsoft.icon` (1,154 bytes).
 
+## CR: keep hosted admin origin configuration from crashing `/admin/` — 15 November 2026
+
+The live public pages were healthy while `/admin/` returned HTTP 500. The admin
+origin guard previously constructed a URL without catching invalid input and
+required the configured string to exactly equal the normalized origin, which
+could throw for otherwise valid formatting such as a trailing slash. The guard
+now normalizes a root HTTPS origin (with or without a trailing slash) and fails
+closed for invalid origins without throwing during the server render. The
+configured production secret itself is not readable from this environment, so
+the exact malformed value was not confirmed.
+
+The three reserved sample notes were refreshed with `npm run showcase:update
+-- "Normalize production admin origin and avoid configuration crashes"` and
+verified in the rebuilt static routes. No personal content or uploaded assets
+changed. Passed locally: `format:check`, lint, public and admin TypeScript
+checks, all 119 unit tests, content validation (3 visible preview notes),
+purpose-comment check, static production build, Cloudflare Worker build,
+`git diff --check`, and all 35 authenticated admin Chromium tests. A unit
+regression test accepts a trailing slash and rejects malformed, non-HTTPS,
+credential-bearing, and path-bearing origins without throwing. Cloudflare
+production deployment and a live `/admin/` smoke check are pending the
+`develop` workflow.
+
 ## CR: restore deployment gate with isolated admin browser data — 20 October 2026
 
 The site retains the three reserved `sample` showcase notes; the removed

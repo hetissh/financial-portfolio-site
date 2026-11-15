@@ -115,6 +115,10 @@ PDF visibility on a protected combined-server preview. Configure `SITE_URL`,
 `npm run build:cloud`; start with `npm run start:cloud`. Switch the public domain
 only after those checks pass, retain the static artifact for rollback, and
 stop local file-backed edits during the final import to avoid diverging copies.
+Set `ADMIN_ORIGIN` to the site's HTTPS origin (for example,
+`https://portfolio.example`); the admin guard normalizes a trailing slash and
+rejects paths, credentials, query strings, or non-HTTPS hosted origins without
+crashing the page render.
 
 The existing `vercel.json` configures only the static export. Cloudflare Workers
 is the combined server target. GitHub Actions checks the Worker build on pushes,

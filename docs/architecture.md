@@ -238,7 +238,10 @@ file and ephemeral filesystems are unsupported in that mode. The cloud server
 uses Postgres, Auth, and Storage and can run without persistent application
 files; its four migrations and initial content import are applied remotely, but
 its hosted behavior remains unverified.
-`ADMIN_ORIGIN` must match the external HTTPS origin;
-`RESEND_API_KEY` and `RESEND_FROM_EMAIL` are needed for email flows. The current
-static release path stays separate. Update this document when verified changes
-alter these boundaries, data flows, ownership, integrations, or failure behavior.
+`ADMIN_ORIGIN` must match the external HTTPS origin. The guard accepts the root
+origin with an optional trailing slash, normalizes it before comparing the
+request host, and fails closed on invalid values instead of throwing during the
+admin render. `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are needed for email
+flows. The current static release path stays separate. Update this document
+when verified changes alter these boundaries, data flows, ownership,
+integrations, or failure behavior.

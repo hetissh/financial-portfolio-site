@@ -424,7 +424,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Guard metadata origin and add static favicon asset"
+                  "text": "Normalize production admin origin and avoid configuration crashes"
                 }
               ]
             },
